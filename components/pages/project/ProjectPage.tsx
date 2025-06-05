@@ -1,11 +1,13 @@
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import Link from 'next/link'
+import {Link} from 'next-view-transitions'
+import Reveal from '../../global/Reveal'
 
 import { Module } from '@/components/modules'
 import { MoreProjects } from '@/components/pages/project/MoreProjects'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import type { ProjectPayload } from '@/types'
 import type { HomePagePayload } from '@/types'
+import RevealDiv from '@/components/global/revealDiv'
 
 export interface ProjectPageProps {
   data: ProjectPayload | null
@@ -38,17 +40,17 @@ export function ProjectPage({
         <div className="flex flex-wrap justify-between flex-col md:flex-row">
           <div className="w-full lg:w-2/4">
             {/* Title */}
-            {title && <div className="text-2xl md:text-4xl">{title}</div>}
+            {title && <Reveal element={'div'} elementClass={'text-2xl md:text-4xl'}>
+              {title}
+              </Reveal>}
             {/* Year */}
             {year && <div className="md:mt-2 text-lg md:text-2xl">{year}</div>}
           </div>
           <div className="w-full lg:w-2/4">
             {/* Overview */}
-            {overview && (
-              <div className="mt-4 text-xl md:text-2xl">
+            {overview && <Reveal element={'div'} elementClass={'mt-4 text-xl md:text-2xl'}>
                 <CustomPortableText value={overview} />
-              </div>
-            )}
+            </Reveal>}
             {/* Site */}
             {site && (
               <div className="mt-3">
@@ -69,7 +71,10 @@ export function ProjectPage({
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (
-            <Module key={key} content={content} />
+            <RevealDiv>
+              <Module key={key} content={content} />
+            </RevealDiv>
+            
           ))}
         </div>
 

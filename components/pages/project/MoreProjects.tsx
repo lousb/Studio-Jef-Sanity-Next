@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import {Link} from 'next-view-transitions'
 
 import ImageBox from '@/components/shared/ImageBox'
 import { resolveHref } from '@/sanity/lib/utils'

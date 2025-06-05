@@ -34,28 +34,50 @@ export default function ImageBox({
     threshold: 0.5,
   })
 
+  // Check if the image is an animated format (GIF or WebP)
+  const isGif = imageUrl?.endsWith('.gif')
+  const isAnimatedWebP = imageUrl?.endsWith('.webp') && imageUrl.includes('animation') // A heuristic to detect animated WebP
+
   return (
     <div
       className={`w-full h-full overflow-hidden rounded-[3px] ${classesWrapper}`}
       data-sanity={props['data-sanity']}
     >
       {imageUrl && (
-        <Image
-          className="absolute w-full h-full"
-          ref={ref}
-          style={{
-            opacity: inView ? 1 : 0,
-            transition: 'opacity 0.3s linear',
-            objectFit: 'cover',
-            width: '100%',
-            height: 'auto',
-          }}
-          alt={alt}
-          width={width}
-          height={height}
-          sizes={size}
-          src={imageUrl}
-        />
+        isGif || isAnimatedWebP ? (
+          // Use a regular <img> tag for animated WebPs and GIFs
+          <img
+            className="absolute w-full h-full"
+            ref={ref}
+            style={{
+              opacity: inView ? 1 : 0,
+              transition: 'opacity 0.3s linear',
+              objectFit: 'cover',
+              width: '100%',
+              height: 'auto',
+            }}
+            alt={alt}
+            src={imageUrl}
+          />
+        ) : (
+          // Use next/image for static images (including static WebP)
+          <Image
+            className="absolute w-full h-full"
+            ref={ref}
+            style={{
+              opacity: inView ? 1 : 0,
+              transition: 'opacity 0.3s linear',
+              objectFit: 'cover',
+              width: '100%',
+              height: 'auto',
+            }}
+            alt={alt}
+            width={width}
+            height={height}
+            sizes={size}
+            src={imageUrl}
+          />
+        )
       )}
       <div className={`w-full overflow-hidden h-full`}>
         <Image

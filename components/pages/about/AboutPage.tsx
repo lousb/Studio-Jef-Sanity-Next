@@ -1,9 +1,10 @@
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import Link from 'next/link'
+import {Link} from 'next-view-transitions'
 
 import AboutImageBox from '@/components/shared/AboutImageBox'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import type { AboutPayload } from '@/types'
+import Reveal from '@/components/global/Reveal'
 
 export interface AboutPageProps {
   data: AboutPayload | null
@@ -15,34 +16,40 @@ export function AboutPage({ data }: AboutPageProps) {
   const { title, overview, aboutImage, aboutLinks } = data ?? {}
 
   return (
-    <div className="h-full mt-4 grid gap-5 grid-cols-1 xl:grid-cols-2">
+    <div className="h-full mt-4 gap-5 pl-[33.5vw]">
       <div className="w-full">
         {/* Title */}
-        <div>{title && title}</div>
+        <div>{title && <Reveal element={'div'}>{title}</Reveal>}</div>
 
         {overview && (
           <div className="mt-2 text-2xl md:text-3xl">
-            <CustomPortableText value={overview} />
+            {overview && <Reveal element={'div'} elementClass={'mt-4 text-xl md:text-2xl'}>
+                <CustomPortableText value={overview} />
+            </Reveal>}
+      
           </div>
         )}
 
-        <div className="mt-10 flex flex-col">
-          {/* Links */}
-          {aboutLinks &&
-            aboutLinks.map((aboutLink, key) => {
-              return (
-                <div key={key} className="flex flex-wrap">
-                  <Link
-                    target="_blank"
-                    className={`flex flex-wrap text-xl text-secondary underline md:text-2xl`}
-                    href={aboutLink.url!}
-                  >
-                    {aboutLink.title}
-                  </Link>
-                </div>
-              )
-            })}
-        </div>
+        
+        
+      </div>
+
+      <div className="mt-10 flex flex-col">
+        {/* Links */}
+        {aboutLinks &&
+          aboutLinks.map((aboutLink, key) => {
+            return (
+              <div key={key} className="flex flex-wrap">
+                <Link
+                  target="_blank"
+                  className={`flex flex-wrap text-xl text-secondary underline md:text-2xl`}
+                  href={aboutLink.url!}
+                >
+                  {aboutLink.title}
+                </Link>
+              </div>
+            )
+          })}
       </div>
 
       <div className="w-full">

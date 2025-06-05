@@ -3,12 +3,22 @@ import {
   type PortableTextBlock,
   type PortableTextComponents,
 } from 'next-sanity'
-import type { Image } from 'sanity'
+import React from 'react'
 
-import ImageBox from '@/components/shared/ImageBox'
+function wrapWords(text: string) {
+  return text.split(' ').map((word, i) => (
+    <span
+      key={i}
+      className="inline-block overflow-hidden mr-2"
+      style={{ display: 'inline-block' }}
+    >
+      <span className="reveal-word inline-block">{word}</span>
+    </span>
+  ))
+}
 
 export function CustomPortableText({
-  paragraphClasses,
+  paragraphClasses = '',
   value,
 }: {
   paragraphClasses?: string
@@ -17,43 +27,43 @@ export function CustomPortableText({
   const components: PortableTextComponents = {
     block: {
       normal: ({ children }) => {
-        return <p className={paragraphClasses}>{children}</p>
+        function processChildren(children: React.ReactNode): React.ReactNode {
+          return React.Children.map(children, (child) => {
+            if (typeof child === 'string') {
+              return wrapWords(child)
+            } else if (React.isValidElement(child) && child.props.children) {
+              return React.cloneElement(child, {
+                children: processChildren(child.props.children),
+              })
+            }
+            return child
+          })
+        }
+
+        return (
+          <p className={`${paragraphClasses} flex flex-wrap`}>
+            {processChildren(children)}
+          </p>
+        )
       },
     },
     marks: {
-      link: ({ children, value }) => {
-        return (
-          <a
-            className="underline transition hover:opacity-50"
-            href={value?.href}
-            rel="noreferrer noopener"
-          >
-            {children}
-          </a>
-        )
-      },
+      link: ({ children, value }) => (
+        <a
+          className="underline transition hover:opacity-50"
+          href={value?.href}
+          rel="noreferrer noopener"
+        >
+          {children}
+        </a>
+      ),
     },
     types: {
-      image: ({
-        value,
-      }: {
-        value: Image & { alt?: string; caption?: string }
-      }) => {
-        return (
-          <div className="my-6 space-y-2">
-            <ImageBox
-              image={value}
-              alt={value.alt}
-              classesWrapper="relative aspect-[16/9]"
-            />
-            {value?.caption && (
-              <div className="font-sans text-sm text-gray-600">
-                {value.caption}
-              </div>
-            )}
-          </div>
-        )
-      },
+      image: ({ value }) => (
+        <div className="my-6 space-y-2">
+          {/* You can render your ImageBox here if needed */}
+        </div>
+      ),
     },
   }
 

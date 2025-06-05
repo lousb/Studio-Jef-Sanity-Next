@@ -1,3 +1,151 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root{
+    view-transition-name: root;
+}
+
+html{
+    font-feature-settings: "kern" off;
+    -webkit-text-size-adjust: none;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    font-kerning: none;
+    font-size: clamp(1px, 12px, 10 * 100vw / 390);
+    font-size: clamp(1px, 12px, 10 * 100vw / var(--size));
+}
+.top-layer{
+    z-index: 9999;
+}
+.h3{
+    font-size: 5.75rem;
+    line-height: 1.13;
+    letter-spacing: -.02em;
+}
+
+::view-transition-old(root) {
+animation: fade-out 0.6s linear;
+cursor: wait !important;
+
+}
+
+.header{
+    position: fixed;
+    z-index: 999;
+    view-transition-name: z-index;
+}
+::view-transition-old(z-index) {
+    z-index: 999;
+}
+
+
+::view-transition-new(root) {
+animation: fade-in 0.6s linear;
+cursor: wait !important;
+
+}
+
+html:has( ::view-transition){
+  cursor: wait !important;
+}
+
+@Keyframes fade-out {
+from {
+opacity: 1;
+}
+to {
+opacity: 0.999;
+}
+}
+
+@Keyframes fade-in {
+from {
+opacity: 0;
+}
+to {
+opacity: 0;
+}
+}
+
+@Keyframes opacity-in {
+from {
+    background: black ;
+    pointer-events: all !important;
+opacity: 0;
+}
+to {
+    background: black ;
+    pointer-events: all !important;
+opacity: 0.5;
+}
+}
+
+
+.overlay {
+position: fixed;
+z-index: 100;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+background: white ;
+clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+pointer-events: all;
+view-transition-name: overlay;
+cursor: wait !important;
+}
+.overlay-shadow{
+    position: fixed;
+    z-index: 99;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black ;
+    opacity: 0;
+    pointer-events: none;
+    view-transition-name: shadow;
+    cursor: wait !important;
+}
+
+@Keyframes slide-out {
+from {
+background: white ;
+-webkit-clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+}
+to {
+background: white ;
+clip-path: polygon(0 100%, 100% 100%, 100% 0, 0 0);
+}
+}
+
+@Keyframes slide-in {
+from {
+background: white ;
+clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+
+}
+to {
+background: white ;
+clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+}
+}
+
+::view-transition-old(overlay) {
+animation: slide-out 0.6s ease-in-out;
+animation-delay: 0s;
+}
+
+::view-transition-old(shadow) {
+animation: opacity-in 0.6s ease-in-out;
+animation-delay: 0s;
+
+}
+
+::view-transition-new(overlay) {
+animation: slide-in 1s ease-in-out;
+animation-delay: 0.6s;
+}

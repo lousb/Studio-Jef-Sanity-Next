@@ -4,9 +4,9 @@ html {
   overflow-x: hidden;
 }
 
-p:not(:last-child) {
+/* p:not(:last-child) {
   margin-bottom: 0.875rem;
-}
+} */
 
 ol,
 ul {
@@ -16,3 +16,5 @@ ul {
 ol {
   list-style-type: disc;
 }
+
+

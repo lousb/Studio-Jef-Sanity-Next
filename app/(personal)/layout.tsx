@@ -72,7 +72,7 @@ export default async function IndexRoute({
         <Suspense>
           <Navbar />
         </Suspense>
-        <div className="mt-16 flex-grow px-4 md:px-5 lg:px-5">
+        <div className="page-wrap mt-16 flex-grow px-4 md:px-5 lg:px-5 min-h-screen">
           <Suspense>{children}</Suspense>
         </div>
         <Suspense>

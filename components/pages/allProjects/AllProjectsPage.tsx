@@ -5,14 +5,13 @@ import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
 import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
-import RevealDiv from '@/components/global/revealDiv'
 
-export interface HomePageProps {
+export interface allProjectsPageProps {
   data: HomePagePayload | null
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
-export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
+export function allProjectsPage({ data, encodeDataAttribute }: allProjectsPageProps) {
   // Default to an empty object to allow previews on non-existent documents
   const { overview = [], showcaseProjects = [] } = data ?? {}
 
@@ -38,10 +37,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                   'slug',
                 ])}
               >
-                <RevealDiv>
-                  <ProjectListItem project={project} />
-                </RevealDiv>
-                
+                <ProjectListItem project={project} />
               </Link>
             )
           })}
@@ -51,4 +47,4 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   )
 }
 
-export default HomePage
+export default allProjectsPage

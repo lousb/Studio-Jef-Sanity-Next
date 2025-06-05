@@ -1,4 +1,5 @@
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
+import Reveal from '../global/Reveal'
 
 interface HeaderProps {
   description?: any
@@ -13,7 +14,9 @@ export function Header(props: HeaderProps) {
       {description && (
         <div className="mt-4 text-3xl md:text-4.5xl">
           {description.displayText == true && (
-            <CustomPortableText value={description.text} />
+            <Reveal element="div" elementClass="mt-4 text-xl md:text-2xl">
+              <CustomPortableText value={description.text} />
+            </Reveal>          
           )}
         </div>
       )}

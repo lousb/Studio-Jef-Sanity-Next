@@ -1,7 +1,9 @@
 import './globals.css'
 
 // import { Inter } from 'next/font/google'
-import { loadSettings } from '@/sanity/loader/loadQuery'
+import { loadSettings } from '@/sanity/loader/loadQuery';
+import  LenisProvider from '@/components/global/LenisProvider';
+import {ViewTransitions} from 'next-view-transitions'
 
 // const sans = Inter({
 //   variable: '--font-sans',
@@ -22,13 +24,21 @@ export default async function RootLayout({
   const rgbaTextColor = `${settings?.textColor?.r || 0}, ${settings?.textColor?.g || 0}, ${settings?.textColor?.b || 0}`
 
   return (
+    <ViewTransitions>
     <html
       lang="en"
       // Assign custom color css variables for Tailwind to use as Tailwind variables
       style={{ ['--color-primary' as any]: rgbaBgColor, ['--color-secondary' as any]: rgbaTextColor }}
       className={`bg-primary`}
     >
-      <body>{children}</body>
+      <body>
+      <LenisProvider>
+      <div className="overlay"></div>
+        <div className="overlay-shadow"></div>
+        {children}
+      </LenisProvider>
+      </body>
     </html>
+    </ViewTransitions>
   )
 }
