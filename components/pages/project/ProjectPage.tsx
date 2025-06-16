@@ -39,33 +39,35 @@ export function ProjectPage({
   // State for info toggle
   const [isInfoActive, setIsInfoActive] = useState(true)
 
-  // Load state from localStorage on mount
+  // Load state from localStorage or reset on project change
   useEffect(() => {
     const storedInfoState = localStorage.getItem('infoActive')
-    if (storedInfoState) {
-      setIsInfoActive(storedInfoState === 'true')
-    }
-  }, [])
+    setIsInfoActive(storedInfoState ? storedInfoState === 'true' : true)
+  }, [slug]) // Reset state when the project changes
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
-  
-
   // GSAP animations for entering and exiting
   useEffect(() => {
     if (titleRef.current) {
-      const spans = titleRef.current.querySelectorAll('span'); // Select all spans inside titleRef
-      console.log('Animating spans:', spans); // Debugging
+      const spans = titleRef.current.querySelectorAll('span') // Select all spans inside titleRef
 
       if (isInfoActive) {
         gsap.fromTo(
           spans,
           { y: '100%', opacity: 0 },
-          { y: '0%', opacity: 1, duration: 0.4, ease: 'power3.out', stagger: 0.01, delay: 0.6, } // Stagger for smoother animation
-        );
+          {
+            y: '0%',
+            opacity: 1,
+            duration: 0.4,
+            ease: 'power3.out',
+            stagger: 0.01,
+            delay: 0.6,
+          }, // Stagger for smoother animation
+        )
       } else {
         gsap.to(spans, {
           y: '-100%',
@@ -73,11 +75,10 @@ export function ProjectPage({
           duration: 0.6,
           ease: 'power3.in',
           stagger: 0.01,
-          
-        });
+        })
       }
     }
-  }, [isInfoActive]);
+  }, [isInfoActive])
 
   return (
     <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
@@ -141,8 +142,8 @@ export function ProjectPage({
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (
-            <RevealDiv delay={0.4}>
-              <Module key={key} content={content} />
+            <RevealDiv delay={0.4} key={key}>
+              <Module content={content} />
             </RevealDiv>
           ))}
         </div>
