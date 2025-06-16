@@ -5,13 +5,14 @@ import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
 import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
+import RevealDiv from '@/components/global/revealDiv'
 
-export interface allProjectsPageProps {
+export interface HomePageProps {
   data: HomePagePayload | null
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
-export function allProjectsPage({ data, encodeDataAttribute }: allProjectsPageProps) {
+export function AllProjectsPage({ data, encodeDataAttribute }: HomePageProps) {
   // Default to an empty object to allow previews on non-existent documents
   const { overview = [], showcaseProjects = [] } = data ?? {}
 
@@ -27,6 +28,10 @@ export function allProjectsPage({ data, encodeDataAttribute }: allProjectsPagePr
             if (!href) {
               return null
             }
+
+            // Calculate delay for every second item in the row
+            const delay = Math.floor(key / 2) * 0.2
+
             return (
               <Link
                 key={key}
@@ -37,7 +42,9 @@ export function allProjectsPage({ data, encodeDataAttribute }: allProjectsPagePr
                   'slug',
                 ])}
               >
-                <ProjectListItem project={project} />
+                <RevealDiv delay={delay}> {/* Apply calculated delay */}
+                  <ProjectListItem project={project} />
+                </RevealDiv>
               </Link>
             )
           })}
@@ -47,4 +54,4 @@ export function allProjectsPage({ data, encodeDataAttribute }: allProjectsPagePr
   )
 }
 
-export default allProjectsPage
+export default AllProjectsPage

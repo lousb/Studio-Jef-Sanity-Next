@@ -63,7 +63,7 @@ export default function ImageBox({
         >
           {rightImageUrl && (
             <Image
-              className="absolute h-full w-full"
+              className="absolute h-full w-full cursor-pointer"
               alt={alt}
               style={{
                 width: '100%',

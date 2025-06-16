@@ -11,22 +11,10 @@ import { motion, Variants } from 'framer-motion'
 
 export interface RevealDivProps {
   children: ReactNode
-  element?: keyof HTMLElementTagNameMap // ✅ Works without relying on React namespace
+  element?: keyof HTMLElementTagNameMap
   elementClass?: string
   onLoad?: boolean
-}
-
-const revealAnimation: Variants = {
-  initial: {
-    opacity:0,
-    y: 40,
-    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 },
-  },
-  open: {
-    opacity:1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 },
-  },
+  delay?: number // Add delay prop
 }
 
 const RevealDiv: React.FC<RevealDivProps> = ({
@@ -34,12 +22,29 @@ const RevealDiv: React.FC<RevealDivProps> = ({
   element = 'div',
   elementClass = '',
   onLoad = false,
+  delay = 0.2, // Default delay to 0.2
 }) => {
   const [isVisible, setIsVisible] = useState(onLoad)
   const ref = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (onLoad) return
+
+    const checkVisibility = () => {
+      if (!ref.current) return
+      const rect = ref.current.getBoundingClientRect()
+
+      // If the element's bottom is above the viewport's top, mark it as visible
+      const isPastViewport = rect.bottom <= 0
+      const isInViewport = rect.top < window.innerHeight && rect.bottom > 0
+
+      if (isPastViewport || isInViewport) {
+        setIsVisible(true)
+      }
+    }
+
+    // Check visibility on initial render
+    checkVisibility()
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -56,6 +61,20 @@ const RevealDiv: React.FC<RevealDivProps> = ({
       if (ref.current) observer.unobserve(ref.current)
     }
   }, [onLoad])
+
+  // Dynamically set the delay in the animation
+  const revealAnimation: Variants = {
+    initial: {
+      opacity: 0,
+      y: 60,
+      transition: { duration: 1, ease: [.4,0,.26,1], delay },
+    },
+    open: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 1, ease: [.4,0,.26,1], delay },
+    },
+  }
 
   const MotionComponent = motion[element as keyof typeof motion] as ElementType
 

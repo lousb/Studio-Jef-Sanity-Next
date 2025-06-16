@@ -28,6 +28,10 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
             if (!href) {
               return null
             }
+
+            // Calculate delay for every second item in the row
+            const delay = Math.floor(key / 2) * 0.2
+
             return (
               <Link
                 key={key}
@@ -38,10 +42,9 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                   'slug',
                 ])}
               >
-                <RevealDiv>
+                <RevealDiv delay={delay}> {/* Apply calculated delay */}
                   <ProjectListItem project={project} />
                 </RevealDiv>
-                
               </Link>
             )
           })}

@@ -35,6 +35,7 @@ export default function ImageBox({
             style={{
               width: '100%',
               height: 'auto',
+              cursor: 'pointer',
             }}
             width={width}
             height={height}

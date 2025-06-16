@@ -28,13 +28,9 @@ function TextBox({ project }: { project: ShowcaseProject }) {
   return (
     <div className="flex flex-wrap justify-between mt-2 mb-2 w-full text-lg md:text-2xl flex-strech">
       {/* Title */}
-      <div className="flex">
-        {project.title}
-      </div>
+      <div className="flex">{project.title}</div>
       {/* Year */}
-      <div className="flex">
-        {project.year}
-      </div>
+      <div className="flex">{project.year}</div>
     </div>
   )
 }

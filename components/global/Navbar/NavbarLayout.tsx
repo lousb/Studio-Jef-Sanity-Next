@@ -9,6 +9,7 @@ interface NavbarProps {
   data: SettingsPayload
   title: string | null
   logo: any | null
+  projectCount?: number // Add this property
 }
 export default function Navbar(props: NavbarProps) {
   const { data } = props
@@ -49,10 +50,15 @@ export default function Navbar(props: NavbarProps) {
         </Link>
       )}
       <div className="flex flex-wrap mt-4 md:mt-0 md:text-1xl">
-      <Link
-          href={`/`}
-          className={`h-full text-1xl hover:text-secondary md:text-1xl pl-2`}
-        >Works<sup className='translate-y-[0.3em]'>4</sup></Link>
+     <Link
+       href={`/projects`}
+       className={`h-full text-1xl hover:text-secondary md:text-1xl pl-2`}
+     >
+       Works
+       {props.projectCount !== undefined && (
+         <sup className="translate-y-[0.3em]">{props.projectCount}</sup>
+       )}
+     </Link>
         <Link
           href={`/about`}
           className={`h-full text-1xl hover:text-secondary md:text-1xl pl-2`}

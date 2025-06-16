@@ -66,6 +66,14 @@ export default async function IndexRoute({
 }: {
   children: React.ReactNode
 }) {
+  const [{ data: settings }, { data: homePage }] = await Promise.all([
+    loadSettings(),
+    loadHomePage(),
+  ])
+
+  const showcaseProjects = homePage?.showcaseProjects || []
+  const projectCount = showcaseProjects.length
+
   return (
     <>
       <div className="flex min-h-screen flex-col text-secondary">

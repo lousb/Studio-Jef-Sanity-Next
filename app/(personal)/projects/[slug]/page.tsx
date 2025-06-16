@@ -8,9 +8,8 @@ import { ProjectPage } from '@/components/pages/project/ProjectPage'
 import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { generateStaticSlugs } from '@/sanity/loader/generateStaticSlugs'
 import { loadMoreProjects, loadProject } from '@/sanity/loader/loadQuery'
-const ProjectPreview = dynamic(
-  () => import('@/components/pages/project/ProjectPreview'),
-)
+
+const ProjectPreview = dynamic(() => import('@/components/pages/project/ProjectPreview'))
 
 type Props = {
   params: { slug: string }
@@ -41,15 +40,17 @@ export function generateStaticParams() {
 }
 
 export default async function ProjectSlugRoute({ params }: Props) {
+  console.log('Params:', params) // Debugging
   const initial = await loadProject(params.slug)
   const moreProjects = await loadMoreProjects()
 
-  if (draftMode().isEnabled) {
-    return <ProjectPreview params={params} initial={initial} />
+  if (!initial || !initial.data) {
+    console.error('Project not found:', params.slug) // Debugging
+    notFound()
   }
 
-  if (!initial.data) {
-    notFound()
+  if (draftMode().isEnabled) {
+    return <ProjectPreview params={params} initial={initial} />
   }
 
   return <ProjectPage data={initial.data} moreProjects={moreProjects.data} />

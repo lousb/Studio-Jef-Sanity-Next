@@ -1,5 +1,10 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { gsap } from 'gsap'
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import {Link} from 'next-view-transitions'
+import styles from './ProjectPage.module.css'
+import { Link } from 'next-view-transitions'
 import Reveal from '../../global/Reveal'
 
 import { Module } from '@/components/modules'
@@ -20,13 +25,8 @@ export function ProjectPage({
   moreProjects,
   encodeDataAttribute,
 }: ProjectPageProps) {
-  // Default to an empty object to allow previews on non-existent documents
   const { year, overview, site, title, content, slug } = data ?? {}
-
-  // Get a list of showcased projects
   const { showcaseProjects = [] } = moreProjects ?? {}
-
-  // Get previous and next project
   const projects = showcaseProjects
   const currentProjectIndex = projects.findIndex(
     (project) => project.slug === slug,
@@ -34,23 +34,88 @@ export function ProjectPage({
   const prevProject = projects[currentProjectIndex - 1] || null
   const nextProject = projects[currentProjectIndex + 1] || null
 
+  const titleRef = useRef<HTMLDivElement>(null)
+
+  // State for info toggle
+  const [isInfoActive, setIsInfoActive] = useState(true)
+
+  // Load state from localStorage on mount
+  useEffect(() => {
+    const storedInfoState = localStorage.getItem('infoActive')
+    if (storedInfoState) {
+      setIsInfoActive(storedInfoState === 'true')
+    }
+  }, [])
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('infoActive', isInfoActive.toString())
+  }, [isInfoActive])
+
+  
+
+  // GSAP animations for entering and exiting
+  useEffect(() => {
+    if (titleRef.current) {
+      const spans = titleRef.current.querySelectorAll('span'); // Select all spans inside titleRef
+      console.log('Animating spans:', spans); // Debugging
+
+      if (isInfoActive) {
+        gsap.fromTo(
+          spans,
+          { y: '100%', opacity: 0 },
+          { y: '0%', opacity: 1, duration: 0.4, ease: 'power3.out', stagger: 0.01, delay: 0.6, } // Stagger for smoother animation
+        );
+      } else {
+        gsap.to(spans, {
+          y: '-100%',
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power3.in',
+          stagger: 0.01,
+          
+        });
+      }
+    }
+  }, [isInfoActive]);
+
   return (
-    <div>
-      <div className="mb-10 md:mb-20 space-y-6">
-        <div className="flex flex-wrap justify-between flex-col md:flex-row">
-          <div className="w-full lg:w-2/4">
-            {/* Title */}
-            {title && <Reveal element={'div'} elementClass={'text-2xl md:text-4xl'}>
-              {title}
-              </Reveal>}
-            {/* Year */}
-            {year && <div className="md:mt-2 text-lg md:text-2xl">{year}</div>}
-          </div>
-          <div className="w-full lg:w-2/4">
+    <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
+      <div
+        ref={titleRef}
+        className={`w-full lg:w-2/4 ${styles.projectPageTitle}`}
+      >
+        {/* Title */}
+        {title && (
+          <Reveal element={'div'} elementClass={'text-2xl md:text-4xl'}>
+            {title}
+          </Reveal>
+        )}
+        {/* Year */}
+        {year && (
+          <Reveal element={'div'} elementClass={'md:mt-2 text-lg md:text-2xl'}>
+            {year}
+          </Reveal>
+        )}
+      </div>
+      <button
+        className={`mt-2 md:mt-4 text-lg md:text-xl ${styles.projectPageTitleInfo}`}
+        onClick={() => setIsInfoActive((prev) => !prev)}
+      >
+        <Reveal>{isInfoActive ? 'Info -' : 'Info +'}</Reveal>
+      </button>
+
+      <div className={`mb-10 md:mb-20 space-y-6 ${styles.projectPage}`}>
+        <div
+          className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}
+        >
+          <div className="w-full">
             {/* Overview */}
-            {overview && <Reveal element={'div'} elementClass={'mt-4 text-xl md:text-2xl'}>
+            {overview && (
+              <Reveal element={'div'} elementClass={'text-xl md:text-2xl'}>
                 <CustomPortableText value={overview} />
-            </Reveal>}
+              </Reveal>
+            )}
             {/* Site */}
             {site && (
               <div className="mt-3">
@@ -60,7 +125,12 @@ export function ProjectPage({
                     className="text-xl break-words md:text-2xl underline"
                     href={site.url}
                   >
-                    {site.urltitle}
+                    <Reveal
+                      element={'div'}
+                      elementClass={'text-xl break-words md:text-2xl underline'}
+                    >
+                      {site.urltitle}
+                    </Reveal>
                   </Link>
                 )}
               </div>
@@ -71,10 +141,9 @@ export function ProjectPage({
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (
-            <RevealDiv>
+            <RevealDiv delay={0.4}>
               <Module key={key} content={content} />
             </RevealDiv>
-            
           ))}
         </div>
 
