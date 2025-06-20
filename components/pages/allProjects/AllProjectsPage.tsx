@@ -39,7 +39,7 @@ export function AllProjectsPage({ data, encodeDataAttribute }: HomePageProps) {
               return null
             }
 
-            const delay = Math.floor(key / 2) * 0.3
+            const delay = Math.floor(key / 2) * 0.4
 
             return (
               <Link
