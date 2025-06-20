@@ -6,6 +6,7 @@ import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
+import Reveal from '@/components/global/Reveal'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -13,24 +14,32 @@ export interface HomePageProps {
 }
 
 export function AllProjectsPage({ data, encodeDataAttribute }: HomePageProps) {
-  // Default to an empty object to allow previews on non-existent documents
+  console.log('AllProjectsPage data:', data) // Debugging
   const { overview = [], showcaseProjects = [] } = data ?? {}
 
   return (
     <div className="space-y-6">
       {/* Header */}
       {overview && <Header description={overview} />}
+      <div className="flex flex-row items-end justify-between space-x-4">
+        <div className="w-1/5 h-auto" style={{cursor:'pointer'}}> {/* 20% width */}
+          <Reveal>Filters +</Reveal>
+        </div>
+        <div className="w-1/2 mt-2 mb-2 "> {/* 80% width */}
+        <RevealDiv element={'div'} delay={0} elementClass={'text-lg md:text-4xl h-auto'}>We're not in the business of boring.<br/>Cool is our currency.</RevealDiv>
+        </div>
+      </div>
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (
         <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
           {showcaseProjects.map((project, key) => {
             const href = resolveHref(project?._type, project?.slug)
+            console.log('Project href:', href) // Debugging
             if (!href) {
               return null
             }
 
-            // Calculate delay for every second item in the row
-            const delay = Math.floor(key / 2) * 0.2
+            const delay = Math.floor(key / 2) * 0.3
 
             return (
               <Link
@@ -42,7 +51,7 @@ export function AllProjectsPage({ data, encodeDataAttribute }: HomePageProps) {
                   'slug',
                 ])}
               >
-                <RevealDiv delay={delay}> {/* Apply calculated delay */}
+                <RevealDiv delay={delay}>
                   <ProjectListItem project={project} />
                 </RevealDiv>
               </Link>

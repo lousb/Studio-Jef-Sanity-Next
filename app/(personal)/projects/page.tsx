@@ -3,15 +3,14 @@ import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { AllProjectsPage } from '@/components/pages/allProjects/AllProjectsPage'
-import { getAboutPage } from '@/sanity/loader/loadQuery'
-import HomePage from '@/components/pages/home/HomePage'
+import { loadHomePage } from '@/sanity/loader/loadQuery'
 
 const AllProjectPreview = dynamic(
   () => import('@/components/pages/allProjects/ProjectPagePreview'),
 )
 
 export default async function IndexRoute() {
-  const initial = await getAboutPage()
+  const initial = await loadHomePage()
 
   if (draftMode().isEnabled) {
     return <AllProjectPreview initial={initial} />
@@ -21,5 +20,5 @@ export default async function IndexRoute() {
     return redirect('/')
   }
 
-  return <HomePage data={initial.data} />
+  return <AllProjectsPage data={initial.data} />
 }
