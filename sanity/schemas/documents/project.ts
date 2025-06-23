@@ -303,6 +303,24 @@ export default defineType({
               title: "Video file",
               name: "video",
               type: "mux.video",
+              options: {
+                onChange: (event, context) => {
+                  const videoAsset = event?.patches?.find((patch) => patch.path[0] === "asset");
+                  if (videoAsset?.value?._ref) {
+                    // Fetch the video asset details using the reference
+                    context.client.fetch(
+                      `*[_id == $id][0]{playbackId, assetId, filename}`,
+                      { id: videoAsset.value._ref }
+                    ).then((data) => {
+                      context.patch.execute([
+                        { set: { playbackId: data.playbackId } },
+                        { set: { assetId: data.assetId } },
+                        { set: { filename: data.filename } },
+                      ]);
+                    });
+                  }
+                },
+              },
             },
           ],
           preview: {
