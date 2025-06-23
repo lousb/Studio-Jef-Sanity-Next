@@ -43,10 +43,11 @@ export default defineConfig({
       settings,
       // Documents
       project,
-      genre,
-      technique,
+      
+      // genre,
+      // technique,
       client,
-      credits,
+      // credits,
     ],
   },
   plugins: [
