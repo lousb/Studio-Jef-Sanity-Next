@@ -281,7 +281,7 @@ export default defineType({
             prepare({ playbackId, title }) {
               return {
                 title: title || "Untitled Video",
-                subtitle: playbackId ? `Playback ID: ${playbackId}` : "No video selected",
+                subtitle: playbackId ? `${playbackId}` : "No video selected",
               };
             },
           },
