@@ -11,6 +11,8 @@ interface VideoBoxProps {
 }
 
 export default function VideoBox({ playbackId, caption, title }: VideoBoxProps) {
+    console.log('VideoBox props:', { playbackId, caption, title }); // Debugging
+    
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {

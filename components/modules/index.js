@@ -10,6 +10,7 @@ const TwoVideos = dynamic(() => import('./two-videos'))
 export const Module = ({
   content,
 }) => {
+  console.log('Module content:', content); // Debugging
   const type = content._type
 
   switch (type) {

@@ -66,11 +66,40 @@ export interface ProjectPayload {
 export interface Content {
   _type: string
   _key: string
-  photo: object[]
-  photoOne: object[]
-  photoTwo: object[]
-  textBlock: object[]
-  videoLink: object[]
+  // Fields for singleImage
+  photo?: {
+    asset?: {
+      url?: string
+    }
+  }
+  caption?: string
+  // Fields for twoImages
+  photoOne?: {
+    asset?: {
+      url?: string
+    }
+  }
+  photoTwo?: {
+    asset?: {
+      url?: string
+    }
+  }
+  // Fields for textBlock
+  textBlock?: object[]
+  // Fields for singleVideo
+  videoLink?: string
+  // Fields for videoBlogPost
+  videoBlogPost?: {
+    title?: string
+    video?: {
+      asset?: {
+        playbackId?: string
+      }
+    }
+  }
+  // Fields for twoVideos
+  videoOneLink?: string
+  videoTwoLink?: string
 }
 
 export interface SettingsPayload {

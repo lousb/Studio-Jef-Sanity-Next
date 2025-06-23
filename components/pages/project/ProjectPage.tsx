@@ -36,6 +36,7 @@ export function ProjectPage({
 
   const titleRef = useRef<HTMLDivElement>(null)
 
+  console.log('Sanity data:', data); // Debugging
   // State for info toggle
   const [isInfoActive, setIsInfoActive] = useState(true)
 
@@ -50,6 +51,8 @@ export function ProjectPage({
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
+  console.log('Project content:', content); // Debugging
+  
   // GSAP animations for entering and exiting
   useEffect(() => {
     if (titleRef.current) {
@@ -79,6 +82,7 @@ export function ProjectPage({
       }
     }
   }, [isInfoActive])
+  
 
   return (
     <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>

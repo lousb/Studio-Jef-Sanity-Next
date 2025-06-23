@@ -270,29 +270,23 @@ export default defineType({
         }),
 
         defineArrayMember({
-          title: "Video Blog Post",
-          name: "videoBlogPost",
-          type: "object",
-          fields: [
-            { title: "Title", name: "title", type: "string" },
-            {
-              title: "Video file",
-              name: "video",
-              type: "mux.video",
-            },
-          ],
+          title: "Video",
+          name: "video",
+          type: "mux.video",
           preview: {
             select: {
+              playbackId: "asset.playbackId",
               title: "title",
             },
-            prepare({ title }) {
+            prepare({ playbackId, title }) {
               return {
-                title: "Video Blog Post",
-                subtitle: title,
+                title: title || "Untitled Video",
+                subtitle: playbackId ? `Playback ID: ${playbackId}` : "No video selected",
               };
             },
           },
         }),
+
         // Two videos
         defineArrayMember({
           title: 'Two Videos (Youtube/Video link)',
