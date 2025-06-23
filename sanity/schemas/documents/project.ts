@@ -97,42 +97,16 @@ export default defineType({
         },
       ],
     }),
+
     defineField({
-      name: 'genre',
-      title: 'Genre',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'tag' }] },
-      ],
-      description: 'Pick from existing genres or add a new one.',
+      name: 'tags',
+      title: 'Tags',
+      type: 'reference',
+      to: [{ type: 'tags' }],
+      description: 'Select tags for this project.',
     }),
-    defineField({
-      name: 'technique',
-      title: 'Technique',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'tag' }] },
-      ],
-      description: 'Pick from existing techniques or add a new one.',
-    }),
-    defineField({
-      name: 'client',
-      title: 'Client',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'tag' }] },
-      ],
-      description: 'Pick from existing clients or add a new one.',
-    }),
-    defineField({
-      name: 'credits',
-      title: 'Credits',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'tag' }] },
-      ],
-      description: 'Pick from existing credits or add a new one.',
-    }),
+     
+
     // Content blocks
     defineField({
       title: 'Content builder',
