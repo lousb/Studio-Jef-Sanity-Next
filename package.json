@@ -15,6 +15,7 @@
     "singleQuote": true
   },
   "dependencies": {
+    "@mux/mux-player-react": "^3.4.1",
     "@next/env": "14.2.4",
     "@number-flow/react": "^0.5.9",
     "@sanity/color-input": "^3.1.1",
