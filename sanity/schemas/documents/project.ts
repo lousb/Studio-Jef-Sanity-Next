@@ -268,6 +268,31 @@ export default defineType({
             },
           },
         }),
+
+        defineArrayMember({
+          title: "Video blog post",
+          name: "videoBlogPost",
+          type: "document",
+          fields: [
+            { title: "Title", "name": "title", "type": "string" },
+            {
+              title: "Video file",
+              name: "video",
+              type: "mux.video"
+            }
+          ],
+          preview: {
+            select: {
+              link: 'videoLink'
+            },
+            prepare({ link }) {
+              return {
+                title: 'Single video',
+                subtitle: link
+              }
+            },
+          },
+        }),
         // Two videos
         defineArrayMember({
           title: 'Two Videos (Youtube/Video link)',

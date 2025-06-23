@@ -9,6 +9,7 @@ import { defineConfig, NavbarProps, useWorkspace } from 'sanity'
 import { presentationTool } from 'sanity/presentation'
 import { structureTool } from 'sanity/structure'
 import { media } from 'sanity-plugin-media'
+import { muxInput } from 'sanity-plugin-mux-input';
 
 import { apiVersion, dataset, projectId, studioUrl } from '@/sanity/lib/api'
 import { Logo } from '@/sanity/plugins/Logo'
@@ -44,6 +45,8 @@ export default defineConfig({
     structureTool({
       structure: pageStructure([home, settings, about]),
     }),
+    muxInput()
+    ,
     presentationTool({
       resolve,
       previewUrl: {
