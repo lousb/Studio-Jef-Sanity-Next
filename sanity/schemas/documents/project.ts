@@ -282,6 +282,24 @@ export default defineType({
               initialValue: "Project Video Section", // Default value
             },
             {
+              title: "Playback ID",
+              name: "playbackId",
+              type: "string",
+              readOnly: true, // Prevent manual editing
+            },
+            {
+              title: "Asset ID",
+              name: "assetId",
+              type: "string",
+              readOnly: true, // Prevent manual editing
+            },
+            {
+              title: "Filename",
+              name: "filename",
+              type: "string",
+              readOnly: true, // Prevent manual editing
+            },
+            {
               title: "Video file",
               name: "video",
               type: "mux.video",
@@ -290,7 +308,7 @@ export default defineType({
           preview: {
             select: {
               title: "title",
-              playbackId: "video.asset.playbackId",
+              playbackId: "playbackId",
             },
             prepare({ title, playbackId }) {
               return {
