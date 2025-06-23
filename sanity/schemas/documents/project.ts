@@ -282,51 +282,15 @@ export default defineType({
               initialValue: "Project Video Section", // Default value
             },
             {
-              title: "Playback ID",
-              name: "playbackId",
-              type: "string",
-              readOnly: true, // Prevent manual editing
-            },
-            {
-              title: "Asset ID",
-              name: "assetId",
-              type: "string",
-              readOnly: true, // Prevent manual editing
-            },
-            {
-              title: "Filename",
-              name: "filename",
-              type: "string",
-              readOnly: true, // Prevent manual editing
-            },
-            {
               title: "Video file",
               name: "video",
               type: "mux.video",
-              options: {
-                onChange: (event, context) => {
-                  const videoAsset = event?.patches?.find((patch) => patch.path[0] === "asset");
-                  if (videoAsset?.value?._ref) {
-                    // Fetch the video asset details using the reference
-                    context.client.fetch(
-                      `*[_id == $id][0]{playbackId, assetId, filename}`,
-                      { id: videoAsset.value._ref }
-                    ).then((data) => {
-                      context.patch.execute([
-                        { set: { playbackId: data.playbackId } },
-                        { set: { assetId: data.assetId } },
-                        { set: { filename: data.filename } },
-                      ]);
-                    });
-                  }
-                },
-              },
             },
           ],
           preview: {
             select: {
               title: "title",
-              playbackId: "playbackId",
+              playbackId: "video.asset.playbackId",
             },
             prepare({ title, playbackId }) {
               return {
