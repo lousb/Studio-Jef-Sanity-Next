@@ -270,17 +270,31 @@ export default defineType({
         }),
 
         defineArrayMember({
-          title: "Video",
-          name: "video",
-          type: "mux.video",
+          title: "Video Section",
+          name: "videoSection",
+          type: "object",
+          fields: [
+            {
+              title: "Title",
+              name: "title",
+              type: "string",
+              description: "A title for the video section.",
+              initialValue: "Project Video Section", // Default value
+            },
+            {
+              title: "Video file",
+              name: "video",
+              type: "mux.video",
+            },
+          ],
           preview: {
             select: {
-              playbackId: "asset.playbackId",
               title: "title",
+              playbackId: "video.asset.playbackId",
             },
-            prepare({ playbackId, title }) {
+            prepare({ title, playbackId }) {
               return {
-                title: title || "Untitled Video",
+                title: title || "Untitled Video Section",
                 subtitle: playbackId ? `Playback ID: ${playbackId}` : "No video selected",
               };
             },
