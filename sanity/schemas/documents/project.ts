@@ -98,41 +98,50 @@ export default defineType({
       ],
     }),
 
-    defineField({
+    // Inline tags
+     defineField({
       name: 'genre',
       title: 'Genre',
       type: 'array',
       of: [
-        { type: 'reference', to: [{ type: 'genre' }] },
+        defineArrayMember({
+          type: 'string',
+        }),
       ],
-      description: 'Pick from existing genres or add a new one.',
+      description: 'Add or select genres.',
     }),
     defineField({
       name: 'technique',
       title: 'Technique',
       type: 'array',
       of: [
-        { type: 'reference', to: [{ type: 'technique' }] },
+        defineArrayMember({
+          type: 'string',
+        }),
       ],
-      description: 'Pick from existing techniques or add a new one.',
+      description: 'Add or select techniques.',
     }),
     defineField({
       name: 'client',
       title: 'Client',
       type: 'array',
       of: [
-        { type: 'reference', to: [{ type: 'client' }] },
+        defineArrayMember({
+          type: 'string',
+        }),
       ],
-      description: 'Pick from existing clients or add a new one.',
+      description: 'Add or select clients.',
     }),
     defineField({
       name: 'credits',
       title: 'Credits',
       type: 'array',
       of: [
-        { type: 'reference', to: [{ type: 'credits' }] },
+        defineArrayMember({
+          type: 'string',
+        }),
       ],
-      description: 'Pick from existing credits or add a new one.',
+      description: 'Add or select credits.',
     }),
      
 
