@@ -272,7 +272,7 @@ export default defineType({
         defineArrayMember({
           title: "Video blog post",
           name: "videoBlogPost",
-          type: "document",
+          type: "object",
           fields: [
             { title: "Title", "name": "title", "type": "string" },
             {
