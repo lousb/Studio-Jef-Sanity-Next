@@ -7,9 +7,9 @@ export default defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Technique Name',
       type: 'string',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().min(1).max(100),
     }),
   ],
 })
