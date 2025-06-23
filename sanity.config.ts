@@ -19,6 +19,7 @@ import project from '@/sanity/schemas/documents/project'
 import about from '@/sanity/schemas/singletons/about'
 import home from '@/sanity/schemas/singletons/home'
 import settings from '@/sanity/schemas/singletons/settings'
+import tags from '@/sanity/schemas/singletons/tags'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE ||
@@ -39,6 +40,7 @@ export default defineConfig({
       settings,
       // Documents
       project,
+      tags,
     ],
   },
   plugins: [

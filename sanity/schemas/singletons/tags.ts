@@ -1,5 +1,6 @@
 import { defineType, defineField } from 'sanity'
 
+
 export default defineType({
   name: 'tags',
   title: 'Tags',
@@ -10,11 +11,16 @@ export default defineType({
       title: 'Genre',
       type: 'array',
       of: [
-        defineField({
-          name: 'item',
-          title: 'Genre Item',
-          type: 'string',
-        }),
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'item',
+              title: 'Genre Item',
+              type: 'string',
+            }),
+          ],
+        },
       ],
       description: 'Add or select genres.',
     }),
@@ -23,11 +29,16 @@ export default defineType({
       title: 'Technique',
       type: 'array',
       of: [
-        defineField({
-          name: 'item',
-          title: 'Technique Item',
-          type: 'string',
-        }),
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'item',
+              title: 'Technique Item',
+              type: 'string',
+            }),
+          ],
+        },
       ],
       description: 'Add or select techniques.',
     }),
@@ -36,11 +47,16 @@ export default defineType({
       title: 'Client',
       type: 'array',
       of: [
-        defineField({
-          name: 'item',
-          title: 'Client Item',
-          type: 'string',
-        }),
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'item',
+              title: 'Client Item',
+              type: 'string',
+            }),
+          ],
+        },
       ],
       description: 'Add or select clients.',
     }),
@@ -49,11 +65,16 @@ export default defineType({
       title: 'Credits',
       type: 'array',
       of: [
-        defineField({
-          name: 'item',
-          title: 'Credits Item',
-          type: 'string',
-        }),
+        {
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'item',
+              title: 'Credits Item',
+              type: 'string',
+            }),
+          ],
+        },
       ],
       description: 'Add or select credits.',
     }),
