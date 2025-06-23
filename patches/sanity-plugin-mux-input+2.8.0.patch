@@ -1,0 +1,25 @@
+diff --git a/node_modules/sanity-plugin-mux-input/dist/index.mjs b/node_modules/sanity-plugin-mux-input/dist/index.mjs
+index 693d797..0d06ef5 100644
+--- a/node_modules/sanity-plugin-mux-input/dist/index.mjs
++++ b/node_modules/sanity-plugin-mux-input/dist/index.mjs
+@@ -1,7 +1,7 @@
+ import { useClient as useClient$1, createHookFromObservableFactory, useDocumentStore, collate, useDocumentValues, truncateString, useFormattedDuration, SanityDefaultPreview, useTimeAgo, TextWithTone, isRecord, getPreviewStateObservable, getPreviewValueWithFallback, DocumentPreviewPresence, useDocumentPreviewStore, useSchema, useDocumentPresence, PreviewCard, isReference, useProjectId, useDataset, PatchEvent, unset, setIfMissing, set, LinearProgress, FormField as FormField$2, definePlugin } from "sanity";
+ import { jsx, jsxs, Fragment } from "react/jsx-runtime";
+ import { ErrorOutlineIcon, RetryIcon, CheckmarkCircleIcon, RetrieveIcon, SortIcon, WarningOutlineIcon, EditIcon, PublishIcon, DocumentIcon, TrashIcon, RevertIcon, SearchIcon, ClockIcon, CropIcon, CalendarIcon, TagIcon, CheckmarkIcon, LockIcon, PlayIcon, PlugIcon, EllipsisHorizontalIcon, UploadIcon, ImageIcon, ResetIcon, TranslateIcon, WarningFilledIcon, DocumentVideoIcon } from "@sanity/icons";
+-import { Card, Box, Spinner, Stack, Text, Checkbox, Button, Dialog, Flex, Heading, Code, MenuButton, Menu, MenuItem, TextInput, Tooltip, Inline, useToast, TabList, Tab, TabPanel, Label as Label$1, Grid, useTheme_v2, useClickOutsideEvent, Popover, MenuDivider, Autocomplete, Radio, rem } from "@sanity/ui";
++import { Card, Box, Spinner, Stack, Text, Checkbox, Button, Dialog, Flex, Heading, Code, MenuButton, Menu, MenuItem, TextInput, Tooltip, Inline, useToast, TabList, Tab, TabPanel, Label as Label$1, Grid, useTheme_v2, Popover, MenuDivider, Autocomplete, Radio, rem } from "@sanity/ui";
+ import React, { useState, useMemo, useEffect, useRef, useId, memo, createContext, useContext, isValidElement, useCallback, useReducer, PureComponent, createElement, forwardRef, Suspense } from "react";
+ import compact from "lodash/compact.js";
+ import toLower from "lodash/toLower.js";
+@@ -2854,10 +2854,7 @@ function PlayerActionsMenu(props) {
+   const { asset, readOnly, dialogState, setDialogState, onChange, onSelect } = props, [open, setOpen] = useState(!1), [menuElement, setMenuRef] = useState(null), isSigned = useMemo(() => getPlaybackPolicy(asset) === "signed", [asset]), onReset = useCallback(() => onChange(PatchEvent.from(unset([]))), [onChange]);
+   return useEffect(() => {
+     open && dialogState && setOpen(!1);
+-  }, [dialogState, open]), useClickOutsideEvent(
+-    () => setOpen(!1),
+-    () => [menuElement]
+-  ), /* @__PURE__ */ jsxs(Inline, { space: 1, padding: 2, children: [
++  }, [dialogState, open]), /* @__PURE__ */ jsxs(Inline, { space: 1, padding: 2, children: [
+     isSigned && /* @__PURE__ */ jsx(
+       Tooltip,
+       {
