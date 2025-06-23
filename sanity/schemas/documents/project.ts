@@ -270,26 +270,26 @@ export default defineType({
         }),
 
         defineArrayMember({
-          title: "Video blog post",
+          title: "Video Blog Post",
           name: "videoBlogPost",
           type: "object",
           fields: [
-            { title: "Title", "name": "title", "type": "string" },
+            { title: "Title", name: "title", type: "string" },
             {
               title: "Video file",
               name: "video",
-              type: "mux.video"
-            }
+              type: "mux.video",
+            },
           ],
           preview: {
             select: {
-              link: 'videoLink'
+              title: "title",
             },
-            prepare({ link }) {
+            prepare({ title }) {
               return {
-                title: 'Single video',
-                subtitle: link
-              }
+                title: "Video Blog Post",
+                subtitle: title,
+              };
             },
           },
         }),
