@@ -22,8 +22,8 @@ export const Module = ({
         return <TextBlock data={content} />
     case 'singleVideo':
       return <SingleVideo data={content} />
-    case 'videoBlogPost':
-      return <SingleVideoMux data={content} />
+    case 'video': // Handle "video" type for SingleVideoMux
+    return <SingleVideoMux data={content} />
     case 'twoVideos':
       return <TwoVideos data={content} />
     default:

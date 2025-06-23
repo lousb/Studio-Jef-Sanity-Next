@@ -149,3 +149,11 @@ animation-delay: 0s;
 animation: slide-in 1s ease-in-out;
 animation-delay: 0.6s;
 }
+
+mux-player {
+    --playback-rate-menu-button: none;
+    --pip-button:none;
+  --seek-backward-button: none;
+  --seek-forward-button: none;
+  --controls: none;
+}

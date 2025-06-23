@@ -88,13 +88,13 @@ export interface Content {
   textBlock?: object[]
   // Fields for singleVideo
   videoLink?: string
-  // Fields for videoBlogPost
-  videoBlogPost?: {
-    title?: string
-    video?: {
-      asset?: {
-        playbackId?: string
-      }
+  // Fields for video
+  video?: {
+    asset?: {
+      playbackId?: string
+      assetId?: string
+      url?: string
+      status?: string
     }
   }
   // Fields for twoVideos

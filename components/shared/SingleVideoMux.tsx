@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react'
 import React from 'react'
 import MuxPlayer from '@mux/mux-player-react'
 
-interface VideoBoxProps {
+interface MuxVideoBoxProps {
   playbackId?: string
   caption?: string
   title?: string
 }
 
-export default function VideoBox({ playbackId, caption, title }: VideoBoxProps) {
+export default function MuxVideoBox({ playbackId, caption, title }: MuxVideoBoxProps) {
     console.log('VideoBox props:', { playbackId, caption, title }); // Debugging
-    
+
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -24,13 +24,16 @@ export default function VideoBox({ playbackId, caption, title }: VideoBoxProps) 
   return (
     <div className="mt-5 md:mt-10">
       <div
-        className={`w-full overflow-hidden rounded-[3px] bg-gray-50 aspect-video`}
+        className={`w-full overflow-hidden rounded-[3px] bg-gray-50`}
       >
         {isClient ? (
           <MuxPlayer
             playbackId={playbackId}
             metadata={title ? { video_title: title } : undefined}
             streamType="on-demand"
+            accentColor="#ea580c"
+            autoPlay="any"
+            loop="true"
           />
         ) : (
           ''

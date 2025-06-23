@@ -1,20 +1,25 @@
-import SingleVideo from '@/components/shared/SingleVideo'
+import SingleVideo from '@/components/shared/SingleVideoMux'
 
 const Video = ({ data = {} }) => {
-  const { playbackId, caption, title } = data
+  const { asset, caption, _type } = data
+  const playbackId = asset?.playbackId || null
+  const url = asset?.url || null
 
-  console.log(data)
+  console.log('single video data:', { playbackId, caption, url, _type })
 
-//   if (!playbackId) return null
+  if (!playbackId) {
+    console.warn('No playbackId found for video:', data)
+    return null
+  }
+
   return (
-    
     <div className="divider">
-        TETTSTSTSTTSS
-          <SingleVideo
-            playbackId={playbackId}
-            caption={caption}
-            title={title}
-          />
+      <SingleVideo
+        playbackId={playbackId}
+        caption={caption}
+        url={url}
+        title={_type}
+      />
     </div>
   )
 }

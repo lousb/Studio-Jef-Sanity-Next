@@ -120,6 +120,17 @@ export const projectBySlugQuery = groq`
         videoTwoLink,
         caption,
       },
+      _type == "video" => {
+        _type,
+        _key,
+        asset->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId
+        },
+        caption,
+      },
     },
   }
 `

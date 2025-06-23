@@ -143,6 +143,9 @@ export function ProjectPage({
           </div>
         </div>
 
+            
+
+
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (
