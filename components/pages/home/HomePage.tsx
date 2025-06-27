@@ -6,6 +6,7 @@ import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
+import { HeroGallery } from './HeroGallery'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -19,6 +20,9 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
+      <div className="w-full h-screen overflow-hidden">
+        <HeroGallery/>
+      </div>
       {overview && <Header description={overview} />}
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (

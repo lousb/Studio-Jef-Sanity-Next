@@ -16,14 +16,14 @@ export function AboutPage({ data }: AboutPageProps) {
   const { title, overview, aboutImage, aboutLinks } = data ?? {}
 
   return (
-    <div className="h-full mt-4 gap-5 pl-[33.5vw]">
+    <div className="about-page h-full mt-4 gap-5 pl-[33.5vw]">
       <div className="w-full">
         {/* Title */}
-        <div>{title && <Reveal element={'div'}>{title}</Reveal>}</div>
+        {/* <div>{title && <Reveal element={'div'}>{title}</Reveal>}</div> */}
 
         {overview && (
-          <div className="mt-2 text-2xl md:text-3xl">
-            {overview && <Reveal element={'div'} elementClass={'mt-4 text-xl md:text-2xl'}>
+          <div className="mt-2 text-12xl md:text-13xl">
+            {overview && <Reveal element={'div'} elementClass={'text-white mt-4 text-7xl md:text-7xl'}>
                 <CustomPortableText value={overview} />
             </Reveal>}
       

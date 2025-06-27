@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { gsap } from 'gsap';
 import ImageBox from '@/components/shared/ImageBox';
 import type { ShowcaseProject } from '@/types';
@@ -11,67 +11,104 @@ interface ProjectProps {
 
 export function ProjectListItem(props: ProjectProps) {
   const { project } = props;
-  const [mouseY, setMouseY] = useState(0); // Track vertical mouse position
-  const [isHovering, setIsHovering] = useState(false); // Track hover state
-  const containerRef = useRef<HTMLDivElement>(null); // Reference to the container
-  const titleRef = useRef<HTMLDivElement>(null); // Reference to the title
-  const yearRef = useRef<HTMLDivElement>(null); // Reference to the year
 
-  const handleMouseMove = (event: React.MouseEvent) => {
-    if (containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const relativeY = event.clientY - containerRect.top; // Calculate position relative to the container
-      const constrainedY = Math.max(0, Math.min(relativeY, containerRect.height - 40)); // Constrain within 20px from top and bottom
-      setMouseY(constrainedY);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textBoxRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const yearRef = useRef<HTMLDivElement>(null);
+
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+  const isActive = useRef(false);
+  const rafId = useRef<number>();
+
+  const animate = () => {
+    const container = containerRef.current;
+    const textBox = textBoxRef.current;
+
+    if (!container || !textBox) {
+      rafId.current = requestAnimationFrame(animate);
+      return;
     }
-  };
 
-  const handleMouseEnter = () => {
-    setIsHovering(true); // Enable hover state
-    if (titleRef.current && yearRef.current) {
-      const timeline = gsap.timeline();
-      timeline
-        .fromTo(
+    const rect = container.getBoundingClientRect();
+    const isInside =
+      mouseX.current >= rect.left &&
+      mouseX.current <= rect.right &&
+      mouseY.current >= rect.top &&
+      mouseY.current <= rect.bottom;
+
+    const relativeY = mouseY.current - rect.top;
+    const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
+    const isTopHalf = relativeY < rect.height / 2;
+
+    if (isInside) {
+      if (!isActive.current) {
+        isActive.current = true;
+
+        const enterFromY = isTopHalf ? '-100%' : '100%';
+
+        const tl = gsap.timeline();
+        tl.fromTo(
           titleRef.current,
-          { y: 50, opacity: 0 }, // Start position (masked upward)
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.in' } // End position (revealed upward)
-        )
-        .fromTo(
+          { y: enterFromY, opacity: 0 },
+          { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' }
+        ).fromTo(
           yearRef.current,
-          { y: 50, opacity: 0 }, // Start position (masked upward)
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.in' }, // End position (revealed upward)
-          0 // Start both animations at the same time
+          { y: enterFromY, opacity: 0 },
+          { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' },
+          0
         );
-    }
-  };
+      }
 
-  const handleMouseLeave = () => {
-    setIsHovering(false); // Disable hover state
-    if (titleRef.current && yearRef.current) {
-      gsap.to(titleRef.current, {
-        y: -50, // Mask out upward
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power2.out',
+      gsap.to(textBox, {
+        y: constrainedY,
+        duration: 0.6,
+        ease: 'power4.out',
       });
-  
-      gsap.to(yearRef.current, {
-        y: -50, // Mask out upward
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power2.out',
-      });
+    } else {
+      if (isActive.current) {
+        isActive.current = false;
+
+        const exitToY = isTopHalf ? '-100%' : '100%';
+
+        gsap.to(titleRef.current, {
+          y: exitToY,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        });
+        gsap.to(yearRef.current, {
+          y: exitToY,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        });
+      }
     }
+
+    rafId.current = requestAnimationFrame(animate);
   };
+  
+
+  // Global mouse tracking
+  useEffect(() => {
+    const updateMouse = (e: MouseEvent) => {
+      mouseX.current = e.clientX;
+      mouseY.current = e.clientY;
+    };
+
+    window.addEventListener('mousemove', updateMouse);
+    animate();
+
+    return () => {
+      cancelAnimationFrame(rafId.current!);
+      window.removeEventListener('mousemove', updateMouse);
+    };
+  }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col gap-x-5 relative"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div ref={containerRef} className="flex flex-col gap-x-5 relative">
       <div className="w-full">
         <ImageBox
           image={project.coverImage}
@@ -79,11 +116,10 @@ export function ProjectListItem(props: ProjectProps) {
           classesWrapper="relative"
         />
       </div>
+
       <div
-        className="absolute left-0 w-full transition-transform pointer-events-none"
-        style={{
-          top: mouseY, // Use constrained mouse Y position
-        }}
+        ref={textBoxRef}
+        className="absolute left-0 w-full pointer-events-none"
       >
         <TextBox project={project} titleRef={titleRef} yearRef={yearRef} />
       </div>
@@ -102,11 +138,9 @@ function TextBox({
 }) {
   return (
     <div className="flex flex-wrap justify-between text-white w-full text-lg md:text-2xl flex-stretch overflow-hidden pl-2 pr-2 pointer-events-none">
-      {/* Title */}
       <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={titleRef}>
         {project.title}
       </div>
-      {/* Year */}
       <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={yearRef}>
         {project.year}
       </div>

@@ -153,13 +153,28 @@ animation-delay: 0s;
 animation: slide-in 1s ease-in-out;
 animation-delay: 0.6s;
 }
-
+.page-wrap:has(.about-page){
+    background-image: url('/about-bg.png');
+    background-size: cover;
+    background-position: top center;
+    margin-top: 0;
+}
+.about-page{
+    padding-top: 80px;
+}
+*{
+    font-weight: 500;
+    letter-spacing: -0.02em;
+}
 mux-player {
     --playback-rate-menu-button: none;
     --pip-button:none;
   --seek-backward-button: none;
   --seek-forward-button: none;
-  --controls: none;
+  --fullscreen-button: none;
+  --volume-range: none;
+  --rendition-menu-button: none;
+  /* --controls: none; */
 }
 
 .scroll-visible{

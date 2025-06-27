@@ -32,8 +32,8 @@ export default function MuxVideoBox({ playbackId, caption, title }: MuxVideoBoxP
             metadata={title ? { video_title: title } : undefined}
             streamType="on-demand"
             accentColor="#ea580c"
-            autoPlay="any"
-            loop="true"
+            // autoPlay="any"
+            // loop="true"
           />
         ) : (
           ''
