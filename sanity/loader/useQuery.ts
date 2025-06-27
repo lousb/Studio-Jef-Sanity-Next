@@ -5,9 +5,9 @@ import {
 } from '@sanity/react-loader'
 import * as queryStore from '@sanity/react-loader'
 
-import { HomePagePayload, SettingsPayload } from '@/types'
+import { HomePagePayload, ProjectsPagePayload, SettingsPayload } from '@/types'
 
-import { homePageQuery, settingsQuery } from '../lib/queries'
+import { homePageQuery, projectsPageQuery, settingsQuery } from '../lib/queries'
 
 /**
  * Exports to be used in client-only or components that render both server and client
@@ -43,4 +43,8 @@ export function useSettings(initial: QueryResponseInitial<SettingsPayload>) {
 
 export function useHomepage(initial: QueryResponseInitial<HomePagePayload>) {
   return useQuery<HomePagePayload>(homePageQuery, {}, { initial })
+}
+
+export function useProjectsPage(initial: QueryResponseInitial<ProjectsPagePayload>) {
+  return useQuery<ProjectsPagePayload>(projectsPageQuery, {}, { initial })
 }

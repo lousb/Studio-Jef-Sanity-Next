@@ -30,7 +30,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
             }
 
             // Calculate delay for every second item in the row
-            const delay = Math.floor(key / 2) * 0.2
+            const delay = Math.floor(key / 2) * 0.2 + 0.2;
 
             return (
               <Link

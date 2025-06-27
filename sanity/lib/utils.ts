@@ -30,17 +30,20 @@ export const urlForLogo = (source: Image | undefined) => {
 
 export function resolveHref(
   documentType?: string,
-  slug?: string,
+  slug?: string | { current?: string },
 ): string | undefined {
+  // Extract `current` if `slug` is an object
+  const slugValue = typeof slug === 'object' ? slug?.current : slug;
+
   switch (documentType) {
     case 'home':
-      return '/'
+      return '/';
     case 'about':
-      return '/about'
+      return '/about';
     case 'project':
-      return slug ? `/projects/${slug}` : undefined
+      return slugValue ? `/projects/${slugValue}` : undefined;
     default:
-      console.warn('Invalid document type:', documentType)
-      return undefined
+      console.warn('Invalid document type:', documentType);
+      return undefined;
   }
 }

@@ -1,66 +1,82 @@
-import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import {Link} from 'next-view-transitions'
+import type { EncodeDataAttributeCallback } from '@sanity/react-loader';
+import { Link } from 'next-view-transitions';
 
-import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
-import { Header } from '@/components/shared/Header'
-import { resolveHref } from '@/sanity/lib/utils'
-import type { HomePagePayload } from '@/types'
-import RevealDiv from '@/components/global/revealDiv'
-import Reveal from '@/components/global/Reveal'
+import { ProjectListItem } from '@/components/pages/home/ProjectListItem';
+import { Header } from '@/components/shared/Header';
+import { resolveHref } from '@/sanity/lib/utils';
+import RevealDiv from '@/components/global/revealDiv';
+import Reveal from '@/components/global/Reveal';
+import type { ProjectsPagePayload } from '@/types';
 
-export interface HomePageProps {
-  data: HomePagePayload | null
-  encodeDataAttribute?: EncodeDataAttributeCallback
-}
+export function AllProjectsPage({
+  data,
+  encodeDataAttribute,
+}: {
+  data: {
+    allProjects?: ProjectsPagePayload[];
+  };
+  encodeDataAttribute?: EncodeDataAttributeCallback;
+}) {
+  // console.log('AllProjectsPage data:', data); // Debugging
 
-export function AllProjectsPage({ data, encodeDataAttribute }: HomePageProps) {
-  console.log('AllProjectsPage data:', data) // Debugging
-  const { overview = [], showcaseProjects = [] } = data ?? {}
+  const validProjects = data?.allProjects?.filter(
+    (project) => project && project.slug && project.title
+  ) || [];
+
+  // console.log('Valid projects:', validProjects); // Debugging
+
+  validProjects.forEach((project, index) => {
+    console.log(`Project ${index}:`, project);
+    console.log(`Genres for Project ${index}:`, project.genre);
+    console.log(`Techniques for Project ${index}:`, project.technique);
+    console.log(`Clients for Project ${index}:`, project.client);
+  });
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      {overview && <Header description={overview} />}
+      <Header description="All Projects" />
       <div className="flex flex-row items-end justify-between space-x-4">
-        <div className="w-1/5 h-auto" style={{cursor:'pointer'}}> {/* 20% width */}
+        <div className="w-1/5 h-auto" style={{ cursor: 'pointer' }}>
           <Reveal>Filters +</Reveal>
         </div>
-        <div className="w-1/2 mt-2 mb-2 "> {/* 80% width */}
-        <RevealDiv element={'div'} delay={0} elementClass={'text-lg md:text-4xl h-auto'}>We're not in the business of boring.<br/>Cool is our currency.</RevealDiv>
+        <div className="w-1/2 mt-2 mb-2 ">
+          <RevealDiv element={'div'} delay={0} elementClass={'text-lg md:text-4xl h-auto'}>
+            We're not in the business of boring.<br />Cool is our currency.
+          </RevealDiv>
         </div>
       </div>
-      {/* Showcase projects */}
-      {showcaseProjects && showcaseProjects.length > 0 && (
+      {validProjects.length > 0 ? (
         <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
-          {showcaseProjects.map((project, key) => {
-            const href = resolveHref(project?._type, project?.slug)
-            console.log('Project href:', href) // Debugging
+          {validProjects.map((project, key) => {
+            console.log('Project slug:', project.slug); // Debugging
+
+            const href = resolveHref(project._type, project.slug);
+            console.log('Resolved href:', href); // Debugging
+
             if (!href) {
-              return null
+              return null;
             }
 
-            const delay = Math.floor(key / 2) * 0.4
+            const delay = Math.floor(key / 2) * 0.4 + 0.2;
 
             return (
               <Link
                 key={key}
-                href={href}
-                data-sanity={encodeDataAttribute?.([
-                  'showcaseProjects',
-                  key,
-                  'slug',
-                ])}
+                href={href} // Ensure href is a valid string
+                data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
               >
                 <RevealDiv delay={delay}>
                   <ProjectListItem project={project} />
                 </RevealDiv>
               </Link>
-            )
+            );
           })}
         </div>
+      ) : (
+        <div className="text-center text-gray-500">No published projects found.</div>
       )}
     </div>
-  )
+  );
 }
 
-export default AllProjectsPage
+export default AllProjectsPage;

@@ -31,7 +31,7 @@ export default function ImageBox({
 
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.5,
+    threshold: 0.2,
   })
 
   // Check if the image is an animated format (GIF or WebP)
@@ -54,7 +54,7 @@ export default function ImageBox({
               transition: 'opacity 0.3s linear',
               objectFit: 'cover',
               width: '100%',
-              height: 'auto',
+       
             }}
             alt={alt}
             src={imageUrl}
@@ -69,7 +69,7 @@ export default function ImageBox({
               transition: 'opacity 0.3s linear',
               objectFit: 'cover',
               width: '100%',
-              height: 'auto',
+            
             }}
             alt={alt}
             width={width}

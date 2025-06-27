@@ -8,6 +8,7 @@ import {
   aboutPageQuery,
   homePageQuery,
   homePageTitleQuery,
+  projectsPageQuery,
   moreProjectsQuery,
   projectBySlugQuery,
   settingsQuery,
@@ -16,6 +17,7 @@ import { token } from '@/sanity/lib/token'
 import {
   AboutPayload,
   HomePagePayload,
+  ProjectsPagePayload,
   ProjectPayload,
   SettingsPayload,
 } from '@/types'
@@ -78,6 +80,21 @@ export function loadHomePage() {
     {},
     { next: { tags: ['home', 'project'] } },
   )
+}
+
+export async function loadProjectsPage(): Promise<{ data: ProjectsPagePayload[] }> {
+  const queryResponse = await loadQuery<ProjectsPagePayload[] | null>(
+    projectsPageQuery,
+    {},
+    { next: { tags: ['projects', 'genre', 'technique', 'client', 'credits'] } },
+  );
+
+  console.log('Raw query response:', queryResponse); // Debugging
+
+  const data = queryResponse?.data || [];
+  console.log('Processed projects data:', data); // Debugging
+
+  return { data };
 }
 
 export function loadMoreProjects() {

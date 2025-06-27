@@ -48,6 +48,21 @@ export interface HomePagePayload {
   _updatedAt?: string
 }
 
+export interface ProjectsPagePayload {
+  _type: string
+  coverImage?: Image
+  overview?: PortableTextBlock[]
+  slug?: string
+  tags?: string[] // General tags
+  genre?: { title: string }[] // Genres
+  technique?: { title: string }[] // Techniques
+  client?: { title: string }[] // Clients
+  credits?: { title: string }[] // Credits
+  title?: string
+  year?: string
+  _updatedAt?: string
+}
+
 export interface ProjectPayload {
   year?: string
   coverImage?: Image

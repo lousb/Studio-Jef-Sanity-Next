@@ -4,6 +4,7 @@ import { draftMode } from 'next/headers'
 import {
   getHomePageTitle,
   loadHomePage,
+  loadProjectsPage,
   loadSettings,
 } from '@/sanity/loader/loadQuery'
 
@@ -11,13 +12,14 @@ import NavbarLayout from './NavbarLayout'
 const NavbarPreview = dynamic(() => import('./NavbarPreview'))
 
 export async function Navbar() {
-  const initial = await loadSettings()
-  const title = await getHomePageTitle()
-  const customLogo = await loadHomePage()
+  const initial = await loadSettings();
+  const title = await getHomePageTitle();
+  const customLogo = await loadHomePage();
+  const projects = await loadProjectsPage();
 
   // Extract showcaseProjects and calculate projectCount
   const showcaseProjects = customLogo.data?.showcaseProjects || []
-  const projectCount = showcaseProjects.length
+  const projectCount = projects.data?.length || 0;
 
   if (draftMode().isEnabled) {
     return (

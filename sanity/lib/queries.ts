@@ -25,6 +25,33 @@ export const homePageQuery = groq`
   }
 `
 
+export const projectsPageQuery = groq`
+*[_type == "project" && defined(slug) && defined(title)]{
+  _type,
+  title,
+  slug,
+  coverImage{
+    _type,
+    asset,
+    "lqip": asset->metadata.lqip,
+  },
+  overview,
+  year,
+  genre[]->{
+    title
+  },
+  technique[]->{
+    title
+  },
+  client[]->{
+    title
+  },
+  credits[]->{
+    title
+  }
+}
+`;
+
 export const moreProjectsQuery = groq`
   *[_type == "home"][0]{
     showcaseProjects[]->{

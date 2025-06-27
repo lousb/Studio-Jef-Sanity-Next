@@ -165,6 +165,12 @@ export default defineType({
               type: 'string',
               description: '(Optional) Caption below the image',
             },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this image as a featured image',
+            },
           ],
           preview: {
             select: {
@@ -206,6 +212,12 @@ export default defineType({
               name: 'caption',
               type: 'string',
               description: '(Optional) Caption below 2 images',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this image as a featured image',
             },
           ],
           preview: {
@@ -296,6 +308,12 @@ export default defineType({
               type: 'string',
               description: '(Optional) Caption below the video',
             },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this video as a featured image',
+            },
           ],
           preview: {
             select: {
@@ -350,6 +368,12 @@ export default defineType({
               name: 'caption',
               type: 'string',
               description: '(Optional) Caption below 2 videos',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this image as a featured image',
             },
           ],
           preview: {

@@ -1,24 +1,32 @@
-import dynamic from 'next/dynamic'
-import { draftMode } from 'next/headers'
-import { redirect } from 'next/navigation'
+import dynamic from 'next/dynamic';
+import { draftMode } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-import { AllProjectsPage } from '@/components/pages/allProjects/AllProjectsPage'
-import { loadHomePage } from '@/sanity/loader/loadQuery'
+import { AllProjectsPage } from '@/components/pages/allProjects/AllProjectsPage';
+import { loadProjectsPage } from '@/sanity/loader/loadQuery';
+import { ProjectsPagePayload } from '@/types';
 
 const AllProjectPreview = dynamic(
   () => import('@/components/pages/allProjects/ProjectPagePreview'),
-)
+);
 
 export default async function IndexRoute() {
-  const initial = await loadHomePage()
+  console.log('Fetching projects data...'); // Debugging
+
+  const { data }: { data: ProjectsPagePayload[] } = await loadProjectsPage();
+
+  console.log('Projects data fetched:', data); // Debugging
 
   if (draftMode().isEnabled) {
-    return <AllProjectPreview initial={initial} />
+    console.log('Draft mode is enabled. Rendering preview...'); // Debugging
+    return <AllProjectPreview initial={{ data }} />;
   }
 
-  if (!initial.data) {
-    return redirect('/')
+  if (!data || data.length === 0) {
+    console.log('No projects found. Redirecting to home page...'); // Debugging
+    return redirect('/');
   }
 
-  return <AllProjectsPage data={initial.data} />
+  console.log('Rendering AllProjectsPage with data:', data); // Debugging
+  return <AllProjectsPage data={{ allProjects: data }} />;
 }
