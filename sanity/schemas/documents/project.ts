@@ -390,7 +390,7 @@ export default defineType({
           },
         }), 
 
-        defineField({
+        defineArrayMember({
           name: 'hybridMedia',
           title: 'Hybrid Media',
           type: 'object',
