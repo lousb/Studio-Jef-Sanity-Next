@@ -46,7 +46,7 @@ export function AllProjectsPage({
         </div>
       </div>
       {validProjects.length > 0 ? (
-        <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
+        <div className="project-link-wrap grid gap-5 grid-cols-1 xl:grid-cols-2">
           {validProjects.map((project, key) => {
             console.log('Project slug:', project.slug); // Debugging
 

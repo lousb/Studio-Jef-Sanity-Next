@@ -26,7 +26,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
       {overview && <Header description={overview} />}
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (
-        <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
+        <div className="grid gap-5 grid-cols-1 xl:grid-cols-2 project-link-wrap">
           {showcaseProjects.map((project, key) => {
             const href = resolveHref(project?._type, project?.slug)
             if (!href) {
