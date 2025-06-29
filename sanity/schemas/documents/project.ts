@@ -401,12 +401,14 @@ export default defineType({
               name: 'media',
               type: 'image',
               options: { hotspot: true },
+              hidden: ({ parent }) => !!parent?.video,
               description: 'Use either an image or a video, not both.',
             },
             {
               title: 'Video',
               name: 'video',
               type: 'mux.video',
+              hidden: ({ parent }) => !!parent?.media,
               description: 'Use either a video or an image, not both.',
             },
             {
@@ -463,6 +465,7 @@ export default defineType({
               return true;
             }),
         })
+        
         
         
 
