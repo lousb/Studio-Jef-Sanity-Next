@@ -21,3 +21,8 @@ ol {
 .project-link-wrap > a{
   height: fit-content;
 }
+.about-link{
+  position: absolute;
+  top: 17px;
+  left: 51%;
+}

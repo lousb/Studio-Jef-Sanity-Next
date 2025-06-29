@@ -51,7 +51,7 @@ export default function Footer(props: FooterProps) {
         <p>{sydneyTime}</p>
       </div>
       <div className="text-xl md:text-left md:text-1xl">
-        <a href='https://www.instagram.com/_awstudios/?hl=en' target='_blank' className='mb-0'>→ Instagram</a>
+        <a href='https://www.instagram.com/aw____studio/' target='_blank' className='mb-0'>→ Instagram</a>
         <p>→ Email</p>
       </div>
 

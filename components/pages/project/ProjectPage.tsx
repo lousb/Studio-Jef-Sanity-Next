@@ -36,27 +36,42 @@ export function ProjectPage({
 
   const titleRef = useRef<HTMLDivElement>(null)
 
-  console.log('Sanity data:', data); // Debugging
-  // State for info toggle
   const [isInfoActive, setIsInfoActive] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect screen size and update isMobile state
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.matchMedia('(max-width: 868px)').matches)
+    }
+
+    // Initial check
+    handleResize()
+
+    // Add resize event listener
+    window.addEventListener('resize', handleResize)
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   // Load state from localStorage or reset on project change
   useEffect(() => {
     const storedInfoState = localStorage.getItem('infoActive')
     setIsInfoActive(storedInfoState ? storedInfoState === 'true' : true)
-  }, [slug]) // Reset state when the project changes
+  }, [slug])
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
-  console.log('Project content:', content); // Debugging
-  
   // GSAP animations for entering and exiting
   useEffect(() => {
     if (titleRef.current) {
-      const spans = titleRef.current.querySelectorAll('span') // Select all spans inside titleRef
+      const spans = titleRef.current.querySelectorAll('span')
 
       if (isInfoActive) {
         gsap.fromTo(
@@ -69,7 +84,7 @@ export function ProjectPage({
             ease: 'power3.out',
             stagger: 0.01,
             delay: 0.6,
-          }, // Stagger for smoother animation
+          },
         )
       } else {
         gsap.to(spans, {
@@ -82,10 +97,10 @@ export function ProjectPage({
       }
     }
   }, [isInfoActive])
-  
 
   return (
     <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
+
       <div
         ref={titleRef}
         className={`w-full lg:w-2/4 ${styles.projectPageTitle}`}
@@ -142,9 +157,6 @@ export function ProjectPage({
             )}
           </div>
         </div>
-
-            
-
 
         <div>
           {/* Display project content by type */}

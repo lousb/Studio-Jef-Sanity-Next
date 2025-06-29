@@ -34,14 +34,17 @@ export function AllProjectsPage({
 
   return (
     <div className="space-y-6">
+      <div className='columns-header'>
+        One, Two, Four
+      </div>
       <Header description="All Projects" />
       <div className="flex flex-row items-end justify-between space-x-4">
         <div className="w-1/5 h-auto" style={{ cursor: 'pointer' }}>
           <Reveal>Filters +</Reveal>
         </div>
-        <div className="w-1/2 mt-2 mb-2 ">
+        <div className="w-[84%] mt-2 mb-2 ">
           <RevealDiv element={'div'} delay={0} elementClass={'text-lg md:text-4xl h-auto'}>
-            We're not in the business of boring.<br />Cool is our currency.
+            Finding & connecting audiences. We're not in the business of boring.
           </RevealDiv>
         </div>
       </div>

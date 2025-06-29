@@ -31,6 +31,10 @@ module.exports = {
       fontSize: {
         '4.5xl': ['2.6rem', '2.8rem'],
       },
+      screens: {
+        sm: '868px', // Adjust the tablet breakpoint to be larger
+        lg: '1024px', // Desktop breakpoint remains the same
+      },
     },
   },
   plugins: [require('@tailwindcss/typography')],

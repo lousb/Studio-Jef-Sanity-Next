@@ -389,6 +389,121 @@ export default defineType({
             },
           },
         }), 
+
+        defineArrayMember({
+          title: 'Single Hybrid Media',
+          name: 'hybridMediaSingle',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            {
+              title: 'Media',
+              name: 'media',
+              type: 'array',
+              of: [
+                { type: 'image', options: { hotspot: true } },
+                { type: 'mux.video' }
+              ],
+              validation: (Rule) => Rule.max(1).required(),
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'string',
+              description: '(Optional) Caption below the media',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this media as a featured image',
+            },
+          ],
+          preview: {
+            select: {
+              media: 'media',
+            },
+            prepare({ media }) {
+              const item = media?.[0];
+              if (!item) return { title: 'Single Hybrid Media', subtitle: 'No media' };
+
+              const isVideo = item.playbackId;
+              return {
+                title: 'Single Hybrid Media',
+                subtitle: isVideo ? `Video: ${item.playbackId}` : 'Image',
+                media: isVideo ? undefined : item, // only show thumbnail for image
+              };
+            },
+          },
+        }),
+
+        defineArrayMember({
+          title: 'Two Hybrid Media',
+          name: 'hybridMediaDouble',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            {
+              title: 'Left Media',
+              name: 'mediaLeft',
+              type: 'array',
+              of: [
+                { type: 'image', options: { hotspot: true } },
+                { type: 'mux.video' }
+              ],
+              validation: (Rule) => Rule.max(1).required(),
+            },
+            {
+              title: 'Right Media',
+              name: 'mediaRight',
+              type: 'array',
+              of: [
+                { type: 'image', options: { hotspot: true } },
+                { type: 'mux.video' }
+              ],
+              validation: (Rule) => Rule.max(1).required(),
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'string',
+              description: '(Optional) Caption below both media items',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark these media items as featured',
+            },
+          ],
+          preview: {
+            select: {
+              mediaLeft: 'mediaLeft',
+              mediaRight: 'mediaRight',
+            },
+            prepare({ mediaLeft, mediaRight }) {
+              const left = mediaLeft?.[0];
+              const right = mediaRight?.[0];
+
+              const leftIsVideo = left?.playbackId;
+              const rightIsVideo = right?.playbackId;
+
+              const subtitleParts: string[] = []; // 👈 Explicit type annotation here
+
+              if (leftIsVideo) subtitleParts.push('L: Video');
+              else if (left) subtitleParts.push('L: Image');
+
+              if (rightIsVideo) subtitleParts.push('R: Video');
+              else if (right) subtitleParts.push('R: Image');
+
+              return {
+                title: 'Two Hybrid Media',
+                subtitle: subtitleParts.join(' | '),
+                media: !leftIsVideo ? left : undefined,
+              };
+            }            
+          },
+        }),        
       ],
     }),
   ],

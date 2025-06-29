@@ -17,6 +17,11 @@ export function AboutPage({ data }: AboutPageProps) {
 
   return (
     <div className="about-page h-full mt-4 gap-5 pl-[19.5vw]">
+      <div className='about-link'>
+        <Reveal element={'div'} elementClass={'text-white'}>
+          <a href='https://www.instagram.com/aw____studio/' target='_blank' className='mb-0 text-white'>→ Instagram</a>
+         </Reveal>
+      </div>
       <div className="w-full">
         {/* Title */}
         {/* <div>{title && <Reveal element={'div'}>{title}</Reveal>}</div> */}

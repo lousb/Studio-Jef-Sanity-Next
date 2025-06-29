@@ -43,12 +43,12 @@ export default function Navbar(props: NavbarProps) {
 
   return (
     <div
-    className={`header flex flex-row flex-nowrap items-center gap-x-5 px-4 py-4 md:px-5 md:py-4 lg:px-5 top-layer w-full transition-transform duration-300 ${        
+    className={`header flex flex-row flex-nowrap items-center gap-x-5 px-4 py-4 md:px-5 md:py-4 lg:px-5 top-layer w-full pointer-events-none transition-transform duration-300 ${        
       isVisible ? 'scroll-hidden' : 'scroll-visible'
       }`}
     >
       {customLogo ? (
-        <div className="flex h-6 w-[30%]">
+        <div className="flex h-6 w-[18%]">
           <Link href="/" className="h-full text-xl hover:text-secondary md:text-1xl">
             <Image
               alt={title}
@@ -100,7 +100,7 @@ export default function Navbar(props: NavbarProps) {
 
       <a
         href="mailto:contact@aw-studio.world"
-        className="gap-3 mt-4 md:mt-0 text-right w-full md:text-1xl"
+        className="gap-3 mt-4 md:mt-0 text-right md:text-1xl absolute right-[1.25rem]"
       >
         Let’s Work →
       </a>

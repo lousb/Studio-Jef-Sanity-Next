@@ -176,7 +176,7 @@ html:has(::view-transition) {
   display: flex;
   align-items: end;
 }
-body:has(.about-page) .header {
+body:has(.about-page) .header > div,  body:has(.about-page) .header > a{
     transition: 500ms invert linear 200ms;
   filter: invert(1);
 }
@@ -224,4 +224,12 @@ mux-player {
 .header > div,
 .header a {
   z-index: 999;
+  pointer-events: all !important;
+}
+
+.columns-header{
+  position: absolute;
+  top:15px;
+  left: 51%;
+  z-index: 9999;
 }
