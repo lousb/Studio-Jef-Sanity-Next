@@ -16,7 +16,7 @@ export function AboutPage({ data }: AboutPageProps) {
   const { title, overview, aboutImage, aboutLinks } = data ?? {}
 
   return (
-    <div className="about-page h-full mt-4 gap-5 pl-[33.5vw]">
+    <div className="about-page h-full mt-4 gap-5 pl-[19.5vw]">
       <div className="w-full">
         {/* Title */}
         {/* <div>{title && <Reveal element={'div'}>{title}</Reveal>}</div> */}

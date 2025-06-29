@@ -43,12 +43,12 @@ export default function Navbar(props: NavbarProps) {
 
   return (
     <div
-      className={`header flex flex-wrap justify-between items-center gap-x-5 px-4 py-4 md:px-5 md:py-4 lg:px-5 top-layer grid grid-cols-3 md:grid-cols-3 gap-3 w-full transition-transform duration-300 ${
-        isVisible ? 'scroll-hidden' : 'scroll-visible'
+    className={`header flex flex-row flex-nowrap items-center gap-x-5 px-4 py-4 md:px-5 md:py-4 lg:px-5 top-layer w-full transition-transform duration-300 ${        
+      isVisible ? 'scroll-hidden' : 'scroll-visible'
       }`}
     >
       {customLogo ? (
-        <div className="flex h-6">
+        <div className="flex h-6 w-[30%]">
           <Link href="/" className="h-full text-xl hover:text-secondary md:text-1xl">
             <Image
               alt={title}
@@ -66,7 +66,7 @@ export default function Navbar(props: NavbarProps) {
         </Link>
       )}
 
-      <div className="flex flex-wrap mt-4 md:mt-0 md:text-1xl">
+      <div className="flex flex-wrap mt-4 md:mt-0 md:text-1xl w-[30.5%]">
         {isProjectsPage ? (
           <span className="text-gray-400 cursor-default pl-2">
             Works

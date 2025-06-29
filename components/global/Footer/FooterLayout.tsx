@@ -41,24 +41,24 @@ export default function Footer(props: FooterProps) {
 
   return (
     <footer className="bottom-0 grid grid-cols-1 md:grid-cols-2 mt-12 gap-3 px-4 md:px-5 py-2 md:py-5 lg:px-5">
-      <div className="text-xl text-center md:text-left md:text-1xl">
+      <div className="text-xl md:text-left md:text-1xl">
         <h2>The studio practice of Aaron Bull & Matt Wilson.</h2>
       </div>
       <div className="text-xl md:text-1xl">
         We respectfully acknowledge the Gadigal people, the traditional custodians of the land we work on. 
       </div>
-      <div className="text-xl text-center md:text-left md:text-1xl">
+      <div className="text-xl md:text-left md:text-1xl">
         <p>{sydneyTime}</p>
       </div>
-      <div className="text-xl text-center md:text-left md:text-1xl">
+      <div className="text-xl md:text-left md:text-1xl">
         <a href='https://www.instagram.com/_awstudios/?hl=en' target='_blank' className='mb-0'>→ Instagram</a>
         <p>→ Email</p>
       </div>
 
-      <div className="text-xl text-center md:text-left md:text-1xl">
+      <div className="text-xl md:text-left md:text-1xl">
         <h2>© AW 2025</h2>
       </div>
-      <div className="text-xl text-center md:text-left md:text-1xl cursor-pointer">
+      <div className="text-xl md:text-left md:text-1xl cursor-pointer">
         <p onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Back to top ↑</p>
       </div>
 

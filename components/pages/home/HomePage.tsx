@@ -20,8 +20,8 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="w-full h-screen overflow-hidden">
-        <HeroGallery/>
+      <div className="w-full h-300 overflow-hidden">
+        {/* <HeroGallery/> */}
       </div>
       {overview && <Header description={overview} />}
       {/* Showcase projects */}
