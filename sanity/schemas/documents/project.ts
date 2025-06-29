@@ -412,20 +412,19 @@ export default defineType({
                 },
                 {
                   name: 'video',
-                  type: 'muxVideoObject', // from the custom type
+                  type: 'mux.video',
                   title: 'Video',
                 },
               ],
               validation: (Rule) =>
-              Rule.custom((value: { image?: any; video?: any }) => {
-                const hasImage = !!value?.image
-                const hasVideo = !!value?.video              
-                if ((hasImage && hasVideo) || (!hasImage && !hasVideo)) {
-                  return 'Add either an image or a video'
-                }
-                return true
-              }),
-              
+                Rule.custom((value: { image?: any; video?: any }) => {
+                  const hasImage = !!value?.image
+                  const hasVideo = !!value?.video
+                  if ((hasImage && hasVideo) || (!hasImage && !hasVideo)) {
+                    return 'Add either an image or a video'
+                  }
+                  return true
+                }),
             },
             {
               title: 'Caption',
@@ -446,9 +445,10 @@ export default defineType({
             },
             prepare({ media }) {
               const image = media?.image
-              const video = media?.video?.video?.asset?.playbackId
-              if (video) {
-                return { title: 'Hybrid Media', subtitle: `Video: ${video}` }
+              const playbackId = media?.video?.asset?.playbackId
+
+              if (playbackId) {
+                return { title: 'Hybrid Media', subtitle: `Video: ${playbackId}` }
               } else if (image) {
                 return { title: 'Hybrid Media', media: image, subtitle: 'Image' }
               } else {
@@ -456,7 +456,8 @@ export default defineType({
               }
             },
           },
-        }),
+        })
+        
 
                
       ],
