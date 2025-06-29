@@ -395,13 +395,65 @@ export default defineType({
           title: 'Hybrid Media Block',
           type: 'array',
           of: [
-            defineArrayMember({
-              title: 'Single Hybrid Media',
-              name: 'hybridMediaSingle',
+            {
               type: 'object',
+              name: 'hybridMediaSingle',
+              title: 'Single Hybrid Media',
               icon: ImageIcon,
-              fields: [ /* ...your fields from above... */ ],
-              preview: { /* ...your preview from above... */ },
+              fields: [
+                {
+                  title: 'Image',
+                  name: 'media',
+                  type: 'image',
+                  options: { hotspot: true },
+                  description: 'Choose an image or a video, not both.',
+                },
+                {
+                  title: 'Video',
+                  name: 'video',
+                  type: 'mux.video',
+                  description: 'Choose a video or an image, not both.',
+                },
+                {
+                  title: 'Caption',
+                  name: 'caption',
+                  type: 'string',
+                  description: '(Optional) Caption below the media',
+                },
+                {
+                  title: 'Featured',
+                  name: 'featured',
+                  type: 'boolean',
+                  description: 'Mark this media as a featured image',
+                },
+              ],
+              preview: {
+                select: {
+                  media: 'media',
+                  video: 'video',
+                },
+                prepare({ media, video }) {
+                  if (video) {
+                    const playbackId = video?.asset?.playbackId;
+                    return {
+                      title: 'Video',
+                      subtitle: playbackId || 'No video selected',
+                      media: undefined,
+                    };
+                  }
+                  if (media) {
+                    return {
+                      title: 'Image',
+                      subtitle: 'Image selected',
+                      media,
+                    };
+                  }
+                  return {
+                    title: 'Single Hybrid Media',
+                    subtitle: 'No media selected',
+                  };
+                },
+              },
               validation: (Rule) =>
                 Rule.custom((fields) => {
                   if (!fields) return 'Please select either one image or one video.';
@@ -411,10 +463,11 @@ export default defineType({
                   if (!hasImage && !hasVideo) return 'Please select an image or a video.';
                   return true;
                 }),
-            }),
+            },
           ],
-          validation: (Rule) => Rule.max(1).error('Only one media item allowed'),
-        }),
+          validation: (Rule) =>
+            Rule.max(1).error('Only one media item allowed'),
+        })
         
         
         
