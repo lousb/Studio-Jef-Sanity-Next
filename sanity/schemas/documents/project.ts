@@ -389,6 +389,84 @@ export default defineType({
             },
           },
         }), 
+
+        defineArrayMember({
+          name: 'hybridMedia',
+          title: 'Hybrid Media',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            {
+              title: 'Image',
+              name: 'media',
+              type: 'image',
+              options: { hotspot: true },
+              description: 'Use either an image or a video, not both.',
+            },
+            {
+              title: 'Video',
+              name: 'video',
+              type: 'mux.video',
+              description: 'Use either a video or an image, not both.',
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'string',
+              description: '(Optional) Caption below the media.',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this media as featured.',
+            },
+          ],
+          preview: {
+            select: {
+              media: 'media',
+              video: 'video',
+            },
+            prepare({ media, video }) {
+              if (video) {
+                const playbackId = video?.asset?.playbackId;
+                return {
+                  title: 'Video',
+                  subtitle: playbackId || 'No video selected',
+                  media: undefined,
+                };
+              }
+              if (media) {
+                return {
+                  title: 'Image',
+                  subtitle: 'Image selected',
+                  media,
+                };
+              }
+              return {
+                title: 'Hybrid Media',
+                subtitle: 'No media selected',
+              };
+            },
+          },
+          validation: (Rule) =>
+            Rule.custom((fields: any) => {
+              const hasImage = !!fields?.media;
+              const hasVideo = !!fields?.video;
+
+              if (hasImage && hasVideo) {
+                return 'Only one: image or video, not both.';
+              }
+              if (!hasImage && !hasVideo) {
+                return 'Please select either an image or a video.';
+              }
+              return true;
+            }),
+        })
+        
+        
+
+               
       ],
     }),
   ],
