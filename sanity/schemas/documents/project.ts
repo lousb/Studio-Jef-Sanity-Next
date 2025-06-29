@@ -399,12 +399,15 @@ export default defineType({
             {
               title: 'Media',
               name: 'media',
-              type: 'array',
-              of: [
-                { type: 'image', options: { hotspot: true } },
-                { type: 'mux.video' },
-              ],
-              validation: (Rule) => Rule.required().max(1),
+              type: 'image', // default type is image
+              options: { hotspot: true },
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              title: 'Video',
+              name: 'video',
+              type: 'mux.video',
+              validation: (Rule) => Rule.required(),
             },
             {
               title: 'Caption',
@@ -422,29 +425,45 @@ export default defineType({
           preview: {
             select: {
               media: 'media',
+              video: 'video',
             },
-            prepare({ media }) {
-              const item = media?.[0];
-              if (!item) {
+            prepare({ media, video }) {
+              if (video) {
+                const playbackId = video?.asset?.playbackId;
                 return {
-                  title: 'Single Hybrid Media',
-                  subtitle: 'No media selected',
+                  title: 'Video',
+                  subtitle: playbackId || 'No video selected',
+                  media: undefined,
                 };
               }
-
-              const isVideo = item._type === 'mux.video';
-              const playbackId = isVideo ? item?.asset?.playbackId : null;
-
+              if (media) {
+                return {
+                  title: 'Image',
+                  subtitle: 'Image selected',
+                  media,
+                };
+              }
               return {
-                title: isVideo ? 'Video' : 'Image',
-                subtitle: isVideo
-                  ? playbackId || 'No video selected'
-                  : 'Image selected',
-                media: isVideo ? undefined : item,
+                title: 'Single Hybrid Media',
+                subtitle: 'No media selected',
               };
             },
           },
-        })
+          validation: (Rule) =>
+          Rule.custom((fields) => {
+            if (!fields) {
+              return 'Please select either one image or one video, but not both.';
+            }
+            const hasMedia = !!fields.media;
+            const hasVideo = !!fields.video;
+            if ((hasMedia && hasVideo) || (!hasMedia && !hasVideo)) {
+              return 'Please select either one image or one video, but not both.';
+            }
+            return true;
+          }),
+          
+        });
+        
         
 
                
