@@ -455,14 +455,21 @@ export default defineType({
                 },
               },
               validation: (Rule) =>
-                Rule.custom((fields) => {
-                  if (!fields) return 'Please select either one image or one video.';
-                  const hasImage = !!fields.media;
-                  const hasVideo = !!fields.video;
-                  if (hasImage && hasVideo) return 'Only one: image or video, not both.';
-                  if (!hasImage && !hasVideo) return 'Please select an image or a video.';
-                  return true;
-                }),
+              Rule.custom((fields) => {
+                // Type guard: check it's an object with expected fields
+                const hasImage = !!(fields as any)?.media;
+                const hasVideo = !!(fields as any)?.video;
+
+                if (hasImage && hasVideo) {
+                  return 'Only one: image or video, not both.';
+                }
+                if (!hasImage && !hasVideo) {
+                  return 'Please select an image or a video.';
+                }
+
+                return true;
+              }),
+              
             },
           ],
           validation: (Rule) =>
