@@ -399,12 +399,8 @@ export default defineType({
             {
               title: 'Media',
               name: 'media',
-              type: 'array',
-              of: [
-                { type: 'image', options: { hotspot: true } },
-                { type: 'mux.video' },
-              ],
-              validation: (Rule) => Rule.required().max(1),
+              type: 'imageOrMuxVideo', // custom type — see below
+              validation: (Rule) => Rule.required(),
             },
             {
               title: 'Caption',
@@ -424,27 +420,27 @@ export default defineType({
               media: 'media',
             },
             prepare({ media }) {
-              const item = media?.[0];
-              if (!item) {
+              if (!media) {
                 return {
                   title: 'Single Hybrid Media',
                   subtitle: 'No media selected',
                 };
               }
 
-              const isVideo = item._type === 'mux.video';
-              const playbackId = isVideo ? item?.asset?.playbackId : null;
+              const isVideo = media._type === 'mux.video';
+              const playbackId = isVideo ? media?.asset?.playbackId : null;
 
               return {
                 title: isVideo ? 'Video' : 'Image',
                 subtitle: isVideo
                   ? playbackId || 'No video selected'
                   : 'Image selected',
-                media: isVideo ? undefined : item,
+                media: isVideo ? undefined : media,
               };
             },
           },
         })
+        
         
 
                
