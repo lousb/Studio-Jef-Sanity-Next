@@ -399,7 +399,7 @@ export default defineType({
             {
               title: 'Media',
               name: 'media',
-              type: 'imageOrMuxVideo', // reference your inline type here
+              type: 'imageOrMuxVideo',  // reference your registered type here
               validation: (Rule) => Rule.required(),
             },
             {
@@ -424,22 +424,20 @@ export default defineType({
                 return {
                   title: 'Single Hybrid Media',
                   subtitle: 'No media selected',
-                };
+                }
               }
-
-              const isVideo = media._type === 'mux.video';
-              const playbackId = isVideo ? media?.asset?.playbackId : null;
-
+              const isVideo = media._type === 'mux.video'
+              const playbackId = isVideo ? media?.asset?.playbackId : null
               return {
                 title: isVideo ? 'Video' : 'Image',
                 subtitle: isVideo
                   ? playbackId || 'No video selected'
                   : 'Image selected',
                 media: isVideo ? undefined : media,
-              };
+              }
             },
           },
-        })
+        }),
         
         
 
@@ -449,51 +447,3 @@ export default defineType({
   ],
 })
 
-const imageOrMuxVideo = {
-  name: 'imageOrMuxVideo',
-  title: 'Image or Video',
-  type: 'object',
-  fields: [
-    {
-      name: 'image',
-      title: 'Image',
-      type: 'image',
-      options: { hotspot: true },
-    },
-    {
-      name: 'video',
-      title: 'Video',
-      type: 'mux.video',
-    },
-  ],
-  validation: (Rule) =>
-    Rule.custom(value => {
-      if (!value) return 'Required field';
-      if (value.image && value.video) return 'Only one media allowed';
-      if (!value.image && !value.video) return 'One media required';
-      return true;
-    }),
-  preview: {
-    select: {
-      image: 'image',
-      videoPlaybackId: 'video.asset.playbackId',
-    },
-    prepare({ image, videoPlaybackId }) {
-      if (videoPlaybackId) {
-        return {
-          title: 'Video',
-          subtitle: videoPlaybackId,
-        };
-      }
-      if (image) {
-        return {
-          title: 'Image',
-          media: image,
-        };
-      }
-      return {
-        title: 'No media selected',
-      };
-    },
-  },
-};
