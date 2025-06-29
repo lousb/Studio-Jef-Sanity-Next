@@ -397,17 +397,17 @@ export default defineType({
           icon: ImageIcon,
           fields: [
             {
-              title: 'Media',
+              title: 'Image',
               name: 'media',
-              type: 'image', // default type is image
+              type: 'image',
               options: { hotspot: true },
-              validation: (Rule) => Rule.required(),
+              description: 'Choose an image or a video, not both.',
             },
             {
               title: 'Video',
               name: 'video',
               type: 'mux.video',
-              validation: (Rule) => Rule.required(),
+              description: 'Choose a video or an image, not both.',
             },
             {
               title: 'Caption',
@@ -450,19 +450,24 @@ export default defineType({
             },
           },
           validation: (Rule) =>
-          Rule.custom((fields) => {
-            if (!fields) {
-              return 'Please select either one image or one video, but not both.';
-            }
-            const hasMedia = !!fields.media;
-            const hasVideo = !!fields.video;
-            if ((hasMedia && hasVideo) || (!hasMedia && !hasVideo)) {
-              return 'Please select either one image or one video, but not both.';
-            }
-            return true;
-          }),
-          
-        });
+            Rule.custom((fields) => {
+              if (!fields) return 'Please select either one image or one video.';
+
+              const hasImage = !!fields.media;
+              const hasVideo = !!fields.video;
+
+              if (hasImage && hasVideo) {
+                return 'Please select only one: either an image or a video, not both.';
+              }
+
+              if (!hasImage && !hasVideo) {
+                return 'You must select either an image or a video.';
+              }
+
+              return true;
+            }),
+        })
+        
         
         
 
