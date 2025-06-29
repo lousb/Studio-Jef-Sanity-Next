@@ -399,7 +399,7 @@ export default defineType({
             {
               title: 'Media',
               name: 'media',
-              type: 'imageOrMuxVideo', // custom type — see below
+              type: 'imageOrMuxVideo', // reference your inline type here
               validation: (Rule) => Rule.required(),
             },
             {
@@ -448,3 +448,52 @@ export default defineType({
     }),
   ],
 })
+
+const imageOrMuxVideo = {
+  name: 'imageOrMuxVideo',
+  title: 'Image or Video',
+  type: 'object',
+  fields: [
+    {
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: { hotspot: true },
+    },
+    {
+      name: 'video',
+      title: 'Video',
+      type: 'mux.video',
+    },
+  ],
+  validation: (Rule) =>
+    Rule.custom(value => {
+      if (!value) return 'Required field';
+      if (value.image && value.video) return 'Only one media allowed';
+      if (!value.image && !value.video) return 'One media required';
+      return true;
+    }),
+  preview: {
+    select: {
+      image: 'image',
+      videoPlaybackId: 'video.asset.playbackId',
+    },
+    prepare({ image, videoPlaybackId }) {
+      if (videoPlaybackId) {
+        return {
+          title: 'Video',
+          subtitle: videoPlaybackId,
+        };
+      }
+      if (image) {
+        return {
+          title: 'Image',
+          media: image,
+        };
+      }
+      return {
+        title: 'No media selected',
+      };
+    },
+  },
+};
