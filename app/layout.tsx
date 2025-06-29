@@ -4,6 +4,7 @@ import './globals.css'
 import { loadSettings } from '@/sanity/loader/loadQuery';
 import  LenisProvider from '@/components/global/LenisProvider';
 import {ViewTransitions} from 'next-view-transitions'
+import { Suspense } from 'react';
 
 // const sans = Inter({
 //   variable: '--font-sans',
@@ -32,11 +33,13 @@ export default async function RootLayout({
       className={`bg-primary`}
     >
       <body>
+      <Suspense fallback={null}>
       <LenisProvider>
       <div className="overlay"></div>
         <div className="overlay-shadow"></div>
         {children}
       </LenisProvider>
+      </Suspense>
       </body>
     </html>
     </ViewTransitions>
