@@ -390,9 +390,6 @@ export default defineType({
           },
         }), 
 
-        
-        
-
         defineArrayMember({
           title: 'Single Hybrid Media',
           name: 'hybridMediaSingle',
@@ -402,29 +399,12 @@ export default defineType({
             {
               title: 'Media',
               name: 'media',
-              type: 'object',
-              fields: [
-                {
-                  name: 'image',
-                  type: 'image',
-                  title: 'Image',
-                  options: { hotspot: true },
-                },
-                {
-                  name: 'video',
-                  type: 'mux.video',
-                  title: 'Video',
-                },
+              type: 'array',
+              of: [
+                { type: 'image', options: { hotspot: true } },
+                { type: 'mux.video' },
               ],
-              validation: (Rule) =>
-                Rule.custom((value: { image?: any; video?: any }) => {
-                  const hasImage = !!value?.image
-                  const hasVideo = !!value?.video
-                  if ((hasImage && hasVideo) || (!hasImage && !hasVideo)) {
-                    return 'Add either an image or a video'
-                  }
-                  return true
-                }),
+              validation: (Rule) => Rule.required().max(1),
             },
             {
               title: 'Caption',
@@ -444,16 +424,24 @@ export default defineType({
               media: 'media',
             },
             prepare({ media }) {
-              const image = media?.image
-              const playbackId = media?.video?.asset?.playbackId
-
-              if (playbackId) {
-                return { title: 'Hybrid Media', subtitle: `Video: ${playbackId}` }
-              } else if (image) {
-                return { title: 'Hybrid Media', media: image, subtitle: 'Image' }
-              } else {
-                return { title: 'Hybrid Media', subtitle: 'No media' }
+              const item = media?.[0];
+              if (!item) {
+                return {
+                  title: 'Single Hybrid Media',
+                  subtitle: 'No media selected',
+                };
               }
+
+              const isVideo = item._type === 'mux.video';
+              const playbackId = isVideo ? item?.asset?.playbackId : null;
+
+              return {
+                title: isVideo ? 'Video' : 'Image',
+                subtitle: isVideo
+                  ? playbackId || 'No video selected'
+                  : 'Image selected',
+                media: isVideo ? undefined : item,
+              };
             },
           },
         })
