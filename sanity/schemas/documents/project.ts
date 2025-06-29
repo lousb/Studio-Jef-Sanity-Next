@@ -464,7 +464,9 @@ export default defineType({
               }
               return true;
             }),
-        })
+        }),
+
+
 
         defineArrayMember({
           name: 'twoHybridMedia',
@@ -479,12 +481,14 @@ export default defineType({
               type: 'image',
               options: { hotspot: true },
               hidden: ({ parent }) => !!parent?.leftVideo,
+              description: 'Either use an image or a video on the left side.',
             },
             {
               title: 'Left Video',
               name: 'leftVideo',
               type: 'mux.video',
               hidden: ({ parent }) => !!parent?.leftImage,
+              description: 'Either use an image or a video on the left side.',
             },
 
             // RIGHT SIDE
@@ -494,12 +498,14 @@ export default defineType({
               type: 'image',
               options: { hotspot: true },
               hidden: ({ parent }) => !!parent?.rightVideo,
+              description: 'Either use an image or a video on the right side.',
             },
             {
               title: 'Right Video',
               name: 'rightVideo',
               type: 'mux.video',
               hidden: ({ parent }) => !!parent?.rightImage,
+              description: 'Either use an image or a video on the right side.',
             },
 
             {
@@ -529,12 +535,12 @@ export default defineType({
               return {
                 title: 'Two Hybrid Media',
                 subtitle: `Left: ${leftLabel}, Right: ${rightLabel}`,
-                media: leftImage || rightImage, // fallback to first image
+                media: leftImage || rightImage || undefined,
               };
             },
           },
           validation: (Rule) =>
-            Rule.custom((fields: any) => {
+            Rule.custom((fields) => {
               const hasLeft = !!fields?.leftImage || !!fields?.leftVideo;
               const hasRight = !!fields?.rightImage || !!fields?.rightVideo;
               const hasBothLeft = !!fields?.leftImage && !!fields?.leftVideo;
@@ -555,7 +561,7 @@ export default defineType({
               return true;
             }),
         })
-        
+
         
         
         
