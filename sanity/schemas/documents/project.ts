@@ -465,6 +465,97 @@ export default defineType({
               return true;
             }),
         })
+
+        defineArrayMember({
+          name: 'twoHybridMedia',
+          title: 'Two Hybrid Media',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            // LEFT SIDE
+            {
+              title: 'Left Image',
+              name: 'leftImage',
+              type: 'image',
+              options: { hotspot: true },
+              hidden: ({ parent }) => !!parent?.leftVideo,
+            },
+            {
+              title: 'Left Video',
+              name: 'leftVideo',
+              type: 'mux.video',
+              hidden: ({ parent }) => !!parent?.leftImage,
+            },
+
+            // RIGHT SIDE
+            {
+              title: 'Right Image',
+              name: 'rightImage',
+              type: 'image',
+              options: { hotspot: true },
+              hidden: ({ parent }) => !!parent?.rightVideo,
+            },
+            {
+              title: 'Right Video',
+              name: 'rightVideo',
+              type: 'mux.video',
+              hidden: ({ parent }) => !!parent?.rightImage,
+            },
+
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'string',
+              description: '(Optional) Caption below the two media items.',
+            },
+            {
+              title: 'Featured',
+              name: 'featured',
+              type: 'boolean',
+              description: 'Mark this media set as featured.',
+            },
+          ],
+          preview: {
+            select: {
+              leftImage: 'leftImage',
+              leftVideo: 'leftVideo',
+              rightImage: 'rightImage',
+              rightVideo: 'rightVideo',
+            },
+            prepare({ leftImage, leftVideo, rightImage, rightVideo }) {
+              const leftLabel = leftVideo ? 'Video' : leftImage ? 'Image' : 'None';
+              const rightLabel = rightVideo ? 'Video' : rightImage ? 'Image' : 'None';
+
+              return {
+                title: 'Two Hybrid Media',
+                subtitle: `Left: ${leftLabel}, Right: ${rightLabel}`,
+                media: leftImage || rightImage, // fallback to first image
+              };
+            },
+          },
+          validation: (Rule) =>
+            Rule.custom((fields: any) => {
+              const hasLeft = !!fields?.leftImage || !!fields?.leftVideo;
+              const hasRight = !!fields?.rightImage || !!fields?.rightVideo;
+              const hasBothLeft = !!fields?.leftImage && !!fields?.leftVideo;
+              const hasBothRight = !!fields?.rightImage && !!fields?.rightVideo;
+
+              if (!hasLeft || !hasRight) {
+                return 'Both left and right sides must have either an image or a video.';
+              }
+
+              if (hasBothLeft) {
+                return 'Only one media type (image or video) allowed on the left side.';
+              }
+
+              if (hasBothRight) {
+                return 'Only one media type (image or video) allowed on the right side.';
+              }
+
+              return true;
+            }),
+        })
+        
         
         
         
