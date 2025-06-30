@@ -26,3 +26,39 @@ ol {
   top: 17px;
   left: 51%;
 }
+
+@media only screen and (max-width: 768px) {
+  .about-link, .columns-header {
+    display: none;
+  }
+  .about-page {
+    width: 100%;
+    padding-left: 0 !important;
+  }
+  .all-projects-header{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: start;
+    justify-content: start;
+  }
+  .all-projects-header > div{
+    margin:0 !important
+  }
+  .header > a{
+    display: none;
+  }
+  .header{
+    justify-content: space-between !important;
+  }
+  .header > .flex:last-of-type{
+    justify-content: end;
+  }
+
+  .scroll-visible {
+    transform: translateY(0%) !important;
+  }
+  .scroll-visible img {
+    transform: translateY(0%) !important;
+  }
+  
+}

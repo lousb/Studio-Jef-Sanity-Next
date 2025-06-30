@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import MuxPlayer from '@mux/mux-player-react'
-import Image from 'next/image'
+import ImageBox from '@/components/shared/ImageBox'
 
 const HybridMedia = ({ data }) => {
   const { media, video, caption } = data || {}
   const muxAsset = video?.asset
-  const imageAsset = media?.asset
 
   const [isClient, setIsClient] = useState(false)
 
@@ -25,30 +24,28 @@ const HybridMedia = ({ data }) => {
         streamType="on-demand"
         accentColor="#ea580c"
         autoPlay="muted"
-        loop='true'
+        loop="true"
       />
     )
   }
 
   return (
-    <div className="divider mt-5 md:mt-10 hybrid-media">
+    <div className="divider mt-3 hybrid-media">
       {muxAsset?.playbackId ? (
-        <div className="w-full overflow-hidden rounded-[3px] bg-gray-50">
+        <div className="w-full overflow-hidden rounded-[3px]">
           {renderMuxPlayer(muxAsset.playbackId, 'Hybrid Video')}
         </div>
-      ) : imageAsset?.url ? (
-        <Image
-          src={imageAsset.url}
+      ) : media?.asset ? (
+        <ImageBox
+          image={{
+            asset: media.asset,
+            lqip: media.asset.metadata?.lqip,
+          }}
           alt={caption || 'Hybrid Image'}
-          width={1600}
-          height={900}
-          className="w-full rounded-[3px] object-cover"
+          caption={caption}
+
         />
       ) : null}
-
-      {caption && (
-        <div className="mt-2 md:mt-4 text-lg md:text-2xl">{caption}</div>
-      )}
     </div>
   )
 }

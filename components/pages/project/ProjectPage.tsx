@@ -26,14 +26,13 @@ export function ProjectPage({
   encodeDataAttribute,
 }: ProjectPageProps) {
   const { year, overview, site, title, content, slug } = data ?? {}
-  
-  console.log(content);
-
+  console
   const { showcaseProjects = [] } = moreProjects ?? {}
-  const projects = showcaseProjects
+  const projects = moreProjects?.showcaseProjects || []
   const currentProjectIndex = projects.findIndex(
     (project) => project.slug === slug,
   )
+
   const prevProject = projects[currentProjectIndex - 1] || null
   const nextProject = projects[currentProjectIndex + 1] || null
 
@@ -45,7 +44,7 @@ export function ProjectPage({
   // Detect screen size and update isMobile state
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.matchMedia('(max-width: 868px)').matches)
+      setIsMobile(window.matchMedia('(max-width: 768px)').matches)
     }
 
     // Initial check

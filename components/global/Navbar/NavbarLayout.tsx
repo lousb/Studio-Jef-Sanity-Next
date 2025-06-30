@@ -66,7 +66,7 @@ export default function Navbar(props: NavbarProps) {
         </Link>
       )}
 
-      <div className="flex flex-wrap mt-4 md:mt-0 md:text-1xl w-[30.5%]">
+      <div className="flex flex-wrap md:mt-0 md:text-1xl w-[30.5%]">
         {isProjectsPage ? (
           <span className="text-gray-400 cursor-default pl-2">
             Works

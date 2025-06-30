@@ -28,7 +28,7 @@ export function AllProjectsPage({
         One, Two, Four
       </div>
       <Header description="All Projects" />
-      <div className="flex flex-row items-end justify-between space-x-4">
+      <div className="flex flex-row items-end justify-between space-x-4 all-projects-header">
         <div className="w-1/5 h-auto" style={{ cursor: 'pointer' }}>
           <Reveal>Filters +</Reveal>
         </div>
