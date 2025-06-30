@@ -23,66 +23,73 @@ export function ProjectListItem(props: ProjectProps) {
   const rafId = useRef<number>();
 
   const animate = () => {
-    const container = containerRef.current;
-    const textBox = textBoxRef.current;
+  const container = containerRef.current;
+  const textBox = textBoxRef.current;
 
-    if (!container || !textBox) {
-      rafId.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    const rect = container.getBoundingClientRect();
-    const isInside =
-      mouseX.current >= rect.left &&
-      mouseX.current <= rect.right &&
-      mouseY.current >= rect.top &&
-      mouseY.current <= rect.bottom;
-
-    if (isInside) {
-      const relativeY = mouseY.current - rect.top;
-      const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
-
-      if (!isActive.current) {
-        isActive.current = true;
-
-        const tl = gsap.timeline();
-        tl.fromTo(
-          titleRef.current,
-          { y: 50, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' }
-        ).fromTo(
-          yearRef.current,
-          { y: 50, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' },
-          0
-        );
-      }
-
-      gsap.to(textBox, {
-        y: constrainedY,
-        duration: 0.6,
-        ease: 'power4.out',
-      });
-    } else {
-      if (isActive.current) {
-        isActive.current = false;
-        gsap.to(titleRef.current, {
-          y: -50,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-        gsap.to(yearRef.current, {
-          y: -50,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      }
-    }
-
+  if (!container || !textBox) {
     rafId.current = requestAnimationFrame(animate);
-  };
+    return;
+  }
+
+  const rect = container.getBoundingClientRect();
+  const isInside =
+    mouseX.current >= rect.left &&
+    mouseX.current <= rect.right &&
+    mouseY.current >= rect.top &&
+    mouseY.current <= rect.bottom;
+
+  const relativeY = mouseY.current - rect.top;
+  const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
+  const isTopHalf = relativeY < rect.height / 2;
+
+  if (isInside) {
+    if (!isActive.current) {
+      isActive.current = true;
+
+      const enterFromY = isTopHalf ? '-100%' : '100%';
+
+      const tl = gsap.timeline();
+      tl.fromTo(
+        titleRef.current,
+        { y: enterFromY, opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' }
+      ).fromTo(
+        yearRef.current,
+        { y: enterFromY, opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' },
+        0
+      );
+    }
+
+    gsap.to(textBox, {
+      y: constrainedY,
+      duration: 0.6,
+      ease: 'power4.out',
+    });
+  } else {
+    if (isActive.current) {
+      isActive.current = false;
+
+      const exitToY = isTopHalf ? '-100%' : '100%';
+
+      gsap.to(titleRef.current, {
+        y: exitToY,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+      gsap.to(yearRef.current, {
+        y: exitToY,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+    }
+  }
+
+  rafId.current = requestAnimationFrame(animate);
+};
+
 
   // Global mouse tracking
   useEffect(() => {
