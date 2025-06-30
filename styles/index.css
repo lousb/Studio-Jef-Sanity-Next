@@ -27,6 +27,7 @@ ol {
   left: 51%;
 }
 
+
 @media only screen and (max-width: 768px) {
   .about-link, .columns-header {
     display: none;
@@ -64,4 +65,14 @@ ol {
     transform: translateY(0%) !important;
   }
   
+ 
+}
+@media only screen and (min-width: 1279px) {
+.project-link-wrap.one-column > a:nth-child(1){
+  width: 79.5%;
+  justify-self: end;
+}
+.project-link-wrap.one-column > a:nth-child(2){
+  width: 79.5%;
+}
 }
