@@ -15,7 +15,6 @@ type Props = {
 export default function AllProjectPreview(props: Props) {
   const { initial } = props;
 
-  console.log('Initial data passed to useQuery:', initial); // Debugging
 
   const { data, encodeDataAttribute } = useQuery<ProjectsPagePayload[] | null>(
     projectsPageQuery,
@@ -23,7 +22,6 @@ export default function AllProjectPreview(props: Props) {
     { initial },
   );
 
-  console.log('Data returned from useQuery:', data); // Debugging
 
   if (!data || data.length === 0) {
     return (

@@ -201,6 +201,9 @@ mux-player {
   --rendition-menu-button: none;
   /* --controls: none; */
 }
+.hybrid-media mux-player {
+  --controls:none;
+}
 
 .scroll-visible {
   transform: translateY(-100%) !important;

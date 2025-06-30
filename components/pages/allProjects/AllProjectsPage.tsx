@@ -17,20 +17,10 @@ export function AllProjectsPage({
   };
   encodeDataAttribute?: EncodeDataAttributeCallback;
 }) {
-  // console.log('AllProjectsPage data:', data); // Debugging
 
   const validProjects = data?.allProjects?.filter(
     (project) => project && project.slug && project.title
   ) || [];
-
-  // console.log('Valid projects:', validProjects); // Debugging
-
-  validProjects.forEach((project, index) => {
-    console.log(`Project ${index}:`, project);
-    console.log(`Genres for Project ${index}:`, project.genre);
-    console.log(`Techniques for Project ${index}:`, project.technique);
-    console.log(`Clients for Project ${index}:`, project.client);
-  });
 
   return (
     <div className="space-y-6">

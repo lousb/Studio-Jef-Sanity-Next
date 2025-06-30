@@ -103,6 +103,38 @@ export const projectBySlugQuery = groq`
     site,
     "slug": slug.current,
     title,
+
+    // Direct mux video blocks
+    "hybridVideos": content[@._type == "hybridMedia" && defined(video)]{
+      caption,
+      featured,
+      video{
+        asset->{
+          _id,
+          playbackId,
+          status
+        }
+      }
+    },
+    "twoHybridVideos": content[@._type == "twoHybridMedia" && (defined(leftVideo) || defined(rightVideo))]{
+      caption,
+      featured,
+      leftVideo{
+        asset->{
+          _id,
+          playbackId,
+          status
+        }
+      },
+      rightVideo{
+        asset->{
+          _id,
+          playbackId,
+          status
+        }
+      }
+    },
+
     content[]{
       _type == 'singleImage' => {
         _type,
@@ -168,12 +200,14 @@ export const projectBySlugQuery = groq`
           asset,
           "lqip": asset->metadata.lqip,
         },
-        video->{
-          playbackId,
-          assetId,
-          filename,
-          "url": "https://stream.mux.com/" + playbackId
-        },
+        video{
+          asset->{
+            playbackId,
+            assetId,
+            filename,
+            "url": "https://stream.mux.com/" + playbackId
+          }
+        }
       },
       _type == 'twoHybridMedia' => {
         _type,
@@ -185,27 +219,32 @@ export const projectBySlugQuery = groq`
           asset,
           "lqip": asset->metadata.lqip,
         },
-        leftVideo->{
-          playbackId,
-          assetId,
-          filename,
-          "url": "https://stream.mux.com/" + playbackId
+        leftVideo{
+          asset->{
+            playbackId,
+            assetId,
+            filename,
+            "url": "https://stream.mux.com/" + playbackId
+          }
         },
         rightImage{
           _type,
           asset,
           "lqip": asset->metadata.lqip,
         },
-        rightVideo->{
-          playbackId,
-          assetId,
-          filename,
-          "url": "https://stream.mux.com/" + playbackId
+        rightVideo{
+          asset->{
+            playbackId,
+            assetId,
+            filename,
+            "url": "https://stream.mux.com/" + playbackId
+          }
         },
       },
     },
   }
 `
+
 
 export const projectPaths = groq`
   *[_type == "project" && slug.current != null].slug.current

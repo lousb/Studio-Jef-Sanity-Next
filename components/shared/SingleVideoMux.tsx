@@ -11,7 +11,6 @@ interface MuxVideoBoxProps {
 }
 
 export default function MuxVideoBox({ playbackId, caption, title }: MuxVideoBoxProps) {
-    console.log('VideoBox props:', { playbackId, caption, title }); // Debugging
 
   const [isClient, setIsClient] = useState(false)
 

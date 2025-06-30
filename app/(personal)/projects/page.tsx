@@ -11,22 +11,17 @@ const AllProjectPreview = dynamic(
 );
 
 export default async function IndexRoute() {
-  console.log('Fetching projects data...'); // Debugging
 
   const { data }: { data: ProjectsPagePayload[] } = await loadProjectsPage();
 
-  console.log('Projects data fetched:', data); // Debugging
 
   if (draftMode().isEnabled) {
-    console.log('Draft mode is enabled. Rendering preview...'); // Debugging
     return <AllProjectPreview initial={{ data }} />;
   }
 
   if (!data || data.length === 0) {
-    console.log('No projects found. Redirecting to home page...'); // Debugging
     return redirect('/');
   }
 
-  console.log('Rendering AllProjectsPage with data:', data); // Debugging
   return <AllProjectsPage data={{ allProjects: data }} />;
 }

@@ -26,6 +26,9 @@ export function ProjectPage({
   encodeDataAttribute,
 }: ProjectPageProps) {
   const { year, overview, site, title, content, slug } = data ?? {}
+  
+  console.log(content);
+
   const { showcaseProjects = [] } = moreProjects ?? {}
   const projects = showcaseProjects
   const currentProjectIndex = projects.findIndex(

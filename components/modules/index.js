@@ -6,6 +6,8 @@ const TextBlock = dynamic(() => import('./text-box'))
 const SingleVideo = dynamic(() => import('./single-video'))
 const SingleVideoMux = dynamic(() => import('./single-video-mux'))
 const TwoVideos = dynamic(() => import('./two-videos'))
+const HybridMedia = dynamic(() => import('./hybrid-media'))
+const TwoHybridMedia = dynamic(() => import('./two-hybrid-media'))
 
 export const Module = ({
   content,
@@ -26,6 +28,10 @@ export const Module = ({
     return <SingleVideoMux data={content} />
     case 'twoVideos':
       return <TwoVideos data={content} />
+    case 'hybridMedia':
+      return <HybridMedia data={content} />
+    case 'twoHybridMedia':
+      return <TwoHybridMedia data={content} />
     default:
       return null
   }
