@@ -390,6 +390,8 @@ export default defineType({
           },
         }), 
 
+        
+
         defineArrayMember({
           name: 'hybridMedia',
           title: 'Hybrid Media',
@@ -407,7 +409,7 @@ export default defineType({
             {
               title: 'Video',
               name: 'video',
-              type: 'mux.video',
+              type: 'videoObject',  // use the custom object type instead of mux.video directly
               hidden: ({ parent }) => !!parent?.media,
               description: 'Use either a video or an image, not both.',
             },
@@ -427,7 +429,7 @@ export default defineType({
           preview: {
             select: {
               media: 'media',
-              playbackId: 'video.asset.playbackId',
+              playbackId: 'video.asset.asset.playbackId',  // note nested asset path
             },
             prepare({ media, playbackId }) {
               if (playbackId) {
@@ -450,7 +452,7 @@ export default defineType({
             },
           },
           validation: (Rule) =>
-            Rule.custom((fields: any) => {
+            Rule.custom((fields) => {
               const hasImage = !!fields?.media;
               const hasVideo = !!fields?.video;
               if (hasImage && hasVideo) {
@@ -462,6 +464,7 @@ export default defineType({
               return true;
             }),
         }),
+        
         
 
 
@@ -483,7 +486,7 @@ export default defineType({
             {
               title: 'Left Video',
               name: 'leftVideo',
-              type: 'mux.video',
+              type: 'videoObject',
               hidden: ({ parent }) => !!parent?.leftImage,
               description: 'Either use an image or a video on the left side.',
             },
@@ -498,7 +501,7 @@ export default defineType({
             {
               title: 'Right Video',
               name: 'rightVideo',
-              type: 'mux.video',
+              type: 'videoObject',
               hidden: ({ parent }) => !!parent?.rightImage,
               description: 'Either use an image or a video on the right side.',
             },
@@ -560,3 +563,40 @@ export default defineType({
     }),
   ],
 })
+
+const videoObject = {
+  name: 'videoObject',
+  title: 'Video',
+  type: 'object',
+  fields: [
+    {
+      name: 'asset',
+      title: 'Asset',
+      type: 'mux.video',  // This stores the mux video reference properly
+    },
+    {
+      name: 'caption',
+      title: 'Caption',
+      type: 'string',
+      description: 'Optional caption',
+    },
+    {
+      name: 'url',
+      title: 'URL',
+      type: 'url',
+      hidden: true, // optional: computed or filled in later
+    },
+  ],
+  preview: {
+    select: {
+      playbackId: 'asset.asset.playbackId',
+      caption: 'caption',
+    },
+    prepare({ playbackId, caption }) {
+      return {
+        title: caption || 'Video',
+        subtitle: playbackId || 'No video selected',
+      };
+    },
+  },
+};
