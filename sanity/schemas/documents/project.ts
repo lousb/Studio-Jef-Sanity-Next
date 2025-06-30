@@ -427,15 +427,13 @@ export default defineType({
           preview: {
             select: {
               media: 'media',
-              video: 'video',
+              playbackId: 'video.asset.playbackId',
             },
-            prepare({ media, video }) {
-              if (video) {
-                const playbackId = video?.asset?.playbackId;
+            prepare({ media, playbackId }) {
+              if (playbackId) {
                 return {
                   title: 'Video',
-                  subtitle: playbackId || 'No video selected',
-                  media: undefined,
+                  subtitle: playbackId,
                 };
               }
               if (media) {
@@ -455,7 +453,6 @@ export default defineType({
             Rule.custom((fields: any) => {
               const hasImage = !!fields?.media;
               const hasVideo = !!fields?.video;
-
               if (hasImage && hasVideo) {
                 return 'Only one: image or video, not both.';
               }
@@ -465,6 +462,7 @@ export default defineType({
               return true;
             }),
         }),
+        
 
 
 
@@ -474,7 +472,6 @@ export default defineType({
           type: 'object',
           icon: ImageIcon,
           fields: [
-            // LEFT SIDE
             {
               title: 'Left Image',
               name: 'leftImage',
@@ -490,8 +487,6 @@ export default defineType({
               hidden: ({ parent }) => !!parent?.leftImage,
               description: 'Either use an image or a video on the left side.',
             },
-
-            // RIGHT SIDE
             {
               title: 'Right Image',
               name: 'rightImage',
@@ -507,7 +502,6 @@ export default defineType({
               hidden: ({ parent }) => !!parent?.rightImage,
               description: 'Either use an image or a video on the right side.',
             },
-
             {
               title: 'Caption',
               name: 'caption',
@@ -524,14 +518,13 @@ export default defineType({
           preview: {
             select: {
               leftImage: 'leftImage',
-              leftVideo: 'leftVideo',
+              leftPlaybackId: 'leftVideo.asset.playbackId',
               rightImage: 'rightImage',
-              rightVideo: 'rightVideo',
+              rightPlaybackId: 'rightVideo.asset.playbackId',
             },
-            prepare({ leftImage, leftVideo, rightImage, rightVideo }) {
-              const leftLabel = leftVideo ? 'Video' : leftImage ? 'Image' : 'None';
-              const rightLabel = rightVideo ? 'Video' : rightImage ? 'Image' : 'None';
-
+            prepare({ leftImage, leftPlaybackId, rightImage, rightPlaybackId }) {
+              const leftLabel = leftPlaybackId ? 'Video' : leftImage ? 'Image' : 'None';
+              const rightLabel = rightPlaybackId ? 'Video' : rightImage ? 'Image' : 'None';
               return {
                 title: 'Two Hybrid Media',
                 subtitle: `Left: ${leftLabel}, Right: ${rightLabel}`,
@@ -549,19 +542,15 @@ export default defineType({
               if (!hasLeft || !hasRight) {
                 return 'Both left and right sides must have either an image or a video.';
               }
-
               if (hasBothLeft) {
                 return 'Only one media type (image or video) allowed on the left side.';
               }
-
               if (hasBothRight) {
                 return 'Only one media type (image or video) allowed on the right side.';
               }
-
               return true;
             }),
-        })
-
+        })        
         
         
         

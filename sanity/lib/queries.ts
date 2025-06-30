@@ -158,6 +158,51 @@ export const projectBySlugQuery = groq`
         },
         caption,
       },
+      _type == 'hybridMedia' => {
+        _type,
+        _key,
+        caption,
+        featured,
+        media{
+          _type,
+          asset,
+          "lqip": asset->metadata.lqip,
+        },
+        video->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId
+        },
+      },
+      _type == 'twoHybridMedia' => {
+        _type,
+        _key,
+        caption,
+        featured,
+        leftImage{
+          _type,
+          asset,
+          "lqip": asset->metadata.lqip,
+        },
+        leftVideo->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId
+        },
+        rightImage{
+          _type,
+          asset,
+          "lqip": asset->metadata.lqip,
+        },
+        rightVideo->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId
+        },
+      },
     },
   }
 `

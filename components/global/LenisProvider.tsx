@@ -10,8 +10,11 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
   const searchParams = useSearchParams();
   const lenisRef = useRef<Lenis | null>(null);
 
+  const isStudio = pathname.startsWith("/studio");
+
   useEffect(() => {
-    // Initialize Lenis instance
+    if (isStudio) return; // Skip initializing Lenis in Sanity Studio
+
     const lenis = new Lenis({
       duration: 1.2,
       orientation: "vertical",
@@ -30,24 +33,25 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
     requestAnimationFrame(raf);
 
     return () => {
-      lenis.destroy(); // Clean up Lenis instance
+      lenis.destroy();
     };
-  }, []);
+  }, [isStudio]);
 
   useEffect(() => {
-    // Handle navigation changes
+    if (isStudio) return;
+
     const handleNavigation = () => {
       if (lenisRef.current) {
-        lenisRef.current.stop(); // Stop Lenis during navigation
+        lenisRef.current.stop();
       }
-      window.scrollTo(0, 0); // Reset scroll position to the top
+      window.scrollTo(0, 0);
       if (lenisRef.current) {
-        lenisRef.current.start(); // Restart Lenis after navigation
+        lenisRef.current.start();
       }
     };
 
     handleNavigation();
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, isStudio]);
 
   return <>{children}</>;
 };
