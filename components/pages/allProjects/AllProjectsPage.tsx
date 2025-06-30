@@ -28,12 +28,12 @@ export function AllProjectsPage({
         One, Two, Four
       </div>
       <Header description="All Projects" />
-      <div className="flex flex-row items-end justify-between space-x-4 all-projects-header">
+      <div className="all-projects-header flex flex-row items-end justify-between space-x-4 all-projects-header">
         <div className="w-1/5 h-auto" style={{ cursor: 'pointer' }}>
           <Reveal>Filters +</Reveal>
         </div>
         <div className="w-[84%] mt-2 mb-2 ">
-          <RevealDiv element={'div'} delay={0} elementClass={'text-lg md:text-4xl h-auto'}>
+          <RevealDiv element={'div'} delay={0} elementClass={'text-4xl h-auto'}>
             Finding & connecting audiences. We're not in the business of boring.
           </RevealDiv>
         </div>

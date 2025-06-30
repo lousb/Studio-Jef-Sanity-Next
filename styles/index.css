@@ -39,7 +39,10 @@ ol {
     display: flex;
     flex-direction: column-reverse;
     align-items: start;
-    justify-content: start;
+    justify-content: end;
+    height: calc(40vh - 24px - 32px);
+    display: flex;
+    gap:1rem
   }
   .all-projects-header > div{
     margin:0 !important

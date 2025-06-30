@@ -17,14 +17,12 @@ export function ProjectListItem(props: ProjectProps) {
   const titleRef = useRef<HTMLDivElement>(null);
   const yearRef = useRef<HTMLDivElement>(null);
 
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
-  const isActive = useRef(false);
+  const mouseClientY = useRef<number | null>(null);
+  const isHovering = useRef(false);
   const rafId = useRef<number>();
 
   const animate = () => {
-    if (window.innerWidth <= 768) {
-      // Skip animation on mobile
+    if (!isHovering.current || mouseClientY.current === null) {
       rafId.current = requestAnimationFrame(animate);
       return;
     }
@@ -32,87 +30,97 @@ export function ProjectListItem(props: ProjectProps) {
     const container = containerRef.current;
     const textBox = textBoxRef.current;
 
-    if (!container || !textBox) {
-      rafId.current = requestAnimationFrame(animate);
-      return;
-    }
-
-    const rect = container.getBoundingClientRect();
-    const isInside =
-      mouseX.current >= rect.left &&
-      mouseX.current <= rect.right &&
-      mouseY.current >= rect.top &&
-      mouseY.current <= rect.bottom;
-
-    const relativeY = mouseY.current - rect.top;
-    const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
-    const isTopHalf = relativeY < rect.height / 2;
-
-    if (isInside) {
-      if (!isActive.current) {
-        isActive.current = true;
-
-        const enterFromY = isTopHalf ? '-100%' : '100%';
-
-        const tl = gsap.timeline();
-        tl.fromTo(
-          titleRef.current,
-          { y: enterFromY, opacity: 0 },
-          { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' }
-        ).fromTo(
-          yearRef.current,
-          { y: enterFromY, opacity: 0 },
-          { y: '0%', opacity: 1, duration: 0.4, ease: 'power1.inOut' },
-          0
-        );
-      }
+    if (container && textBox) {
+      const rect = container.getBoundingClientRect();
+      const relativeY = mouseClientY.current - rect.top;
+      const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
 
       gsap.to(textBox, {
         y: constrainedY,
         duration: 0.6,
         ease: 'power4.out',
       });
-    } else {
-      if (isActive.current) {
-        isActive.current = false;
-
-        const exitToY = isTopHalf ? '-100%' : '100%';
-
-        gsap.to(titleRef.current, {
-          y: exitToY,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-        gsap.to(yearRef.current, {
-          y: exitToY,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.out',
-        });
-      }
     }
 
     rafId.current = requestAnimationFrame(animate);
   };
 
-  useEffect(() => {
-    const updateMouse = (e: MouseEvent) => {
-      mouseX.current = e.clientX;
-      mouseY.current = e.clientY;
-    };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    mouseClientY.current = e.clientY;
 
-    window.addEventListener('mousemove', updateMouse);
+    // If not hovering, start hover behavior and animation loop
+    if (!isHovering.current) {
+      isHovering.current = true;
+      animate();
+
+      if (titleRef.current && yearRef.current) {
+        const tl = gsap.timeline();
+        tl.fromTo(
+          titleRef.current,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' }
+        ).fromTo(
+          yearRef.current,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' },
+          0
+        );
+      }
+    }
+  };
+  
+
+  const handleMouseEnter = () => {
+    isHovering.current = true;
     animate();
 
-    return () => {
-      cancelAnimationFrame(rafId.current!);
-      window.removeEventListener('mousemove', updateMouse);
-    };
+    if (titleRef.current && yearRef.current) {
+      const tl = gsap.timeline();
+      tl.fromTo(
+        titleRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' }
+      ).fromTo(
+        yearRef.current,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' },
+        0
+      );
+    }
+  };
+
+  const handleMouseLeave = () => {
+    isHovering.current = false;
+    mouseClientY.current = null;
+    cancelAnimationFrame(rafId.current!);
+
+    gsap.to(titleRef.current, {
+      y: -50,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
+    gsap.to(yearRef.current, {
+      y: -50,
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out',
+    });
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => cancelAnimationFrame(rafId.current!);
   }, []);
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-x-5 relative">
+    <div
+      ref={containerRef}
+      className="flex flex-col gap-x-5 relative"
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="w-full">
         <ImageBox
           image={project.coverImage}
@@ -123,7 +131,7 @@ export function ProjectListItem(props: ProjectProps) {
 
       <div
         ref={textBoxRef}
-        className="absolute left-0 w-full pointer-events-none top-[40%] -translate-y-1/2 md:top-auto md:translate-y-0"
+        className="absolute left-0 w-full pointer-events-none"
       >
         <TextBox project={project} titleRef={titleRef} yearRef={yearRef} />
       </div>
@@ -142,19 +150,12 @@ function TextBox({
 }) {
   return (
     <div className="flex flex-wrap justify-between text-white w-full text-lg md:text-2xl flex-stretch overflow-hidden pl-2 pr-2 pointer-events-none">
-      <div
-        className="mask-out-page-transition flex pointer-events-all opacity-100 md:opacity-0"
-        ref={titleRef}
-      >
+      <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={titleRef}>
         {project.title}
       </div>
-      <div
-        className="mask-out-page-transition flex pointer-events-all opacity-100 md:opacity-0"
-        ref={yearRef}
-      >
+      <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={yearRef}>
         {project.year}
       </div>
     </div>
   );
 }
-
