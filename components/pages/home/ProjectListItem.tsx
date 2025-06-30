@@ -23,6 +23,12 @@ export function ProjectListItem(props: ProjectProps) {
   const rafId = useRef<number>();
 
   const animate = () => {
+    if (window.innerWidth <= 768) {
+      // Skip animation on mobile
+      rafId.current = requestAnimationFrame(animate);
+      return;
+    }
+
     const container = containerRef.current;
     const textBox = textBoxRef.current;
 
@@ -89,9 +95,7 @@ export function ProjectListItem(props: ProjectProps) {
 
     rafId.current = requestAnimationFrame(animate);
   };
-  
 
-  // Global mouse tracking
   useEffect(() => {
     const updateMouse = (e: MouseEvent) => {
       mouseX.current = e.clientX;
@@ -119,7 +123,7 @@ export function ProjectListItem(props: ProjectProps) {
 
       <div
         ref={textBoxRef}
-        className="absolute left-0 w-full pointer-events-none"
+        className="absolute left-0 w-full pointer-events-none top-[40%] -translate-y-1/2 md:top-auto md:translate-y-0"
       >
         <TextBox project={project} titleRef={titleRef} yearRef={yearRef} />
       </div>
@@ -138,10 +142,16 @@ function TextBox({
 }) {
   return (
     <div className="flex flex-wrap justify-between text-white w-full text-lg md:text-2xl flex-stretch overflow-hidden pl-2 pr-2 pointer-events-none">
-      <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={titleRef}>
+      <div
+        className="mask-out-page-transition flex pointer-events-all opacity-100 md:opacity-0"
+        ref={titleRef}
+      >
         {project.title}
       </div>
-      <div className="mask-out-page-transition flex pointer-events-all opacity-0" ref={yearRef}>
+      <div
+        className="mask-out-page-transition flex pointer-events-all opacity-100 md:opacity-0"
+        ref={yearRef}
+      >
         {project.year}
       </div>
     </div>
