@@ -17,43 +17,34 @@ export function ProjectListItem(props: ProjectProps) {
   const titleRef = useRef<HTMLDivElement>(null);
   const yearRef = useRef<HTMLDivElement>(null);
 
-  const mouseClientY = useRef<number | null>(null);
-  const isHovering = useRef(false);
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+  const isActive = useRef(false);
   const rafId = useRef<number>();
 
   const animate = () => {
-    if (!isHovering.current || mouseClientY.current === null) {
+    const container = containerRef.current;
+    const textBox = textBoxRef.current;
+
+    if (!container || !textBox) {
       rafId.current = requestAnimationFrame(animate);
       return;
     }
 
-    const container = containerRef.current;
-    const textBox = textBoxRef.current;
+    const rect = container.getBoundingClientRect();
+    const isInside =
+      mouseX.current >= rect.left &&
+      mouseX.current <= rect.right &&
+      mouseY.current >= rect.top &&
+      mouseY.current <= rect.bottom;
 
-    if (container && textBox) {
-      const rect = container.getBoundingClientRect();
-      const relativeY = mouseClientY.current - rect.top;
+    if (isInside) {
+      const relativeY = mouseY.current - rect.top;
       const constrainedY = Math.max(0, Math.min(relativeY, rect.height - 40));
 
-      gsap.to(textBox, {
-        y: constrainedY,
-        duration: 0.6,
-        ease: 'power4.out',
-      });
-    }
+      if (!isActive.current) {
+        isActive.current = true;
 
-    rafId.current = requestAnimationFrame(animate);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    mouseClientY.current = e.clientY;
-
-    // If not hovering, start hover behavior and animation loop
-    if (!isHovering.current) {
-      isHovering.current = true;
-      animate();
-
-      if (titleRef.current && yearRef.current) {
         const tl = gsap.timeline();
         tl.fromTo(
           titleRef.current,
@@ -66,61 +57,51 @@ export function ProjectListItem(props: ProjectProps) {
           0
         );
       }
-    }
-  };
-  
 
-  const handleMouseEnter = () => {
-    isHovering.current = true;
+      gsap.to(textBox, {
+        y: constrainedY,
+        duration: 0.6,
+        ease: 'power4.out',
+      });
+    } else {
+      if (isActive.current) {
+        isActive.current = false;
+        gsap.to(titleRef.current, {
+          y: -50,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        });
+        gsap.to(yearRef.current, {
+          y: -50,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+        });
+      }
+    }
+
+    rafId.current = requestAnimationFrame(animate);
+  };
+
+  // Global mouse tracking
+  useEffect(() => {
+    const updateMouse = (e: MouseEvent) => {
+      mouseX.current = e.clientX;
+      mouseY.current = e.clientY;
+    };
+
+    window.addEventListener('mousemove', updateMouse);
     animate();
 
-    if (titleRef.current && yearRef.current) {
-      const tl = gsap.timeline();
-      tl.fromTo(
-        titleRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' }
-      ).fromTo(
-        yearRef.current,
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: 'power1.inOut' },
-        0
-      );
-    }
-  };
-
-  const handleMouseLeave = () => {
-    isHovering.current = false;
-    mouseClientY.current = null;
-    cancelAnimationFrame(rafId.current!);
-
-    gsap.to(titleRef.current, {
-      y: -50,
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    });
-    gsap.to(yearRef.current, {
-      y: -50,
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.out',
-    });
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => cancelAnimationFrame(rafId.current!);
+    return () => {
+      cancelAnimationFrame(rafId.current!);
+      window.removeEventListener('mousemove', updateMouse);
+    };
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col gap-x-5 relative"
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div ref={containerRef} className="flex flex-col gap-x-5 relative">
       <div className="w-full">
         <ImageBox
           image={project.coverImage}
