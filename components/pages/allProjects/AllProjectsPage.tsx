@@ -33,7 +33,10 @@ export function AllProjectsPage({
     credits: new Set<string>(),
     genres: new Set<string>(),
     techniques: new Set<string>(),
+    years: new Set<string>(),
   });
+
+  const [filtersVisible, setFiltersVisible] = useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -97,6 +100,11 @@ export function AllProjectsPage({
       )
     ),
   ];
+  const years = [
+    ...new Set(
+      validProjects.map((project) => project.year || 'Unknown')
+    ),
+  ];
 
   const toggleFilter = (type: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prev) => {
@@ -120,8 +128,11 @@ export function AllProjectsPage({
     const matchesTechniques =
       selectedFilters.techniques.size === 0 ||
       project.technique?.some((item) => selectedFilters.techniques.has(item.title));
+    const matchesYears =
+      selectedFilters.years.size === 0 ||
+      selectedFilters.years.has(project.year || 'Unknown');
 
-    return matchesClients && matchesGenres && matchesTechniques;
+    return matchesClients && matchesGenres && matchesTechniques && matchesYears;
   });
 
   return (
@@ -150,72 +161,103 @@ export function AllProjectsPage({
       <Header description="All Projects" />
 
       <div className="all-projects-header flex flex-row items-end justify-between space-x-4">
-        <div className="w-1/5 h-auto" style={{ cursor: 'pointer' }}>
-          <Reveal>Filters +</Reveal>
+        <div
+          className="w-1/5 h-auto cursor-pointer"
+          onClick={() => setFiltersVisible((prev) => !prev)}
+        >
+          <Reveal>Filters {filtersVisible ? '-' : '+'}</Reveal>
         </div>
-        <div className="w-[84%] mt-2 mb-2">
-        <div className="aggregated-data space-y-4 filters-wrap">
-            <div className="text-sm">
-              <div className='flex flex-col space-y-2 text-2xl'>
-                <strong>Clients:</strong>{' '}
-                {clients.length > 0
-                  ? clients.map((client) => (
-                      <button
-                        key={client}
-                        className={`inline-block text-2xl  ${
-                          selectedFilters.clients.has(client) ? 'text-gray-400' : ''
-                        }`}
-                        onClick={() => toggleFilter('clients', client)}
-                      >
-                        {client}
-                      </button>
-                    ))
-                  : 'None'}
-              </div>
-              <div className='flex flex-col space-y-2 text-2xl'>
-                <strong>Genre:</strong>{' '}
-                {genres.length > 0
-                  ? genres.map((genre) => (
-                      <button
-                        key={genre}
-                        className={`inline-block text-2xl  ${
-                          selectedFilters.genres.has(genre) ? 'text-gray-400' : ''
-                        }`}
-                        onClick={() => toggleFilter('genres', genre)}
-                      >
-                        {genre}
-                      </button>
-                    ))
-                  : 'None'}
-              </div>
-              <div className='flex flex-col space-y-2 text-2xl'>
-                <strong>Technique:</strong>{' '}
-                {techniques.length > 0
-                  ? techniques.map((technique) => (
-                      <button
-                        key={technique}
-                        className={`inline-block text-2xl  ${
-                          selectedFilters.techniques.has(technique) ? 'text-gray-400' : ''
-                        }`}
-                        onClick={() => toggleFilter('techniques', technique)}
-                      >
-                        {technique}
-                      </button>
-                    ))
-                  : 'None'}
+        {filtersVisible && (
+          <div className="header-wrap w-[84%] mt-2 mb-2">
+            <div className="aggregated-data space-y-4 filters-wrap">
+              <div className="text-sm">
+                <div className="flex flex-col space-y-2 text-2xl">
+                  <p>Clients:</p>{' '}
+                  <div className='flex flex-col m-0'>
+                  {clients.length > 0
+                    ? clients.map((client) => (
+                        <button
+                          key={client}
+                          className={`inline-block text-2xl ${
+                            selectedFilters.clients.has(client) ? 'text-gray-400' : ''
+                          }`}
+                          onClick={() => toggleFilter('clients', client)}
+                        >
+                          {client}
+                        </button>
+                      ))
+                    : 'None'}
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-2 text-2xl">
+                  <p>Genre:</p>{' '}
+                  <div className='flex flex-col m-0'>
+                  {genres.length > 0
+                    ? genres.map((genre) => (
+                        <button
+                          key={genre}
+                          className={`inline-block text-2xl ${
+                            selectedFilters.genres.has(genre) ? 'text-gray-400' : ''
+                          }`}
+                          onClick={() => toggleFilter('genres', genre)}
+                        >
+                          {genre}
+                        </button>
+                      ))
+                    : 'None'}
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-2 text-2xl">
+                  <p>Technique:</p>{' '}
+                  <div className='flex flex-col m-0'>
+                  {techniques.length > 0
+                    ? techniques.map((technique) => (
+                        <button
+                          key={technique}
+                          className={`inline-block text-2xl ${
+                            selectedFilters.techniques.has(technique) ? 'text-gray-400' : ''
+                          }`}
+                          onClick={() => toggleFilter('techniques', technique)}
+                        >
+                          {technique}
+                        </button>
+                      ))
+                    : 'None'}
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-2 text-2xl">
+                  <p>Year:</p>{' '}
+                  <div className='flex flex-col m-0'>
+                  {years.length > 0
+                    ? years.map((year) => (
+                        <button
+                          key={year}
+                          className={`inline-block text-2xl ${
+                            selectedFilters.years.has(year) ? 'text-gray-400' : ''
+                          }`}
+                          onClick={() => toggleFilter('years', year)}
+                        >
+                          {year}
+                        </button>
+                      ))
+                    : 'None'}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        )}
+        {!filtersVisible && (
           <RevealDiv element="div" delay={0} elementClass="text-4xl h-auto">
             Finding & connecting audiences. We're not in the business of boring.
           </RevealDiv>
-        </div>
+        )}
       </div>
 
       {filteredProjects.length > 0 ? (
         <div
           ref={gridRef}
-          className={`project-link-wrap grid gap-5  ${columnClass}`}
+          className={`project-link-wrap grid gap-5 ${columnClass}`}
         >
           {filteredProjects.map((project, key) => {
             const href = resolveHref(project._type, project.slug);

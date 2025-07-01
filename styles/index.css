@@ -43,7 +43,7 @@ ol {
     flex-direction: column-reverse;
     align-items: start;
     justify-content: end;
-    height: calc(40vh - 24px - 32px);
+    min-height: calc(40vh - 24px - 32px);
     display: flex;
     gap:1rem
   }
@@ -66,8 +66,22 @@ ol {
   .scroll-visible img {
     transform: translateY(0%) !important;
   }
-  
- 
+  .filters-wrap > div{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column !important;
+  }
+  .filters-wrap > div > .flex{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+  .filters-wrap > div > .flex > p, .filters-wrap > div > .flex > div{
+    width: 50%;
+  }
+  .header-wrap{
+    width: 100%;
+  }
 }
 @media only screen and (min-width: 1279px) {
 .project-link-wrap.one-column > a:nth-child(1){

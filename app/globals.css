@@ -212,7 +212,7 @@ mux-player {
   transform: translateY(200%) !important;
 }
 body:has(.scroll-visible) .columns-header {
-  transform: translateY(-100%) !important;
+  transform: translateY(-200%) !important;
 }
 
 .header::before {
@@ -239,6 +239,7 @@ body:has(.scroll-visible) .columns-header {
   left: 51%;
   margin:0 !important;
   z-index: 9999;
+  transition: 500ms ease-in-out transform;
 }
 .mobile-intersector {
   position: fixed;
