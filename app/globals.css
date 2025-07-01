@@ -211,6 +211,9 @@ mux-player {
 .scroll-visible img {
   transform: translateY(200%) !important;
 }
+body:has(.scroll-visible) .columns-header {
+  transform: translateY(-100%) !important;
+}
 
 .header::before {
   content: '';
@@ -231,9 +234,10 @@ mux-player {
 }
 
 .columns-header{
-  position: absolute;
+  position: fixed;
   top:15px;
   left: 51%;
+  margin:0 !important;
   z-index: 9999;
 }
 .mobile-intersector {
@@ -244,4 +248,16 @@ mux-player {
   height: 10px;
   /* background-color: blue; */
   z-index: 9999;
+}
+.filters-wrap button{
+  width: max-content;
+  margin-top:0px !important;
+}
+.filters-wrap > div > div{
+  margin-bottom:20px !important;
+  width: 33%;
+}
+.filters-wrap > div{
+  display: flex;
+  justify-content: space-between;
 }
