@@ -236,3 +236,12 @@ mux-player {
   left: 51%;
   z-index: 9999;
 }
+.mobile-intersector {
+  position: fixed;
+  top: calc(40vh + 20px);
+  left: 0;
+  width: 100vw;
+  height: 10px;
+  /* background-color: blue; */
+  z-index: 9999;
+}

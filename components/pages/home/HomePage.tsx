@@ -19,6 +19,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
 
   return (
     <div className="space-y-6">
+      <div className={`mobile-intersector`}></div>
       {/* Header */}
       <div className="w-full h-300 overflow-hidden">
         {/* <HeroGallery/> */}

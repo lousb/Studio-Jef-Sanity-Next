@@ -23,6 +23,7 @@ export function AllProjectsPage({
   };
   encodeDataAttribute?: EncodeDataAttributeCallback;
 }) {
+
   const [columns, setColumns] = useState<'1' | '2' | '4'>(() => {
     // Initialize state from localStorage during the first render
     const saved = localStorage.getItem(COLUMN_STORAGE_KEY);
@@ -67,15 +68,22 @@ export function AllProjectsPage({
 
   return (
     <div className="space-y-6">
+      <div className={`mobile-intersector`}></div>
       <div className="columns-header flex space-x-2 font-medium">
         {(['1', '2', '4'] as const).map((num) => (
+          <RevealDiv
+          element="span"
+          delay={0}
+          elementClass={`text-1xl ${columns === num ? 'text-gray-400' : ''}`}>
           <button
             key={num}
             className={`text-1xl ${columns === num ? 'text-gray-400' : ''}`}
             onClick={() => setColumns(num)}
           >
+            
             {num === '1' ? 'One' : num === '2' ? 'Two' : 'Four'}
           </button>
+          </RevealDiv>
         ))}
       </div>
 
