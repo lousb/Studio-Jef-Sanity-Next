@@ -30,61 +30,14 @@ export default defineType({
     }),
     defineField({
       name: 'coverImage',
-      title: 'Cover Media',
+      title: 'Cover Image',
       description:
-        'This is the featured image or video shown on the homepage and as the project cover. Choose either an image or a video, not both.',
-      type: 'object',
-      fields: [
-        {
-          title: 'Image',
-          name: 'image',
-          type: 'image',
-          options: { hotspot: true },
-          hidden: ({ parent }) => !!parent?.video,
-        },
-        {
-          title: 'Video',
-          name: 'video',
-          type: 'mux.video',
-          hidden: ({ parent }) => !!parent?.image,
-        },
-      ],
-      validation: (Rule) =>
-        Rule.custom((fields) => {
-          const hasImage = !!fields?.image;
-          const hasVideo = !!fields?.video;
-          if (hasImage && hasVideo) {
-            return 'Only one media type is allowed: image or video.';
-          }
-          if (!hasImage && !hasVideo) {
-            return 'Please add an image or a video.';
-          }
-          return true;
-        }),
-      preview: {
-        select: {
-          image: 'image',
-          playbackId: 'video.asset.playbackId',
-        },
-        prepare({ image, playbackId }) {
-          if (image) {
-            return {
-              title: 'Cover Media - Image',
-              media: image,
-            };
-          }
-          if (playbackId) {
-            return {
-              title: 'Cover Media - Video',
-              subtitle: playbackId,
-            };
-          }
-          return {
-            title: 'Cover Media',
-            subtitle: 'No media selected',
-          };
-        },
+        'This image will be used as the cover image for the project. If you choose to add it to Home page, this is the image displayed in the list within the homepage.',
+      type: 'image',
+      options: {
+        hotspot: true,
       },
+      validation: (rule) => rule.required(),
     }),
 
     defineField({
