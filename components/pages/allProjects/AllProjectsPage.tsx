@@ -81,10 +81,7 @@ export function AllProjectsPage({
       )
     ),
   ];
-<<<<<<< HEAD
   
-=======
->>>>>>> ba9e6ebac2156b835642fbfdfaa0e4ebf703e198
   const genres = [
     ...new Set(
       validProjects.flatMap((project) =>
