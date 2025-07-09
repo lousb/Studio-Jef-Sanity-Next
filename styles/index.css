@@ -28,7 +28,9 @@ ol {
   top: 17px;
   left: 51%;
 }
-
+.all-projects-header > div{
+  margin:0 !important;
+}
 
 @media only screen and (max-width: 768px) {
   .about-link, .columns-header {
@@ -85,10 +87,10 @@ ol {
 }
 @media only screen and (min-width: 1279px) {
 .project-link-wrap.one-column > a:nth-child(1){
-  width: 79.5%;
+  width: 80%;
   justify-self: end;
 }
 .project-link-wrap.one-column > a:nth-child(2){
-  width: 79.5%;
+  width: 80%;
 }
 }

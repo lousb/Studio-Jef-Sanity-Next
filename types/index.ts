@@ -28,13 +28,35 @@ export interface LinkItem {
 
 export interface ShowcaseProject {
   _type: string
-  coverImage?: Image
+  coverImage?: {
+    image?: {
+      asset?: {
+        _ref?: string;
+        _type?: string;
+        metadata?: {
+          dimensions?: {
+            width: number;
+            height: number;
+          };
+          lqip?: string;
+          // add other metadata fields here if you want
+        };
+      };
+    };
+    video?: {
+      asset?: {
+        playbackId?: string;
+        status?: string;
+      };
+    };
+  };
   overview?: PortableTextBlock[]
   slug?: string
   tags?: string[]
   title?: string
   year?: string
   _updatedAt?: string
+  
 }
 
 // Page payloads
@@ -50,7 +72,28 @@ export interface HomePagePayload {
 
 export interface ProjectsPagePayload {
   _type: string
-  coverImage?: Image
+  coverImage?: {
+    image?: {
+      asset?: {
+        _ref?: string;
+        _type?: string;
+        metadata?: {
+          dimensions?: {
+            width: number;
+            height: number;
+          };
+          lqip?: string;
+          // add other metadata fields here if you want
+        };
+      };
+    };
+    video?: {
+      asset?: {
+        playbackId?: string;
+        status?: string;
+      };
+    };
+  };
   overview?: PortableTextBlock[]
   slug?: string
   tags?: string[] // General tags
