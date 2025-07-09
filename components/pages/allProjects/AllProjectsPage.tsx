@@ -28,6 +28,8 @@ export function AllProjectsPage({
     return saved === '1' || saved === '2' || saved === '4' ? saved : '2';
   });
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   const [selectedFilters, setSelectedFilters] = useState({
     clients: new Set<string>(),
     credits: new Set<string>(),
@@ -106,6 +108,24 @@ export function AllProjectsPage({
     ),
   ];
 
+  useLayoutEffect(() => {
+    if (!headerRef.current) return;
+
+    const el = headerRef.current;
+    gsap.killTweensOf(el); // Stop any ongoing animation
+
+    gsap.fromTo(
+      el,
+      { height: el.offsetHeight },
+      {
+        height: 'auto',
+        duration: 0.5,
+        ease: 'power2.inOut',
+      }
+    );
+  }, [filtersVisible]);
+  
+
   const toggleFilter = (type: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prev) => {
       const updatedSet = new Set(prev[type]);
@@ -160,7 +180,9 @@ export function AllProjectsPage({
 
       <Header description="All Projects" />
 
-      <div className="all-projects-header flex flex-row items-end justify-between space-x-4">
+      <div ref={headerRef}
+      className="all-projects-header flex flex-row items-end space-x-4"
+      >
         <div
           className="w-1/5 h-auto cursor-pointer"
           onClick={() => setFiltersVisible((prev) => !prev)}
@@ -168,11 +190,14 @@ export function AllProjectsPage({
           <Reveal>Filters {filtersVisible ? '-' : '+'}</Reveal>
         </div>
         {filtersVisible && (
-          <div className="header-wrap w-[84%] mt-2 mb-2">
+          <div className="header-wrap w-[80%] mt-2 mb-2">
             <div className="aggregated-data space-y-4 filters-wrap">
               <div className="text-sm">
                 <div className="flex flex-col space-y-2 text-2xl">
-                  <p>Clients:</p>{' '}
+                  <Reveal element='p'>
+                    <p>Clients:</p>
+                  </Reveal>
+                  
                   <div className='flex flex-col m-0'>
                   {clients.length > 0
                     ? clients.map((client) => (
@@ -183,14 +208,18 @@ export function AllProjectsPage({
                           }`}
                           onClick={() => toggleFilter('clients', client)}
                         >
+                           <Reveal element='p'>
                           {client}
+                          </Reveal>
                         </button>
                       ))
                     : 'None'}
                     </div>
                 </div>
                 <div className="flex flex-col space-y-2 text-2xl">
-                  <p>Genre:</p>{' '}
+                <Reveal element='p'>
+                    <p>Genre:</p>
+                  </Reveal>
                   <div className='flex flex-col m-0'>
                   {genres.length > 0
                     ? genres.map((genre) => (
@@ -201,14 +230,18 @@ export function AllProjectsPage({
                           }`}
                           onClick={() => toggleFilter('genres', genre)}
                         >
+                           <Reveal element='p'>
                           {genre}
+                          </Reveal>
                         </button>
                       ))
                     : 'None'}
                     </div>
                 </div>
                 <div className="flex flex-col space-y-2 text-2xl">
-                  <p>Technique:</p>{' '}
+                  <Reveal element='p'>
+                    <p>Technique:</p>
+                  </Reveal>
                   <div className='flex flex-col m-0'>
                   {techniques.length > 0
                     ? techniques.map((technique) => (
@@ -219,14 +252,18 @@ export function AllProjectsPage({
                           }`}
                           onClick={() => toggleFilter('techniques', technique)}
                         >
+                          <Reveal element='p'>
                           {technique}
+                          </Reveal>
                         </button>
                       ))
                     : 'None'}
                   </div>
                 </div>
                 <div className="flex flex-col space-y-2 text-2xl">
-                  <p>Year:</p>{' '}
+                <Reveal element='p'>
+                    <p>Year:</p>
+                  </Reveal>
                   <div className='flex flex-col m-0'>
                   {years.length > 0
                     ? years.map((year) => (
@@ -237,7 +274,9 @@ export function AllProjectsPage({
                           }`}
                           onClick={() => toggleFilter('years', year)}
                         >
+                           <Reveal element='p'>
                           {year}
+                          </Reveal>
                         </button>
                       ))
                     : 'None'}
@@ -248,9 +287,9 @@ export function AllProjectsPage({
           </div>
         )}
         {!filtersVisible && (
-          <RevealDiv element="div" delay={0} elementClass="text-4xl h-auto">
+          <Reveal element='p' elementClass="text-4xl h-auto">
             Finding & connecting audiences. We're not in the business of boring.
-          </RevealDiv>
+          </Reveal>
         )}
       </div>
 
