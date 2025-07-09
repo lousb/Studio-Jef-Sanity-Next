@@ -79,13 +79,7 @@ export function AllProjectsPage({
       )
     ),
   ];
-  const credits = [
-    ...new Set(
-      validProjects.flatMap((project) =>
-        project.credit?.map((item) => item.title) || []
-      )
-    ),
-  ];
+  
   const genres = [
     ...new Set(
       validProjects.flatMap((project) =>
