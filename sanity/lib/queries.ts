@@ -1,38 +1,42 @@
 import { groq } from 'next-sanity'
 
 export const homePageQuery = groq`
-*[_type == "home"][0]{
-  _id,
-  _updatedAt,
-  title,
-  customLogo,
-  overview {
-    text,
-    displayText,
-  },
-  showcaseProjects[]->{
+  *[_type == "home"][0]{
+    _id,
+    _updatedAt,
+    overview{
+      text,
+      displayText,
+    },
+    customLogo,
+    showcaseProjects[]->{
+      _type,
+      coverImage{
+        _type,
+        asset,
+        "lqip": asset->metadata.lqip,
+      },
+      overview,
+      "slug": slug.current,
+      title,
+      year,
+    },
     title,
-    "slug": slug.current,
-    year,
-    overview,
-    coverImage {
-      asset,
-      "lqip": asset->metadata.lqip,
-    }
   }
-}
 `
 
 export const projectsPageQuery = groq`
 *[_type == "project" && defined(slug) && defined(title)]{
+  _type,
   title,
-  "slug": slug.current,
-  overview,
-  year,
-  coverImage {
+  slug,
+  coverImage{
+    _type,
     asset,
     "lqip": asset->metadata.lqip,
   },
+  overview,
+  year,
   genre[]->{
     title
   },
@@ -46,7 +50,7 @@ export const projectsPageQuery = groq`
     title
   }
 }
-`
+`;
 
 export const moreProjectsQuery = groq`
   *[_type == "home"][0]{
@@ -240,6 +244,7 @@ export const projectBySlugQuery = groq`
     },
   }
 `
+
 
 export const projectPaths = groq`
   *[_type == "project" && slug.current != null].slug.current

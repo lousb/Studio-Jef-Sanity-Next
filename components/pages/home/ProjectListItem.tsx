@@ -167,7 +167,7 @@ export function ProjectListItem(props: ProjectProps) {
 
           gsap.to(textBox, {
             y: constrainedY,
-            duration: 0.65,
+            duration: 0.6,
             ease: 'power4.out',
           });
         } else {
