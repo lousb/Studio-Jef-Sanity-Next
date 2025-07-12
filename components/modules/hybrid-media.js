@@ -1,39 +1,51 @@
-'use client'
+import React, { useEffect, useState, lazy, Suspense } from 'react';
+import ImageBox from '../shared/ImageBox';
 
-import { useEffect, useState } from 'react'
-import MuxPlayer from '@mux/mux-player-react'
-import ImageBox from '@/components/shared/ImageBox'
+const MuxPlayer = lazy(() => import('@mux/mux-player-react'));
 
 const HybridMedia = ({ data }) => {
-  const { media, video, caption } = data || {}
-  const muxAsset = video?.asset
+  const { media, video, caption } = data || {};
+  const muxAsset = video?.asset;
 
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
-  const renderMuxPlayer = (playbackId, title) => {
-    if (!playbackId || !isClient) return null
-
-    return (
-      <MuxPlayer
-        playbackId={playbackId}
-        metadata={title ? { video_title: title } : undefined}
-        streamType="on-demand"
-        accentColor="#ea580c"
-        autoPlay="muted"
-        loop="true"
-      />
-    )
-  }
+  const aspectRatio = muxAsset?.aspect_ratio || '16:9';
+  const [width, height] = aspectRatio.split(':').map(Number);
+  const paddingBottom = (height / width) * 100;
 
   return (
     <div className="divider mt-3 hybrid-media">
       {muxAsset?.playbackId ? (
-        <div className="w-full overflow-hidden rounded-[3px]">
-          {renderMuxPlayer(muxAsset.playbackId, 'Hybrid Video')}
+        <div
+          style={{
+            position: 'relative',
+            width: '100%',
+            paddingBottom: `${paddingBottom}%`,
+          }}
+        >
+          {isClient ? (
+            <Suspense fallback={<div>Loading video player...</div>}>
+              <MuxPlayer
+                playbackId={muxAsset.playbackId}
+                metadata={{ video_title: 'Hybrid Video' }}
+                streamType="on-demand"
+                accentColor="#ea580c"
+                autoPlay="muted"
+                loop="true"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            </Suspense>
+          ) : null}
         </div>
       ) : media?.asset ? (
         <ImageBox
@@ -43,11 +55,10 @@ const HybridMedia = ({ data }) => {
           }}
           alt={caption || 'Hybrid Image'}
           caption={caption}
-
         />
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default HybridMedia
+export default HybridMedia;

@@ -104,36 +104,7 @@ export const projectBySlugQuery = groq`
     "slug": slug.current,
     title,
 
-    // Direct mux video blocks
-    "hybridVideos": content[@._type == "hybridMedia" && defined(video)]{
-      caption,
-      featured,
-      video{
-        asset->{
-          _id,
-          playbackId,
-          status
-        }
-      }
-    },
-    "twoHybridVideos": content[@._type == "twoHybridMedia" && (defined(leftVideo) || defined(rightVideo))]{
-      caption,
-      featured,
-      leftVideo{
-        asset->{
-          _id,
-          playbackId,
-          status
-        }
-      },
-      rightVideo{
-        asset->{
-          _id,
-          playbackId,
-          status
-        }
-      }
-    },
+  
 
     content[]{
       _type == 'singleImage' => {
@@ -186,7 +157,8 @@ export const projectBySlugQuery = groq`
           playbackId,
           assetId,
           filename,
-          "url": "https://stream.mux.com/" + playbackId
+          "url": "https://stream.mux.com/" + playbackId,
+           "aspect_ratio": data.aspect_ratio
         },
         caption,
       },
@@ -205,7 +177,8 @@ export const projectBySlugQuery = groq`
             playbackId,
             assetId,
             filename,
-            "url": "https://stream.mux.com/" + playbackId
+            "url": "https://stream.mux.com/" + playbackId,
+            "aspect_ratio": data.aspect_ratio
           }
         }
       },
@@ -224,7 +197,8 @@ export const projectBySlugQuery = groq`
             playbackId,
             assetId,
             filename,
-            "url": "https://stream.mux.com/" + playbackId
+            "url": "https://stream.mux.com/" + playbackId,
+            "aspect_ratio": data.aspect_ratio
           }
         },
         rightImage{
@@ -237,7 +211,8 @@ export const projectBySlugQuery = groq`
             playbackId,
             assetId,
             filename,
-            "url": "https://stream.mux.com/" + playbackId
+            "url": "https://stream.mux.com/" + playbackId,
+            "aspect_ratio": data.aspect_ratio
           }
         },
       },

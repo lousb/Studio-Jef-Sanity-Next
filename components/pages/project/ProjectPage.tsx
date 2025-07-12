@@ -119,15 +119,6 @@ export function ProjectPage({
             {year}
           </Reveal>
         )}
-      </div>
-      <button
-        className={`mt-2 md:mt-4 text-lg md:text-xl ${styles.projectPageTitleInfo}`}
-        onClick={() => setIsInfoActive((prev) => !prev)}
-      >
-        <Reveal>{isInfoActive ? 'Info -' : 'Info +'}</Reveal>
-      </button>
-
-      <div className={`mb-10 md:mb-20 space-y-6 ${styles.projectPage}`}>
         <div
           className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}
         >
@@ -159,6 +150,17 @@ export function ProjectPage({
             )}
           </div>
         </div>
+      </div>
+      
+      <button
+        className={`mt-2 md:mt-4 text-lg md:text-xl project-page-title-info ${styles.projectPageTitleInfo}`}
+        onClick={() => setIsInfoActive((prev) => !prev)}
+      >
+        <Reveal>{isInfoActive ? 'Info -' : 'Info +'}</Reveal>
+      </button>
+
+      <div className={`mb-10 md:mb-20 space-y-6 ${styles.projectPage}`}>
+        
 
         <div>
           {/* Display project content by type */}

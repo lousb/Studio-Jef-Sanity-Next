@@ -199,6 +199,8 @@ mux-player {
   --fullscreen-button: none;
   --volume-range: none;
   --rendition-menu-button: none;
+  --media-object-fit: cover;
+  --media-object-position: center;
   /* --controls: none; */
 }
 .hybrid-media mux-player {
@@ -214,7 +216,9 @@ mux-player {
 body:has(.scroll-visible) .columns-header {
   transform: translateY(-200%) !important;
 }
-
+body:has(.scroll-visible) .project-page-title-info{
+  transform: translateY(-200%) !important;
+}
 .header::before {
   content: '';
   position: absolute;
@@ -232,7 +236,9 @@ body:has(.scroll-visible) .columns-header {
   z-index: 999;
   pointer-events: all !important;
 }
-
+.project-page-title-info{
+  transition: 500ms ease-in-out transform;
+}
 .columns-header{
   position: fixed;
   top:15px;
