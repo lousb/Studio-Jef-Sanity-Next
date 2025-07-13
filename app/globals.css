@@ -169,15 +169,17 @@ html:has(::view-transition) {
   animation-delay: 0.6s;
 }
 .page-wrap:has(.about-page) {
-  background-image: url('/about-bg.png');
-  background-size: cover;
-  background-position: top center;
+  overflow: hidden;
   margin-top: 0;
   display: flex;
   align-items: end;
 }
-body:has(.about-page) .header > div,  body:has(.about-page) .header > a{
-    transition: 500ms invert linear 200ms;
+.about-page-bg *{
+  min-height: 100vh !important;
+}
+body:has(.about-page):has(.header-invert) .header > div,  body:has(.about-page):has(.header-invert) .header > a{
+  transition: 200ms all linear 1000ms ;
+
   filter: invert(1);
 }
 body:has(.about-page) .header::before {
@@ -205,6 +207,11 @@ mux-player {
 }
 .hybrid-media mux-player {
   --controls:none;
+}
+.about-page .hybrid-media {
+  --media-aspect-ratio: auto !important;
+  height: 100vh;
+  display: block;
 }
 
 .scroll-visible {
@@ -235,6 +242,7 @@ body:has(.scroll-visible) .project-page-title-info{
 .header a {
   z-index: 999;
   pointer-events: all !important;
+  transition: 200ms all linear 0ms ;
 }
 .project-page-title-info{
   transition: 500ms ease-in-out transform;
@@ -267,4 +275,31 @@ body:has(.scroll-visible) .project-page-title-info{
 .filters-wrap > div{
   display: flex;
   justify-content: space-between;
+}
+.about-page-bg{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -2;
+}
+.about-page-overlay {
+  padding-inline: 1.25rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+  display: flex;
+  align-items: end;
+  padding-bottom: 1.25rem;
+}
+div:has(> .reveal-word){
+margin-bottom: -0.3rem;
+
+}
+.reveal-word{
+  padding-bottom: 0.3rem;
 }

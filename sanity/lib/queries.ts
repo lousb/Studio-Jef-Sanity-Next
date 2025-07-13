@@ -76,10 +76,26 @@ export const aboutPageQuery = groq`
     title,
     customLogo,
     overview,
-    aboutImage{
+    aboutMedia{
       _type,
-      asset,
-      "lqip": asset->metadata.lqip,
+      media{
+        asset->{
+          _id,
+          url,
+          metadata {
+            lqip
+          }
+        }
+      },
+      video{
+        asset->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId,
+          "aspect_ratio": data.aspect_ratio
+        }
+      }
     },
     aboutLinks[]{
       _type,

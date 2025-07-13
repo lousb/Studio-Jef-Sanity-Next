@@ -11,14 +11,19 @@ const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0
     if (!el) return
 
     const triggerAnimation = () => {
-      const words = el.querySelectorAll('.reveal-word')
+      // Select the inner span inside .reveal-word
+      const words = el.querySelectorAll('.reveal-word > span')
       if (words.length) {
-        gsap.set(words, { y: '110%' })
+        // Set initial transform immediately (no animation)
+        words.forEach(word => {
+          word.style.transform = 'translateY(110%)'
+        })
+
         gsap.to(words, {
           y: '0%',
           duration: 1,
           ease: 'power3.out',
-          stagger: staggerDelay, // stagger delay in seconds between each word
+          stagger: staggerDelay,
           delay: 0.5,
         })
       } else {
@@ -31,12 +36,12 @@ const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0
       }
     }
 
-    // Check if the element is already in the viewport
+    // Check if the element is already visible in viewport (for instant animation)
     const rect = el.getBoundingClientRect()
     const isInViewport = rect.top < window.innerHeight && rect.bottom > 0
     if (isInViewport) {
       triggerAnimation()
-      return // Skip setting up the observer if already visible
+      return
     }
 
     const observer = new IntersectionObserver(
@@ -56,24 +61,28 @@ const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0
 
   const Tag = element
 
-  // Split text into words or characters wrapped in `.reveal-word`
-  const splitText = (text) => {
-    return text
-      .split(' ')
-      .map((word, index) => (
-        <span key={index} className="reveal-word" style={{ display: 'inline-block' }}>
-          <span>{word}&nbsp;</span>
-          
-        </span>
-      ))
-  }
+  // Split text into words wrapped in .reveal-word > span
+  const splitText = (text) =>
+    text.split(' ').map((word, index) => (
+      <span
+        key={index}
+        className="reveal-word"
+        style={{
+          display: 'inline-block',
+          overflow: 'hidden',
+          verticalAlign: 'bottom',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        <span style={{ display: 'inline-block' }}>{word}&nbsp;</span>
+      </span>
+    ))
 
   return (
     <Tag
       ref={containerRef}
       className={elementClass}
-      style={{ opacity: 1, overflow: 'hidden', margin:0 }}
-      
+      style={{ opacity: 1, overflow: 'hidden', margin: 0, willChange: 'transform' }}
     >
       {typeof children === 'string' ? splitText(children) : children}
     </Tag>

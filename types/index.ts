@@ -184,10 +184,25 @@ export interface SettingsPayload {
 export interface AboutPayload {
   overview?: PortableTextBlock[]
   title?: string
-  aboutImage?: {
-    asset: Image
-    width: number
-    height: number
+  aboutMedia?: {
+    media?: {
+      asset: Image & {
+        metadata?: {
+          lqip?: string
+        }
+      }
+      width?: number
+      height?: number
+    }
+    video?: {
+      asset: {
+        playbackId: string
+        assetId?: string
+        filename?: string
+        url?: string
+        aspect_ratio?: string
+      }
+    }
   }
   aboutLinks?: LinkItem[]
 }

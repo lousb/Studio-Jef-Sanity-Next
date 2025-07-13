@@ -28,7 +28,7 @@ const HybridMedia = ({ data }) => {
           }}
         >
           {isClient ? (
-            <Suspense fallback={<div>Loading video player...</div>}>
+            <Suspense fallback={<div></div>}>
               <MuxPlayer
                 playbackId={muxAsset.playbackId}
                 metadata={{ video_title: 'Hybrid Video' }}

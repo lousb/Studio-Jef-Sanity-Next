@@ -29,15 +29,66 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'coverImage',
-      title: 'Cover Image',
+      name: 'coverMedia',
+      title: 'Cover Media',
       description:
-        'This image will be used as the cover image for the project. If you choose to add it to Home page, this is the image displayed in the list within the homepage.',
-      type: 'image',
-      options: {
-        hotspot: true,
+        'This media will be used as the cover for the project. You can select either an image or a video, not both.',
+      type: 'object',
+      icon: ImageIcon,
+      fields: [
+        {
+          title: 'Image',
+          name: 'media',
+          type: 'image',
+          options: { hotspot: true },
+          hidden: ({ parent }) => !!parent?.video,
+          description: 'Use either an image or a video, not both.',
+        },
+        {
+          title: 'Video',
+          name: 'video',
+          type: 'mux.video',
+          hidden: ({ parent }) => !!parent?.media,
+          description: 'Use either a video or an image, not both.',
+        },
+      ],
+      validation: (Rule) =>
+        Rule.custom((fields) => {
+          const hasImage = !!fields?.media;
+          const hasVideo = !!fields?.video;
+          if (hasImage && hasVideo) {
+            return 'Only one: image or video, not both.';
+          }
+          if (!hasImage && !hasVideo) {
+            return 'Please select either an image or a video.';
+          }
+          return true;
+        }),
+      preview: {
+        select: {
+          media: 'media',
+          playbackId: 'video.asset.playbackId',
+        },
+        prepare({ media, playbackId }) {
+          if (playbackId) {
+            return {
+              title: 'Video',
+              subtitle: playbackId,
+            };
+          }
+          if (media) {
+            return {
+              title: 'Image',
+              subtitle: 'Image selected',
+              media,
+            };
+          }
+          return {
+            title: 'Cover Media',
+            subtitle: 'No media selected',
+          };
+        },
       },
-      validation: (rule) => rule.required(),
     }),
 
     defineField({
