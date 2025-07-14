@@ -11,10 +11,24 @@ export const homePageQuery = groq`
     customLogo,
     showcaseProjects[]->{
       _type,
-      coverImage{
-        _type,
-        asset,
-        "lqip": asset->metadata.lqip,
+      coverImage {
+        media {
+          _type,
+          asset->{
+            _id,
+            url,
+            metadata {
+              lqip
+            }
+          }
+        },
+        video {
+          asset->{
+            playbackId,
+            aspect_ratio,
+            "url": "https://stream.mux.com/" + playbackId
+          }
+        }
       },
       overview,
       "slug": slug.current,
@@ -30,10 +44,24 @@ export const projectsPageQuery = groq`
   _type,
   title,
   slug,
-  coverImage{
-    _type,
-    asset,
-    "lqip": asset->metadata.lqip,
+  coverImage {
+    media {
+      _type,
+      asset->{
+        _id,
+        url,
+        metadata {
+          lqip
+        }
+      }
+    },
+    video {
+      asset->{
+        playbackId,
+        aspect_ratio,
+        "url": "https://stream.mux.com/" + playbackId
+      }
+    }
   },
   overview,
   year,
@@ -113,7 +141,25 @@ export const projectBySlugQuery = groq`
   *[_type == "project" && slug.current == $slug][0] {
     _id,
     year,
-    coverImage,
+   coverImage {
+     media {
+       _type,
+       asset->{
+         _id,
+         url,
+         metadata {
+           lqip
+         }
+       }
+     },
+     video {
+       asset->{
+         playbackId,
+         aspect_ratio,
+         "url": "https://stream.mux.com/" + playbackId
+       }
+     }
+   },
     description,
     overview,
     site,

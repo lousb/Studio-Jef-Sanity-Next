@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import ImageBox from '@/components/shared/ImageBox';
+import MuxPlayer from '@mux/mux-player-react';
 import type { ShowcaseProject } from '@/types';
 
 interface ProjectProps {
@@ -11,6 +12,8 @@ interface ProjectProps {
 
 export function ProjectListItem(props: ProjectProps) {
   const { project } = props;
+
+  console.log('ProjectListItem', project);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const textBoxRef = useRef<HTMLDivElement>(null);
@@ -34,16 +37,12 @@ export function ProjectListItem(props: ProjectProps) {
   useEffect(() => {
     intersectorRef.current = document.querySelector('.mobile-intersector');
 
-    // Debug: Check if refs are populated
-
-      if (titleRef.current && yearRef.current) {
-        gsap.set([titleRef.current, yearRef.current], {
-          opacity: 0,
-          y: '100%',
-        });
-        console.log('Initial state set by GSAP');
-      }
-    
+    if (titleRef.current && yearRef.current) {
+      gsap.set([titleRef.current, yearRef.current], {
+        opacity: 0,
+        y: '100%',
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -67,7 +66,6 @@ export function ProjectListItem(props: ProjectProps) {
 
         gsap.to(textBoxRef.current, {
           y: constrainedY,
-     
           duration: 0.3,
           ease: 'power2.out',
         });
@@ -78,12 +76,10 @@ export function ProjectListItem(props: ProjectProps) {
       observer = new IntersectionObserver(
         ([entry]) => {
           const isIntersecting = entry.isIntersecting;
-          console.log('IntersectionObserver triggered:', { isIntersecting });
 
           if (isIntersecting && !isActive.current) {
             isActive.current = true;
 
-            // Reveal titles and years when intersecting
             gsap.to([titleRef.current, yearRef.current], {
               y: '0%',
               opacity: 1,
@@ -96,7 +92,6 @@ export function ProjectListItem(props: ProjectProps) {
             isActive.current = false;
             cancelAnimationFrame(animationFrame);
 
-            // Hide titles and years when not intersecting
             gsap.to([titleRef.current, yearRef.current], {
               y: '100%',
               opacity: 0,
@@ -110,7 +105,6 @@ export function ProjectListItem(props: ProjectProps) {
           threshold: 0.05,
         }
       );
-      
 
       observer.observe(container);
 
@@ -119,7 +113,6 @@ export function ProjectListItem(props: ProjectProps) {
         cancelAnimationFrame(animationFrame);
       };
     } else {
-      // Desktop fallback with mouse tracking
       const updateMouse = (e: MouseEvent) => {
         mouseX.current = e.clientX;
         mouseY.current = e.clientY;
@@ -205,14 +198,27 @@ export function ProjectListItem(props: ProjectProps) {
     }
   }, [isMobile]);
 
+  const hasVideo = !!project.coverImage?.video?.asset?.playbackId;
+  const hasImage = !!project.coverImage?.media?.asset;
+
   return (
-    <div ref={containerRef} className="flex flex-col gap-x-5 relative">
-      <div className="w-full">
-        <ImageBox
-          image={project.coverImage}
-          alt={`Cover image from ${project.title}`}
-          classesWrapper="relative"
-        />
+    <div ref={containerRef} className="flex flex-col gap-x-5 relative hybrid-media">
+      <div className="w-full aspect-video relative">
+        {hasVideo ? (
+          <MuxPlayer
+            playbackId={project?.coverImage?.video?.asset.playbackId}
+            streamType="on-demand"
+            autoPlay='muted'
+            loop='true'
+            className="w-full h-full object-cover"
+          />
+        ) : hasImage ? (
+          <ImageBox
+             image={project?.coverImage?.media}
+            alt={`Cover image from ${project.title}`}
+            classesWrapper="relative"
+          />
+        ) : null}
       </div>
 
       <div

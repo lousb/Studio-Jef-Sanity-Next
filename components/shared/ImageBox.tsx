@@ -33,8 +33,7 @@ export default function ImageBox({
   previewImageUrl = image?.lqip,
   ...props
 }: ImageBoxProps) {
-  const imageUrl =
-    image && urlForImage(image)?.fit('max').auto('format').url()
+  const imageUrl = image?.asset?.url || urlForImage(image)?.fit('max').auto('format').url();
 
   const { ref, inView } = useInView({
     triggerOnce: true,

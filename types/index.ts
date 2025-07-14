@@ -27,10 +27,18 @@ export interface LinkItem {
 }
 
 export interface ShowcaseProject {
-  _type: string
+  _type: string;
+  title?: string;
+  year?: string;
+  slug?: string;
+  overview?: PortableTextBlock[];
+  _updatedAt?: string;
+  tags?: string[];
+
   coverImage?: {
-    image?: {
-      asset?: {
+    media?: {
+      _type: 'image';
+      asset: {
         _ref?: string;
         _type?: string;
         metadata?: {
@@ -39,24 +47,20 @@ export interface ShowcaseProject {
             height: number;
           };
           lqip?: string;
-          // add other metadata fields here if you want
         };
+        url?: string;
       };
+      lqip?: string;
     };
     video?: {
-      asset?: {
+      asset: {
         playbackId?: string;
         status?: string;
+        aspect_ratio?: string;
+        url?: string;
       };
     };
   };
-  overview?: PortableTextBlock[]
-  slug?: string
-  tags?: string[]
-  title?: string
-  year?: string
-  _updatedAt?: string
-  
 }
 
 // Page payloads
