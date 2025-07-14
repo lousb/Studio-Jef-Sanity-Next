@@ -28,6 +28,7 @@ export default defineType({
       },
       validation: (rule) => rule.required(),
     }),
+    
     defineField({
       name: 'coverMedia',
       title: 'Cover Media',

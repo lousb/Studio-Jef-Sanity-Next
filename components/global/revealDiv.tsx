@@ -52,7 +52,7 @@ const RevealDiv: React.FC<RevealDivProps> = ({
           setIsVisible(true)
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.1 }
     )
 
     if (ref.current) observer.observe(ref.current)

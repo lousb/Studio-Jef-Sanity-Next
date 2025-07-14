@@ -44,6 +44,19 @@ body:has(.scroll-visible) .about-link{
     width: 100%;
     padding-left: 0 !important;
   }
+  .about-page-overlay{
+    padding-inline:1rem;
+    min-height: 100vh;
+    height: fit-content;
+
+  }
+  .about-page-overlay > div{
+    padding-left: 0;
+   
+  }
+  .about-page-overlay > div{
+    padding-top:calc(1rem + 80px) !important;
+  }
   .all-projects-header{
     display: flex;
     flex-direction: column-reverse;

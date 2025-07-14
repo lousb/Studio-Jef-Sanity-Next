@@ -296,10 +296,10 @@ body:has(.scroll-visible) .project-page-title-info{
   align-items: end;
   padding-bottom: 1.25rem;
 }
-div:has(> .reveal-word){
+.reveal-word{
 margin-bottom: -0.3rem;
 
 }
-.reveal-word{
-  padding-bottom: 0.3rem;
+.reveal-word > span{
+  margin-bottom: 0.3rem;
 }
