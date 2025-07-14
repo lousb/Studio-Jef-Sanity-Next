@@ -30,7 +30,7 @@ export default defineType({
     }),
     
     defineField({
-      name: 'coverMedia',
+      name: 'coverImage',
       title: 'Cover Media',
       description:
         'This media will be used as the cover for the project. You can select either an image or a video, not both.',
