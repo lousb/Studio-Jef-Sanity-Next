@@ -82,7 +82,7 @@ const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0
     <Tag
       ref={containerRef}
       className={elementClass}
-      style={{ opacity: 1, overflow: 'hidden', margin: 0, willChange: 'transform' }}
+      style={{ opacity: 1,  margin: 0, willChange: 'transform' }}
     >
       {typeof children === 'string' ? splitText(children) : children}
     </Tag>

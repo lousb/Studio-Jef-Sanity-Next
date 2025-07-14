@@ -92,7 +92,7 @@ export function AboutPage({ data }: AboutPageProps) {
 
   return (
     <div
-      className={`about-page h-full mt-4 gap-5 pl-[19.5vw] overflow-hidden ${
+      className={`about-page h-full mt-4 gap-5 pl-[19.5vw] ${
         headerInvert ? 'header-invert' : ''
       }`}
     >

@@ -303,3 +303,6 @@ margin-bottom: -0.3rem;
 .reveal-word > span{
   margin-bottom: 0.3rem;
 }
+.project-item-animate{
+  cursor: pointer;
+}
