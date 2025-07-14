@@ -25,7 +25,7 @@ export const homePageQuery = groq`
         video {
           asset->{
             playbackId,
-            aspect_ratio,
+            "aspect_ratio": data.aspect_ratio,
             "url": "https://stream.mux.com/" + playbackId
           }
         }
@@ -58,7 +58,7 @@ export const projectsPageQuery = groq`
     video {
       asset->{
         playbackId,
-        aspect_ratio,
+        "aspect_ratio": data.aspect_ratio,
         "url": "https://stream.mux.com/" + playbackId
       }
     }

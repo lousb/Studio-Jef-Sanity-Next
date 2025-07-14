@@ -196,94 +196,6 @@ export default defineType({
       name: 'content',
       type: 'array',
       of: [
-        // Single image block
-        defineArrayMember({
-          title: 'Single Image',
-          name: 'singleImage',
-          type: 'object',
-          icon: ImageIcon,
-          fields: [
-            {
-              title: 'Photo',
-              name: 'photo',
-              type: 'image',
-              options: {
-                hotspot: true
-              },
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below the image',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this image as a featured image',
-            },
-          ],
-          preview: {
-            select: {
-              photo: 'photo'
-            },
-            prepare({ photo }) {
-              return {
-                title: 'Single image',
-                media: photo
-              }
-            },
-          },
-        }),
-        // Two images block
-        defineArrayMember({
-          title: 'Two Images',
-          name: 'twoImages',
-          type: 'object',
-          icon: ImageIcon,
-          fields: [
-            {
-              title: 'Left photo',
-              name: 'photoOne',
-              type: 'image',
-              options: {
-                hotspot: true
-              },
-            },
-            {
-              title: 'Right photo',
-              name: 'photoTwo',
-              type: 'image',
-              options: {
-                hotspot: true
-              },
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below 2 images',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this image as a featured image',
-            },
-          ],
-          preview: {
-            select: {
-              photo: 'photoOne'
-            },
-            prepare({ photo }) {
-              return {
-                title: 'Two images',
-                media: photo
-              }
-            },
-          },
-        }),
         // Text block 
         defineArrayMember({
           title: 'Text Block',
@@ -342,43 +254,6 @@ export default defineType({
             },
           },
         }),
-        // Single video
-        defineArrayMember({
-          title: 'Single Video (Youtube/Video link)',
-          name: 'singleVideo',
-          type: 'object',
-          icon: PlayIcon,
-          fields: [
-            {
-              title: 'Youtube or Vimeo link',
-              name: 'videoLink',
-              type: 'url',
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below the video',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this video as a featured image',
-            },
-          ],
-          preview: {
-            select: {
-              link: 'videoLink'
-            },
-            prepare({ link }) {
-              return {
-                title: 'Single video',
-                subtitle: link
-              }
-            },
-          },
-        }),
 
         defineArrayMember({
           title: "Video",
@@ -398,53 +273,10 @@ export default defineType({
           },
         }),
 
-        // Two videos
-        defineArrayMember({
-          title: 'Two Videos (Youtube/Video link)',
-          name: 'twoVideos',
-          type: 'object',
-          icon: PlayIcon,
-          fields: [
-            {
-              title: 'Left video (Youtube/Video link)',
-              name: 'videoOneLink',
-              type: 'url',
-            },
-            {
-              title: 'Right video (Youtube/Video link)',
-              name: 'videoTwoLink',
-              type: 'url',
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below 2 videos',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this image as a featured image',
-            },
-          ],
-          preview: {
-            select: {
-              linkOne: 'videoOneLink',
-              linkTwo: 'videoTwoLink'
-            },
-            prepare({ linkOne, linkTwo }) {
-              return {
-                title: 'Two videos',
-                subtitle: linkOne + ` + ` + linkTwo
-              }
-            },
-          },
-        }), 
 
         defineArrayMember({
           name: 'hybridMedia',
-          title: 'Hybrid Media',
+          title: 'Media',
           type: 'object',
           icon: ImageIcon,
           fields: [
@@ -520,7 +352,7 @@ export default defineType({
 
         defineArrayMember({
           name: 'twoHybridMedia',
-          title: 'Two Hybrid Media',
+          title: 'Double Media',
           type: 'object',
           icon: ImageIcon,
           fields: [

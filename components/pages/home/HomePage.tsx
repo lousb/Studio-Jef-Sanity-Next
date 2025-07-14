@@ -6,7 +6,7 @@ import { Header } from '@/components/shared/Header'
 import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
-import { HeroGallery } from './HeroGallery'
+import HeroGallery from './HeroGallery'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -21,13 +21,17 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     <div className="space-y-6">
       <div className={`mobile-intersector`}></div>
       {/* Header */}
-      <div className="w-full h-300 overflow-hidden">
-        {/* <HeroGallery/> */}
-      </div>
+      {/* <div className="w-full h-[100vh] overflow-hidden">
+        <HeroGallery
+         sources={[{ src: '/about-bg.png', caption: 'Caption 1' }, { src: 'img2.jpg', caption: 'Caption 2' }]}
+         data={[{ x: 0, y: 0, w: 100, h: 100 }, { x: 150, y: 0, w: 100, h: 100 }]}
+         originalSize={{ w: 500, h: 300 }}
+        />
+      </div> */}
       {overview && <Header description={overview} />}
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (
-        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 project-link-wrap">
+        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 project-link-wrap bg-white">
           {showcaseProjects.map((project, key) => {
             const href = resolveHref(project?._type, project?.slug)
             if (!href) {

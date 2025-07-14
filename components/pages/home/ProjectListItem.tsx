@@ -201,24 +201,44 @@ export function ProjectListItem(props: ProjectProps) {
   const hasVideo = !!project.coverImage?.video?.asset?.playbackId;
   const hasImage = !!project.coverImage?.media?.asset;
 
+  const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
+
+  useEffect(() => {
+    const ratio = project.coverImage?.video?.asset?.aspect_ratio;
+    if (ratio && typeof ratio === 'string' && ratio.includes(':')) {
+      setVideoAspectRatio(ratio);
+    }
+  }, [project.coverImage?.video?.asset?.aspect_ratio]);
+
+  const [w, h] = videoAspectRatio.split(':').map(Number);
+  const paddingBottom = `${(h / w) * 100}%`;
+
   return (
     <div ref={containerRef} className="flex flex-col gap-x-5 relative hybrid-media">
       <div className="w-full aspect-video relative">
-        {hasVideo ? (
-          <MuxPlayer
-            playbackId={project?.coverImage?.video?.asset.playbackId}
-            streamType="on-demand"
-            autoPlay='muted'
-            loop='true'
-            className="w-full h-full object-cover"
-          />
-        ) : hasImage ? (
-          <ImageBox
-             image={project?.coverImage?.media}
-            alt={`Cover image from ${project.title}`}
-            classesWrapper="relative"
-          />
-        ) : null}
+      {hasVideo ? (
+        <div style={{ width: '100%', paddingBottom, position: 'relative' }}>
+          <div className="absolute inset-0">
+            <MuxPlayer
+              playbackId={project.coverImage.video.asset.playbackId}
+              streamType="on-demand"
+              autoPlay="muted"
+              loop="true"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </div>
+        </div>
+      ) : hasImage ? (
+        <ImageBox
+          image={project.coverImage.media}
+          alt={`Cover image from ${project.title}`}
+          classesWrapper="relative"
+        />
+      ) : null}
       </div>
 
       <div

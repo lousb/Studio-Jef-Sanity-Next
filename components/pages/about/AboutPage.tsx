@@ -172,7 +172,7 @@ export function AboutPage({ data }: AboutPageProps) {
                 streamType="on-demand"
                 playbackId={playbackId}
                 autoPlay="muted"
-                loop={true}
+                loop="true"
                 playsInline
                 className="w-full h-full object-cover"
                 style={{
