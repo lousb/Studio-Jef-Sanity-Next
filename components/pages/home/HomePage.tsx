@@ -21,13 +21,18 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     <div className="space-y-6">
       <div className={`mobile-intersector`}></div>
       {/* Header */}
-      {/* <div className="w-full h-[100vh] overflow-hidden">
+      <div className="w-full h-[100vh] overflow-hidden">
         <HeroGallery
-         sources={[{ src: '/about-bg.png', caption: 'Caption 1' }, { src: 'img2.jpg', caption: 'Caption 2' }]}
-         data={[{ x: 0, y: 0, w: 100, h: 100 }, { x: 150, y: 0, w: 100, h: 100 }]}
-         originalSize={{ w: 500, h: 300 }}
+        images={[
+          { src: '/about-bg.png' },
+          { src: '/about-bg-2.gif'},
+          { src: '/about-bg-3.gif' },
+          { src: '/about-bg-4.gif' },
+          { src: '/about-bg-5.png' },
+   
+        ]}
         />
-      </div> */}
+      </div>
       {overview && <Header description={overview} />}
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (

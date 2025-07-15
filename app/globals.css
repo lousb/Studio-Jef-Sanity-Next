@@ -306,3 +306,6 @@ margin-bottom: -0.3rem;
 .project-item-animate{
   cursor: pointer;
 }
+.infinite-grid-container .item{
+  cursor:pointer;
+}
