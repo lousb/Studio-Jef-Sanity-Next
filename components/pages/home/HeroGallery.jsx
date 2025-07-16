@@ -66,7 +66,7 @@ const HeroGallery = ({ images }) => {
 
     items.current = []
 
-    const spacing = 250
+    const spacing = window.innerWidth < 700 ? 180 : 250
     const countX = Math.floor(bounds.current.w / spacing)
     const countY = Math.floor(bounds.current.h / spacing)
     const imageCount = images.length
