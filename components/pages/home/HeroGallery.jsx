@@ -48,6 +48,26 @@ const HeroGallery = ({ images }) => {
   const winSize = useRef({ w: 0, h: 0 })
   const animationFrame = useRef(null)
 
+  // Added a state to track loading before showing
+  const loadingComplete = useRef(false)
+
+  // Preload all images before generating items, to avoid flashing
+  const preloadImages = () => {
+    return Promise.all(
+      images.map(image => {
+        return new Promise((resolve) => {
+          const img = new Image()
+          img.src = image.src
+          img.onload = () => resolve()
+          img.onerror = () => {
+            console.warn(`Failed to preload image: ${image.src}`)
+            resolve()
+          }
+        })
+      })
+    )
+  }
+
   const generateItems = () => {
     const container = containerRef.current
     if (!container) return
@@ -101,6 +121,7 @@ const HeroGallery = ({ images }) => {
         img.style.height = '100%'
         img.style.objectFit = 'cover'
         img.style.display = 'block'
+        img.style.willChange = 'transform, opacity' // enable GPU acceleration
 
         const isGif = image.src.toLowerCase().endsWith('.gif')
 
@@ -129,6 +150,8 @@ const HeroGallery = ({ images }) => {
           el.style.overflow = 'hidden'
           el.style.background = '#000'
           el.style.opacity = '0.95'
+          el.style.willChange = 'transform, opacity' // GPU accelerate
+          el.style.transition = 'opacity 0.3s ease' // smooth opacity to reduce flash
 
           el.appendChild(img)
           container.appendChild(el)
@@ -196,6 +219,7 @@ const HeroGallery = ({ images }) => {
 
   const onTouchStart = e => {
     if (e.touches.length !== 1) return
+    e.preventDefault() // prevent scrolling and zooming flash
     isDragging.current = true
     document.documentElement.classList.add('dragging')
     mouse.current.press.t = 1
@@ -208,6 +232,7 @@ const HeroGallery = ({ images }) => {
 
   const onTouchMove = e => {
     if (!isDragging.current || e.touches.length !== 1) return
+    e.preventDefault() // prevent default scrolling to avoid flash
 
     const touch = e.touches[0]
     mouse.current.x.t = touch.clientX / winSize.current.w
@@ -255,7 +280,7 @@ const HeroGallery = ({ images }) => {
       posY = ((posY % gridHeight) + gridHeight) % gridHeight - gridHeight / 2
 
       if (Math.abs(posX - item.lastX) > 0.5 || Math.abs(posY - item.lastY) > 0.5) {
-        item.el.style.transform = `translate(${posX}px, ${posY}px)`
+        item.el.style.transform = `translate3d(${posX}px, ${posY}px, 0)`
         item.lastX = posX
         item.lastY = posY
       }
@@ -271,20 +296,30 @@ const HeroGallery = ({ images }) => {
     const container = containerRef.current
     if (!container) return
 
-    generateItems()
+    let isMounted = true
 
-    window.addEventListener('resize', generateItems)
+    // Preload images first to avoid flashing
+    preloadImages().then(() => {
+      if (!isMounted) return
+      loadingComplete.current = true
+      generateItems()
+      render()
+    })
+
+    window.addEventListener('resize', () => {
+      if (!loadingComplete.current) return
+      generateItems()
+    })
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
     container.addEventListener('mousedown', onMouseDown)
     container.addEventListener('touchstart', onTouchStart, { passive: false })
-    window.addEventListener('touchmove', onTouchMove)
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('touchend', onTouchEnd)
 
-    render()
-
     return () => {
+      isMounted = false
       window.removeEventListener('resize', generateItems)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('mousemove', onMouseMove)
@@ -312,7 +347,11 @@ const HeroGallery = ({ images }) => {
         height: '100vh',
         top: 0,
         left: 0,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        backgroundColor: '#000', // Prevent white flash on mobile
+        WebkitTapHighlightColor: 'transparent', // remove tap highlight flash on iOS
+        touchAction: 'none', // prevent default gestures that cause flashes
+        userSelect: 'none'
       }}
     />
   )
