@@ -59,7 +59,11 @@ const HeroGallery = ({ images }) => {
     scroll.current.target = { x: 0, y: 0 }
     scroll.current.last = { x: 0, y: 0 }
 
-    container.innerHTML = ''
+    // Safe DOM clearing
+    while (container.firstChild) {
+      container.removeChild(container.firstChild)
+    }
+
     items.current = []
 
     const spacing = 250
@@ -71,7 +75,6 @@ const HeroGallery = ({ images }) => {
     for (let i = 0; i < countX; i++) {
       for (let j = 0; j < countY; j++) {
         const seed = i * 1000 + j
-
         const dropoutChance = 0.3 + 0.15 * Math.sin(i * 0.3) * Math.cos(j * 0.3)
         if (seededRandom(seed) < dropoutChance) continue
 
@@ -90,7 +93,7 @@ const HeroGallery = ({ images }) => {
         const image = images[imageIndex % imageCount]
         imageIndex++
 
-        const seedCopy = seed // for closure
+        const seedCopy = seed
         const img = new Image()
         img.src = image.src
         img.loading = 'lazy'
@@ -116,14 +119,13 @@ const HeroGallery = ({ images }) => {
               break
             }
           }
-          if (hasTooMuchOverlap) return // skip adding this item
+          if (hasTooMuchOverlap) return
 
           const el = document.createElement('div')
           el.classList.add('item')
           el.style.position = 'absolute'
           el.style.width = `${baseWidth}px`
           el.style.height = `${baseHeight}px`
-
           el.style.overflow = 'hidden'
           el.style.background = '#000'
           el.style.opacity = '0.95'
@@ -174,12 +176,6 @@ const HeroGallery = ({ images }) => {
     drag.current.scrollY = scroll.current.target.y
   }
 
-  const onMouseUp = () => {
-    isDragging.current = false
-    document.documentElement.classList.remove('dragging')
-    mouse.current.press.t = 0
-  }
-
   const onMouseMove = e => {
     mouse.current.x.t = e.clientX / winSize.current.w
     mouse.current.y.t = e.clientY / winSize.current.h
@@ -190,6 +186,45 @@ const HeroGallery = ({ images }) => {
       scroll.current.target.x = drag.current.scrollX + dx
       scroll.current.target.y = drag.current.scrollY + dy
     }
+  }
+
+  const onMouseUp = () => {
+    isDragging.current = false
+    document.documentElement.classList.remove('dragging')
+    mouse.current.press.t = 0
+  }
+
+  const onTouchStart = e => {
+    if (e.touches.length !== 1) return
+    isDragging.current = true
+    document.documentElement.classList.add('dragging')
+    mouse.current.press.t = 1
+    const touch = e.touches[0]
+    drag.current.startX = touch.clientX
+    drag.current.startY = touch.clientY
+    drag.current.scrollX = scroll.current.target.x
+    drag.current.scrollY = scroll.current.target.y
+  }
+
+  const onTouchMove = e => {
+    if (!isDragging.current || e.touches.length !== 1) return
+    e.preventDefault()
+
+    const touch = e.touches[0]
+    mouse.current.x.t = touch.clientX / winSize.current.w
+    mouse.current.y.t = touch.clientY / winSize.current.h
+
+    const dx = (touch.clientX - drag.current.startX) * 0.8
+    const dy = (touch.clientY - drag.current.startY) * 0.8
+
+    scroll.current.target.x = drag.current.scrollX + dx
+    scroll.current.target.y = drag.current.scrollY + dy
+  }
+
+  const onTouchEnd = () => {
+    isDragging.current = false
+    document.documentElement.classList.remove('dragging')
+    mouse.current.press.t = 0
   }
 
   const render = () => {
@@ -234,18 +269,18 @@ const HeroGallery = ({ images }) => {
   }
 
   useEffect(() => {
-    if (!containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
 
     generateItems()
 
     window.addEventListener('resize', generateItems)
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('mousemove', onMouseMove)
-    containerRef.current.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
-
-    containerRef.current.addEventListener('touchstart', onTouchStart, { passive: false })
-    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    container.addEventListener('mousedown', onMouseDown)
+    container.addEventListener('touchstart', onTouchStart, { passive: false })
+    container.addEventListener('touchmove', onTouchMove, { passive: false })
     window.addEventListener('touchend', onTouchEnd)
 
     render()
@@ -254,44 +289,18 @@ const HeroGallery = ({ images }) => {
       window.removeEventListener('resize', generateItems)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('mousemove', onMouseMove)
-      if (containerRef.current) containerRef.current.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('touchend', onTouchEnd)
+
+      if (container) {
+        container.removeEventListener('mousedown', onMouseDown)
+        container.removeEventListener('touchstart', onTouchStart)
+        container.removeEventListener('touchmove', onTouchMove)
+      }
+
       if (animationFrame.current) cancelAnimationFrame(animationFrame.current)
     }
   }, [])
-
-  const onTouchStart = e => {
-    if (e.touches.length !== 1) return
-    isDragging.current = true
-    document.documentElement.classList.add('dragging')
-    mouse.current.press.t = 1
-    const touch = e.touches[0]
-    drag.current.startX = touch.clientX
-    drag.current.startY = touch.clientY
-    drag.current.scrollX = scroll.current.target.x
-    drag.current.scrollY = scroll.current.target.y
-  }
-
-  const onTouchMove = e => {
-    if (!isDragging.current || e.touches.length !== 1) return
-    const touch = e.touches[0]
-
-    mouse.current.x.t = touch.clientX / winSize.current.w
-    mouse.current.y.t = touch.clientY / winSize.current.h
-
-    const dx = touch.clientX - drag.current.startX
-    const dy = touch.clientY - drag.current.startY
-
-    scroll.current.target.x = drag.current.scrollX + dx
-    scroll.current.target.y = drag.current.scrollY + dy
-  }
-
-  const onTouchEnd = () => {
-    isDragging.current = false
-    document.documentElement.classList.remove('dragging')
-    mouse.current.press.t = 0
-  }
-
 
   return (
     <div
