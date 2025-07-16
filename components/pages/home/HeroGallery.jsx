@@ -194,6 +194,8 @@ const HeroGallery = ({ images }) => {
     mouse.current.press.t = 0
   }
 
+  let lastTouchY = 0
+
   const onTouchStart = e => {
     if (e.touches.length !== 1) return
     isDragging.current = true
@@ -204,18 +206,23 @@ const HeroGallery = ({ images }) => {
     drag.current.startY = touch.clientY
     drag.current.scrollX = scroll.current.target.x
     drag.current.scrollY = scroll.current.target.y
+    lastTouchY = touch.clientY
   }
 
   const onTouchMove = e => {
     if (!isDragging.current || e.touches.length !== 1) return
-    e.preventDefault()
-
     const touch = e.touches[0]
+
+    const dx = touch.clientX - drag.current.startX
+    const dy = touch.clientY - drag.current.startY
+
+    // Only prevent vertical scroll if horizontal move dominates
+    if (Math.abs(dx) > Math.abs(dy)) {
+      e.preventDefault()
+    }
+
     mouse.current.x.t = touch.clientX / winSize.current.w
     mouse.current.y.t = touch.clientY / winSize.current.h
-
-    const dx = (touch.clientX - drag.current.startX) * 0.8
-    const dy = (touch.clientY - drag.current.startY) * 0.8
 
     scroll.current.target.x = drag.current.scrollX + dx
     scroll.current.target.y = drag.current.scrollY + dy
