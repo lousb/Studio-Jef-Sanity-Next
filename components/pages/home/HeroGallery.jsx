@@ -66,7 +66,7 @@ const HeroGallery = ({ images }) => {
 
     items.current = []
 
-    const spacing = window.innerWidth < 700 ? 180 : 250
+    const spacing = 250
     const countX = Math.floor(bounds.current.w / spacing)
     const countY = Math.floor(bounds.current.h / spacing)
     const imageCount = images.length
@@ -194,8 +194,6 @@ const HeroGallery = ({ images }) => {
     mouse.current.press.t = 0
   }
 
-  let lastTouchY = 0
-
   const onTouchStart = e => {
     if (e.touches.length !== 1) return
     isDragging.current = true
@@ -206,23 +204,17 @@ const HeroGallery = ({ images }) => {
     drag.current.startY = touch.clientY
     drag.current.scrollX = scroll.current.target.x
     drag.current.scrollY = scroll.current.target.y
-    lastTouchY = touch.clientY
   }
 
   const onTouchMove = e => {
     if (!isDragging.current || e.touches.length !== 1) return
+
     const touch = e.touches[0]
-
-    const dx = touch.clientX - drag.current.startX
-    const dy = touch.clientY - drag.current.startY
-
-    // Only prevent vertical scroll if horizontal move dominates
-    if (Math.abs(dx) > Math.abs(dy)) {
-      e.preventDefault()
-    }
-
     mouse.current.x.t = touch.clientX / winSize.current.w
     mouse.current.y.t = touch.clientY / winSize.current.h
+
+    const dx = (touch.clientX - drag.current.startX) * 0.8
+    const dy = (touch.clientY - drag.current.startY) * 0.8
 
     scroll.current.target.x = drag.current.scrollX + dx
     scroll.current.target.y = drag.current.scrollY + dy
@@ -287,7 +279,7 @@ const HeroGallery = ({ images }) => {
     window.addEventListener('mouseup', onMouseUp)
     container.addEventListener('mousedown', onMouseDown)
     container.addEventListener('touchstart', onTouchStart, { passive: false })
-    container.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchmove', onTouchMove)
     window.addEventListener('touchend', onTouchEnd)
 
     render()
