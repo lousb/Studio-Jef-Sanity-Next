@@ -244,6 +244,10 @@ const HeroGallery = ({ images }) => {
     containerRef.current.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mouseup', onMouseUp)
 
+    containerRef.current.addEventListener('touchstart', onTouchStart, { passive: false })
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onTouchEnd)
+
     render()
 
     return () => {
@@ -256,13 +260,46 @@ const HeroGallery = ({ images }) => {
     }
   }, [])
 
+  const onTouchStart = e => {
+    if (e.touches.length !== 1) return
+    isDragging.current = true
+    document.documentElement.classList.add('dragging')
+    mouse.current.press.t = 1
+    const touch = e.touches[0]
+    drag.current.startX = touch.clientX
+    drag.current.startY = touch.clientY
+    drag.current.scrollX = scroll.current.target.x
+    drag.current.scrollY = scroll.current.target.y
+  }
+
+  const onTouchMove = e => {
+    if (!isDragging.current || e.touches.length !== 1) return
+    const touch = e.touches[0]
+
+    mouse.current.x.t = touch.clientX / winSize.current.w
+    mouse.current.y.t = touch.clientY / winSize.current.h
+
+    const dx = touch.clientX - drag.current.startX
+    const dy = touch.clientY - drag.current.startY
+
+    scroll.current.target.x = drag.current.scrollX + dx
+    scroll.current.target.y = drag.current.scrollY + dy
+  }
+
+  const onTouchEnd = () => {
+    isDragging.current = false
+    document.documentElement.classList.remove('dragging')
+    mouse.current.press.t = 0
+  }
+
+
   return (
     <div
       ref={containerRef}
       className="infinite-grid-container"
       style={{
         overflow: 'hidden',
-        position: 'absolute',
+        position: 'fixed',
         width: '100vw',
         height: '100vh',
         top: 0,

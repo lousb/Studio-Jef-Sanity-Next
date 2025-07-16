@@ -16,9 +16,36 @@ ul {
 ol {
   list-style-type: disc;
 }
+footer{
+  z-index: 99;
+  
+}
+.project-link-wrap::before{
+  content:'';
+  width: 120%; 
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: -10%;
 
+  background-color:white;
+}
+.home-project-title{
+    position: relative;
+}
+.home-project-title::before{
+  content:'';
+  width: 120%; 
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: -10%;
+
+  background-color:white;
+}
 .project-link-wrap{
-  margin-top:20px !important;
+  margin-top:0px !important;
+  position: relative;
 }
 .project-link-wrap > a{
   height: fit-content;

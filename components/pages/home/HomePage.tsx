@@ -7,6 +7,7 @@ import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
 import HeroGallery from './HeroGallery'
+import Reveal from '@/components/global/Reveal'
 
 export interface HomePageProps {
   data: HomePagePayload | null
@@ -21,7 +22,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     <div className="space-y-6">
       <div className={`mobile-intersector`}></div>
       {/* Header */}
-      <div className="w-full h-[100vh] overflow-hidden">
+      <div className="w-full h-[150vh] overflow-hidden">
         <HeroGallery
         images={[
           { src: '/about-bg.png' },
@@ -34,9 +35,15 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
         />
       </div>
       {overview && <Header description={overview} />}
+      <div className="w-full h-auto flex pt-5 pb-5 bg-white home-project-title">
+        <Reveal element='p' elementClass="text-4xl h-auto">
+          Featured projects
+        </Reveal>
+      </div>
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (
         <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 project-link-wrap bg-white">
+          
           {showcaseProjects.map((project, key) => {
             const href = resolveHref(project?._type, project?.slug)
             if (!href) {
