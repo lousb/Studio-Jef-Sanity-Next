@@ -219,7 +219,7 @@ const HeroGallery = ({ images }) => {
 
   const onTouchStart = e => {
     if (e.touches.length !== 1) return
-    e.preventDefault() // prevent scrolling and zooming flash
+
     isDragging.current = true
     document.documentElement.classList.add('dragging')
     mouse.current.press.t = 1
@@ -232,8 +232,7 @@ const HeroGallery = ({ images }) => {
 
   const onTouchMove = e => {
     if (!isDragging.current || e.touches.length !== 1) return
-    e.preventDefault() // prevent default scrolling to avoid flash
-
+  
     const touch = e.touches[0]
     mouse.current.x.t = touch.clientX / winSize.current.w
     mouse.current.y.t = touch.clientY / winSize.current.h
