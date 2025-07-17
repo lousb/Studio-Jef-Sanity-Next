@@ -280,11 +280,11 @@ export function AllProjectsPage({
             </div>
           </div>
         )}
-        {!filtersVisible && (
+        {/* {!filtersVisible && (
           <Reveal element='p' elementClass="text-4xl h-auto">
-            Finding & connecting audiences. We're not in the business of boring.
+            Sharing real people to real audiences
           </Reveal>
-        )}
+        )} */}
       </div>
 
       {filteredProjects.length > 0 ? (
