@@ -25,7 +25,7 @@ const variants = {
 
 // Console Credits
 console.log(
-  '%cDesign & Web Development by Danil Vladimirov \n– https://danilvladimirov.co.uk',
+  '%cDesign & Web Development by Louis Wyeth \n– https://wyeeeth.com',
   'display:block;font-family:courier;font-size:12px;font-weight:bold;line-height:1;color:black;',
 )
 

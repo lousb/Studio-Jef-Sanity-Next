@@ -108,6 +108,11 @@ body:has(.scroll-visible) .about-link{
   .all-projects-header > div{
     margin:0 !important
   }
+  .home-project-title{
+    min-height: calc(40vh - 24px - 32px);
+    display: flex;
+    align-items: end;
+  }
   .header > a{
     display: none;
   }
@@ -117,7 +122,10 @@ body:has(.scroll-visible) .about-link{
   .header > .flex:last-of-type{
     justify-content: end;
   }
-
+  .div-reveal-element > div{
+    opacity: 1 !important;
+    transform: translateY(0%) !important;
+  }
   .scroll-visible {
     transform: translateY(0%) !important;
   }
