@@ -26,6 +26,8 @@ export function ProjectListItem(props: ProjectProps) {
   const isActive = useRef(false);
   const rafId = useRef<number>();
   const [isMobile, setIsMobile] = useState(false);
+  const mediaRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 800);
@@ -35,7 +37,8 @@ export function ProjectListItem(props: ProjectProps) {
   }, []);
 
   useEffect(() => {
-    intersectorRef.current = document.querySelector('.mobile-intersector');
+    if (!containerRef.current) return;
+    intersectorRef.current = containerRef.current.querySelector('.mobile-intersector');
 
     if (titleRef.current && yearRef.current) {
       gsap.set([titleRef.current, yearRef.current], {
@@ -45,15 +48,30 @@ export function ProjectListItem(props: ProjectProps) {
     }
   }, []);
 
+
   useEffect(() => {
+    intersectorRef.current = document.querySelector('.mobile-intersector');
+
     const container = containerRef.current;
     const intersector = intersectorRef.current;
+    const mediaEl = mediaRef.current;
 
-    if (!container || !intersector) return;
+    if (!container || !mediaEl) return;
+
+    const parallaxAmount = 0.01; 
+
+    if (titleRef.current && yearRef.current) {
+      gsap.set([titleRef.current, yearRef.current], {
+        opacity: 0,
+        y: '100%',
+      });
+    }
 
     if (isMobile) {
       let observer: IntersectionObserver;
       let animationFrame: number;
+
+      if (!intersector) return;
 
       const updatePosition = () => {
         if (!container || !titleRef.current || !yearRef.current || !intersector) return;
@@ -62,12 +80,22 @@ export function ProjectListItem(props: ProjectProps) {
         const intersectorRect = intersector.getBoundingClientRect();
 
         const relativeY = intersectorRect.top - containerRect.top;
-        const constrainedY = Math.max(0, Math.min(relativeY, containerRect.height - 40));
+        const constrainedY = Math.max(0, Math.min(relativeY, containerRect.height - 32));
 
         gsap.to(textBoxRef.current, {
           y: constrainedY,
           duration: 0.3,
           ease: 'power2.out',
+        });
+
+        // Parallax on scroll
+        const scrollProgress = containerRect.top / window.innerHeight;
+        const translateY = scrollProgress * parallaxAmount * 100;
+
+        gsap.to(mediaEl, {
+          y: `${translateY}%`,
+          duration: 0.6,
+          ease: 'power3.out',
         });
 
         animationFrame = requestAnimationFrame(updatePosition);
@@ -106,28 +134,33 @@ export function ProjectListItem(props: ProjectProps) {
         }
       );
 
-      observer.observe(container);
+      observer.observe(intersector);
 
       return () => {
         observer.disconnect();
         cancelAnimationFrame(animationFrame);
       };
-    } else {
+    }
+else {
       const updateMouse = (e: MouseEvent) => {
         mouseX.current = e.clientX;
         mouseY.current = e.clientY;
       };
 
       const animate = () => {
-        const container = containerRef.current;
-        const textBox = textBoxRef.current;
-
-        if (!container || !textBox) {
-          rafId.current = requestAnimationFrame(animate);
-          return;
-        }
-
         const rect = container.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+        const distanceFromCenter = mouseY.current - centerY;
+        const maxMove = rect.height * parallaxAmount;
+
+        const translateY = (distanceFromCenter / (rect.height / 2)) * maxMove;
+
+        gsap.to(mediaEl, {
+          y: `${translateY}px`,
+          duration: 0.6,
+          ease: 'power3.out',
+        });
+
         const isInside =
           mouseX.current >= rect.left &&
           mouseX.current <= rect.right &&
@@ -158,7 +191,7 @@ export function ProjectListItem(props: ProjectProps) {
               );
           }
 
-          gsap.to(textBox, {
+          gsap.to(textBoxRef.current, {
             y: constrainedY,
             duration: 0.6,
             ease: 'power4.out',
@@ -198,6 +231,7 @@ export function ProjectListItem(props: ProjectProps) {
     }
   }, [isMobile]);
 
+
   const hasVideo = !!project.coverImage?.video?.asset?.playbackId;
   const hasImage = !!project.coverImage?.media?.asset;
 
@@ -214,12 +248,13 @@ export function ProjectListItem(props: ProjectProps) {
   const paddingBottom = `${(h / w) * 100}%`;
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-x-5 relative hybrid-media">
+    <div ref={containerRef} className="flex flex-col gap-x-5 relative hybrid-media" style={{ overflow: 'hidden' }}>
       <div className="w-full aspect-video relative">
       {hasVideo ? (
-        <div style={{ width: '100%', paddingBottom, position: 'relative' }}>
-          <div className="absolute inset-0">
+        <div ref={mediaRef} className='will-change-transform' style={{ width: '100%', paddingBottom, position: 'relative', scale:1.1 }}>
+          <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
             <MuxPlayer
+            userInactiveTimeout={0}
               playbackId={project.coverImage.video.asset.playbackId}
               streamType="on-demand"
               autoPlay="muted"
@@ -233,11 +268,19 @@ export function ProjectListItem(props: ProjectProps) {
           </div>
         </div>
       ) : hasImage ? (
-        <ImageBox
-          image={project.coverImage.media}
-          alt={`Cover image from ${project.title}`}
-          classesWrapper="relative"
-        />
+        <div
+        ref={mediaRef}
+        style={{ width: '100%', position: 'relative', scale:1.1 }}
+        className="will-change-transform"
+        >
+          <ImageBox
+           
+            image={project.coverImage.media}
+            alt={`Cover image from ${project.title}`}
+            classesWrapper="relative"
+          />
+          </div>
+       
       ) : null}
       </div>
 
@@ -260,14 +303,35 @@ function TextBox({
   titleRef: React.RefObject<HTMLDivElement>;
   yearRef: React.RefObject<HTMLDivElement>;
 }) {
+  const [typedClients, setTypedClients] = useState('');
+  const typingInterval = useRef<number | null>(null);
+  const fullClientsText = project.client?.map(c => c.title).join(', ') || '';
+
   return (
     <div className="flex flex-wrap justify-between text-white w-full text-lg md:text-2xl flex-stretch overflow-hidden pl-2 pr-2 pointer-events-none">
       <div
         ref={titleRef}
         className="mask-out-page-transition flex pointer-events-all opacity-0 translate-y-full"
       >
-        {project.title}
+        <div className="flex flex-col">
+          {project.title}
+
+          {project.client && project.client.length > 0 && (
+            <span
+              className="mt-0 opacity-75 cursor-pointer"
+      
+            >
+              {typedClients || project.client.map((client, i) => (
+                <span key={i}>
+                  {client.title}
+                  {i < project.client!.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </span>
+          )}
+        </div>
       </div>
+
       <div
         ref={yearRef}
         className="mask-out-page-transition flex pointer-events-all opacity-0 translate-y-full"

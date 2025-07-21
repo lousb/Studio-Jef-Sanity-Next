@@ -25,13 +25,10 @@ export function ProjectPage({
   moreProjects,
   encodeDataAttribute,
 }: ProjectPageProps) {
-  const { year, overview, site, title, content, slug } = data ?? {}
-  console
+  const { year, overview, site, client, title, content, slug } = data ?? {}
   const { showcaseProjects = [] } = moreProjects ?? {}
   const projects = moreProjects?.showcaseProjects || []
-  const currentProjectIndex = projects.findIndex(
-    (project) => project.slug === slug,
-  )
+  const currentProjectIndex = projects.findIndex((project) => project.slug === slug)
 
   const prevProject = projects[currentProjectIndex - 1] || null
   const nextProject = projects[currentProjectIndex + 1] || null
@@ -39,25 +36,56 @@ export function ProjectPage({
   const titleRef = useRef<HTMLDivElement>(null)
 
   const [isInfoActive, setIsInfoActive] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
+  const [hasScrolled, setHasScrolled] = useState(false)
+  const [shouldShowTitleBlock, setShouldShowTitleBlock] = useState(true)
+  const [isAnimating, setIsAnimating] = useState(false) // To track if animation is running
 
-  // Detect screen size and update isMobile state
+  // Detect scroll position and update states
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.matchMedia('(max-width: 768px)').matches)
+    const onScroll = () => {
+      const scrolled = window.scrollY > 100
+      setHasScrolled(scrolled)
     }
 
-    // Initial check
-    handleResize()
+    window.addEventListener('scroll', onScroll)
+    onScroll() // initial check
 
-    // Add resize event listener
-    window.addEventListener('resize', handleResize)
-
-    // Cleanup event listener on unmount
-    return () => {
-      window.removeEventListener('resize', handleResize)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Update title visibility based on infoActive and scroll position
+  useEffect(() => {
+    const visible = isInfoActive || !hasScrolled
+    setShouldShowTitleBlock(visible)
+
+    // Only trigger GSAP animations when scrolled past 100px (and avoid retriggering at the top)
+    if (titleRef.current && shouldShowTitleBlock !== visible && !isAnimating) {
+      setIsAnimating(true) // Set animation state to true when animation starts
+
+      const spans = titleRef.current.querySelectorAll('span')
+
+      // Run animation only if the title block should be visible
+      if (visible) {
+        gsap.to(spans, {
+          y: '0%',
+          opacity: 1,
+          duration: 0.4,
+          ease: 'power3.out',
+          stagger: 0.01,
+          onComplete: () => setIsAnimating(false), // Reset animation state when animation completes
+        })
+      } else {
+        gsap.to(spans, {
+          y: '-100%',
+          opacity: 0,
+          duration: 0.6,
+          ease: 'power3.in',
+          stagger: 0.01,
+          onComplete: () => setIsAnimating(false), // Reset animation state when animation completes
+        })
+      }
+    }
+  }, [isInfoActive, hasScrolled, shouldShowTitleBlock])
 
   // Load state from localStorage or reset on project change
   useEffect(() => {
@@ -70,88 +98,63 @@ export function ProjectPage({
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
-  // GSAP animations for entering and exiting
-  useEffect(() => {
-    if (titleRef.current) {
-      const spans = titleRef.current.querySelectorAll('span')
-
-      if (isInfoActive) {
-        gsap.fromTo(
-          spans,
-          { y: '100%', opacity: 0 },
-          {
-            y: '0%',
-            opacity: 1,
-            duration: 0.4,
-            ease: 'power3.out',
-            stagger: 0.01,
-            delay: 0.6,
-          },
-        )
-      } else {
-        gsap.to(spans, {
-          y: '-100%',
-          opacity: 0,
-          duration: 0.6,
-          ease: 'power3.in',
-          stagger: 0.01,
-        })
-      }
-    }
-  }, [isInfoActive])
-
   return (
     <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
-
-      <div
-        ref={titleRef}
-        className={`w-full lg:w-2/4 ${styles.projectPageTitle}`}
-      >
+      <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} flex-col`}>
         {/* Title */}
-        {title && (
-          <Reveal element={'div'} elementClass={'text-2xl md:text-4xl'}>
-            {title}
-          </Reveal>
-        )}
-        {/* Year */}
-        {year && (
-          <Reveal element={'div'} elementClass={'md:mt-2 text-lg md:text-2xl'}>
-            {year}
-          </Reveal>
-        )}
-        <div
-          className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}
-        >
-          <div className="w-full">
-            {/* Overview */}
-            {overview && (
-              <Reveal element={'div'} elementClass={'text-xl md:text-2xl'}>
-                <CustomPortableText value={overview} />
-              </Reveal>
-            )}
-            {/* Site */}
-            {site && (
-              <div className="mt-3">
+        <div>
+          {title && (
+            <Reveal element={'div'} elementClass={'text-2xl md:text-4xl break-words hyphens-auto'}>
+              {title}
+            </Reveal>
+          )}
+          {/* Year */}
+          {year && (
+            <Reveal element={'div'} elementClass={'md:mt-2 text-lg md:text-2xl'}>
+              {year}
+            </Reveal>
+          )}
+        </div>
+
+        <div>
+          <div style={{ marginTop: '1rem', opacity: 0.6 }}>
+            {client?.map((client, i) => (
+              <span key={i}>
+                {client.title}
+                <br />
+              </span>
+            ))}
+          </div>
+          {overview && (
+            <div className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}>
+              <div className="w-full">
+                {/* Overview */}
+                <Reveal element={'div'} elementClass={'text-xl md:text-2xl'}>
+                  <CustomPortableText value={overview} />
+                </Reveal>
+
+                {/* Site */}
                 {site && (
-                  <Link
-                    target="_blank"
-                    className="text-xl break-words md:text-2xl underline"
-                    href={site.url}
-                  >
-                    <Reveal
-                      element={'div'}
-                      elementClass={'text-xl break-words md:text-2xl underline'}
-                    >
-                      {site.urltitle}
-                    </Reveal>
-                  </Link>
+                  <div className="mt-3">
+                    {site && (
+                      <Link
+                        target="_blank"
+                        className="text-xl break-words md:text-2xl underline"
+                        href={site.url}
+                      >
+                        <Reveal element={'div'} elementClass={'text-xl break-words md:text-2xl underline'}>
+                          {site.urltitle}
+                        </Reveal>
+                      </Link>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-      
+
       <button
         className={`mt-2 md:mt-4 text-lg md:text-xl project-page-title-info ${styles.projectPageTitleInfo}`}
         onClick={() => setIsInfoActive((prev) => !prev)}
@@ -160,8 +163,6 @@ export function ProjectPage({
       </button>
 
       <div className={`mb-10 md:mb-20 space-y-6 ${styles.projectPage}`}>
-        
-
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (

@@ -256,6 +256,7 @@ body:has(.scroll-visible) .project-page-title-info{
   transition: 500ms ease-in-out transform;
 }
 .mobile-intersector {
+  pointer-events: none;
   position: fixed;
   top: calc(40vh + 20px);
   left: 0;
@@ -263,6 +264,10 @@ body:has(.scroll-visible) .project-page-title-info{
   height: 10px;
   /* background-color: blue; */
   z-index: 9999;
+}
+/* styles/globals.css or component.module.css */
+.mux-player.vjs-user-inactive {
+  cursor: auto !important;
 }
 .filters-wrap button{
   width: max-content;

@@ -34,6 +34,9 @@ export const homePageQuery = groq`
       "slug": slug.current,
       title,
       year,
+      client[]->{
+        title
+      }
     },
     title,
   }
@@ -141,6 +144,9 @@ export const projectBySlugQuery = groq`
   *[_type == "project" && slug.current == $slug][0] {
     _id,
     year,
+    client[]->{
+      title
+    },
    coverImage {
      media {
        _type,

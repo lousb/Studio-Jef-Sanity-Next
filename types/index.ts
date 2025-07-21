@@ -34,6 +34,7 @@ export interface ShowcaseProject {
   overview?: PortableTextBlock[];
   _updatedAt?: string;
   tags?: string[];
+   client?: { title: string }[] // Clients
 
   coverImage?: {
     media?: {
@@ -115,6 +116,7 @@ export interface ProjectPayload {
   coverImage?: Image
   description?: PortableTextBlock[]
   overview?: PortableTextBlock[]
+   client?: { title: string }[] // Clients
   site?: {
     urltitle?: string
     url: string
