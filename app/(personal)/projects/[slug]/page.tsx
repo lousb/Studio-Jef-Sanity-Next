@@ -40,7 +40,6 @@ export function generateStaticParams() {
 }
 
 export default async function ProjectSlugRoute({ params }: Props) {
-  console.log('Params:', params) // Debugging
   const initial = await loadProject(params.slug)
   const moreProjects = await loadMoreProjects()
 

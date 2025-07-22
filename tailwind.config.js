@@ -24,6 +24,19 @@ module.exports = {
       // sans: 'var(--font-sans)',
     },
     extend: {
+      fontFamily: {
+        sansInstant: [
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          'Oxygen',
+          'Ubuntu',
+          'Cantarell',
+          'sans-serif',
+        ],
+      },
       colors: {
         primary: withOpacity("--color-primary"),
         secondary: withOpacity("--color-secondary"),

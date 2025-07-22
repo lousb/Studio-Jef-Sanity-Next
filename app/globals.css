@@ -5,7 +5,11 @@
 :root {
   view-transition-name: root;
 }
+.header img{
+  z-index: 9999;
 
+  position: fixed
+}
 
 html {
   font-feature-settings: 'kern' off;
@@ -18,7 +22,7 @@ html {
   font-size: clamp(1px, 12px, 10 * 100vw / var(--size));
 }
 .top-layer {
-  z-index: 9999;
+  z-index: 9997;
 }
 .h3 {
   font-size: 5.75rem;
@@ -177,7 +181,7 @@ html:has(::view-transition) {
 .about-page-bg *{
   min-height: 100vh !important;
 }
-body:has(.about-page):has(.header-invert) .header > div,  body:has(.about-page):has(.header-invert) .header > a{
+body:has(.about-page):has(.header-invert) .header > div,  body:has(.about-page):has(.header-invert) .header > a, body:has(.about-page):has(.header-invert) #initial-loader{
   transition: 200ms all linear 1000ms ;
 
   filter: invert(1);
@@ -313,4 +317,17 @@ margin-bottom: -0.3rem;
 }
 .infinite-grid-container .item{
   cursor:pointer;
+}
+.home-page .project-link-wrap > a:nth-child(7n+1),
+.home-page .project-link-wrap > a:nth-child(7n+4),
+.home-page .project-link-wrap > a:nth-child(7n+7) {
+  transform: scale(1);
+}
+
+/* Scale: 2nd, 3rd, 5th, 6th elements in the pattern */
+.home-page .project-link-wrap > a:nth-child(7n+2),
+.home-page .project-link-wrap > a:nth-child(7n+3),
+.home-page .project-link-wrap > a:nth-child(7n+5),
+.home-page .project-link-wrap > a:nth-child(7n+6) {
+  transform: scale(0.8);
 }

@@ -13,7 +13,6 @@ interface ProjectProps {
 export function ProjectListItem(props: ProjectProps) {
   const { project } = props;
 
-  console.log('ProjectListItem', project);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const textBoxRef = useRef<HTMLDivElement>(null);

@@ -51,9 +51,16 @@ footer{
 
   background-color:white;
 }
+.home-page .project-link-wrap{
+    align-items: center;
+}
+.all-projects-page .two-column.project-link-wrap{
+  align-items: end;
+}
 .project-link-wrap{
   margin-top:0px !important;
   position: relative;
+
 }
 .project-link-wrap > a{
   height: fit-content;
@@ -76,6 +83,9 @@ body:has(.scroll-visible) .about-link{
 }
 
 @media only screen and (max-width: 768px) {
+  #initial-loader{
+    padding:1rem !important;
+  }
   .about-link, .columns-header {
     display: none;
   }

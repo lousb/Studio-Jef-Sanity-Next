@@ -89,10 +89,8 @@ export async function loadProjectsPage(): Promise<{ data: ProjectsPagePayload[] 
     { next: { tags: ['projects', 'genre', 'technique', 'client', 'credits'] } },
   );
 
-  console.log('Raw query response:', queryResponse); // Debugging
 
   const data = queryResponse?.data || [];
-  console.log('Processed projects data:', data); // Debugging
 
   return { data };
 }

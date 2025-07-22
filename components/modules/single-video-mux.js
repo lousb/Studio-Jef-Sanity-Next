@@ -8,7 +8,6 @@ const Video = ({ data = {} }) => {
   const url = asset?.url || null
   const aspectRatio = asset?.aspect_ratio || '16:9'
 
-  console.log('single video data:', { playbackId, caption, url, _type, aspectRatio })
 
   if (!playbackId) {
     console.warn('No playbackId found for video:', data)

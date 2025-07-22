@@ -150,7 +150,7 @@ export function AllProjectsPage({
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 all-projects-page">
       {/* Display aggregated lists at the top */}
 
       <div className={`mobile-intersector`}></div>

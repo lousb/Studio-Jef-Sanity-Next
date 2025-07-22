@@ -12,7 +12,6 @@ const TwoHybridMedia = dynamic(() => import('./two-hybrid-media'))
 export const Module = ({
   content,
 }) => {
-  console.log('Module content:', content); // Debugging
   const type = content._type
 
   switch (type) {
