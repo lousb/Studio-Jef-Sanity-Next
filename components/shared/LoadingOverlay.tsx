@@ -12,110 +12,120 @@ export default function LoadingOverlay() {
   const doneTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches
 
-    const initHeader = document.querySelector('#initial-loader') as HTMLElement;
-    const header = document.querySelector('.header') as HTMLElement;
+    const initHeader = document.querySelector('#initial-loader') as HTMLElement
+    const header = document.querySelector('.header') as HTMLElement
 
     if (initHeader) {
-      const anchorTags = initHeader.querySelectorAll(':scope .loading-counter-init');
+      const anchorTags = initHeader.querySelectorAll(
+        ':scope .loading-counter-init',
+      )
       anchorTags.forEach((a) => {
-        gsap.set(a, { opacity: 0, pointerEvents: 'none' });
-      });
+        gsap.set(a, { opacity: 0, pointerEvents: 'none' })
+      })
     }
 
-    let showTimeout: NodeJS.Timeout | null = null;
+    let showTimeout: NodeJS.Timeout | null = null
 
     const animateHide = () => {
-      if (!containerRef.current) return;
+      if (!containerRef.current) return
 
       gsap.to(containerRef.current, {
         yPercent: -100,
         duration: 1.5,
         ease: 'power2.inOut',
         onComplete: () => {
-          setDone(true);
+          setDone(true)
         },
-      });
-    };
+      })
+    }
 
-    const counterInit = document.querySelector('.loader-counter-init') as HTMLElement;
+    const counterInit = document.querySelector(
+      '.loader-counter-init',
+    ) as HTMLElement
     if (counterInit) {
-      counterInit.style.display = 'none';
+      counterInit.style.display = 'none'
     }
 
     const onFullLoad = () => {
-      if (showTimeout) clearTimeout(showTimeout);
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (showTimeout) clearTimeout(showTimeout)
+      if (intervalRef.current) clearInterval(intervalRef.current)
 
-      setProgress(100);
+      setProgress(100)
 
       doneTimeoutRef.current = setTimeout(() => {
-        animateHide();
+        animateHide()
 
         if (header) {
-          const contentHeight = 'auto';
-          header.style.height = '100vh';
+          const contentHeight = 'auto'
+          header.style.height = '100vh'
           gsap.to(header, {
             height: contentHeight,
             duration: 1.2,
             ease: 'power2.inOut',
-          });
+          })
         }
 
         if (initHeader) {
           // ⬇️ Conditional height based on screen size
           const targetHeight = isMobile
             ? 'calc(24px + 2.4rem)' // Same as your media query
-            : 'calc(24px + 2.5rem)';
+            : 'calc(24px + 2.5rem)'
 
           gsap.to(initHeader, {
             height: targetHeight,
             duration: 1.2,
             ease: 'power2.inOut',
-          });
+            onComplete: () => {
+              gsap.to(initHeader, { opacity: 0, duration: 0 })
+            },
+          })
         }
-      }, 30);
-    };
+      }, 30)
+    }
 
     showTimeout = setTimeout(() => {
       if (document.readyState !== 'complete') {
-        setShouldShow(true);
-
+        setShouldShow(true)
         if (header) {
-          gsap.to(header, {
-            height: 'auto',
-          });
+          header.style.height = 'auto' // instant
         }
 
-        setProgress(0);
+        if (initHeader) {
+          initHeader.style.display = 'none' // instant
+        }
+      
+
+        setProgress(0)
         intervalRef.current = setInterval(() => {
           setProgress((prev) => {
             if (prev >= 90) {
-              if (intervalRef.current) clearInterval(intervalRef.current);
-              return prev;
+              if (intervalRef.current) clearInterval(intervalRef.current)
+              return prev
             }
-            return prev + Math.random() * 5;
-          });
-        }, 50);
+            return prev + Math.random() * 5
+          })
+        }, 50)
       }
-    }, 150);
+    }, 150)
 
     if (document.readyState === 'complete') {
-      setDone(true);
-      setShouldShow(false);
-      if (showTimeout) clearTimeout(showTimeout);
+      setDone(true)
+      setShouldShow(false)
+      
+      if (showTimeout) clearTimeout(showTimeout)
     } else {
-      window.addEventListener('load', onFullLoad);
+      window.addEventListener('load', onFullLoad)
     }
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (showTimeout) clearTimeout(showTimeout);
-      if (doneTimeoutRef.current) clearTimeout(doneTimeoutRef.current);
-      window.removeEventListener('load', onFullLoad);
-    };
-  }, []);
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      if (showTimeout) clearTimeout(showTimeout)
+      if (doneTimeoutRef.current) clearTimeout(doneTimeoutRef.current)
+      window.removeEventListener('load', onFullLoad)
+    }
+  }, [])
 
   if (done || !shouldShow) return null
 
@@ -124,8 +134,10 @@ export default function LoadingOverlay() {
       ref={containerRef}
       className="opacity-[1] fixed inset-0 z-[9998] bg-white text-black flex items-center pr-4 justify-end"
       style={{ transform: 'translateY(0)' }}
-    > 
-      <p className="text-4xl font-mono">{Math.min(100, Math.round(progress))}%</p>
+    >
+      <p className="text-4xl font-mono">
+        {Math.min(100, Math.round(progress))}%
+      </p>
     </div>
   )
 }

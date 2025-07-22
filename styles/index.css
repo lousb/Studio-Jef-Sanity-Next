@@ -81,6 +81,11 @@ body:has(.scroll-visible) .about-link{
 .all-projects-header{
   margin-bottom: 20px !important;
 }
+.select-filter p::after{
+  content:'•';
+  display: inline;
+
+}
 
 @media only screen and (max-width: 768px) {
   #initial-loader{

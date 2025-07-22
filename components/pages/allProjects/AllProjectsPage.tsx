@@ -198,7 +198,7 @@ export function AllProjectsPage({
                         <button
                           key={client}
                           className={`inline-block text-2xl ${
-                            selectedFilters.clients.has(client) ? 'text-gray-400' : ''
+                            selectedFilters.clients.has(client) ? ' select-filter' : ''
                           }`}
                           onClick={() => toggleFilter('clients', client)}
                         >
@@ -220,7 +220,7 @@ export function AllProjectsPage({
                         <button
                           key={genre}
                           className={`inline-block text-2xl ${
-                            selectedFilters.genres.has(genre) ? 'text-gray-400' : ''
+                            selectedFilters.genres.has(genre) ? ' select-filter' : ''
                           }`}
                           onClick={() => toggleFilter('genres', genre)}
                         >
@@ -242,7 +242,7 @@ export function AllProjectsPage({
                         <button
                           key={technique}
                           className={`inline-block text-2xl ${
-                            selectedFilters.techniques.has(technique) ? 'text-gray-400' : ''
+                            selectedFilters.techniques.has(technique) ? ' select-filter' : ''
                           }`}
                           onClick={() => toggleFilter('techniques', technique)}
                         >
@@ -264,7 +264,7 @@ export function AllProjectsPage({
                         <button
                           key={year}
                           className={`inline-block text-2xl ${
-                            selectedFilters.years.has(year) ? 'text-gray-400' : ''
+                            selectedFilters.years.has(year) ? 'select-filter' : ''
                           }`}
                           onClick={() => toggleFilter('years', year)}
                         >
