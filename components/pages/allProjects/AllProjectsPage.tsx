@@ -25,8 +25,9 @@ export function AllProjectsPage({
 }) {
   const [columns, setColumns] = useState<'1' | '2' | '4'>(() => {
     const saved = localStorage.getItem(COLUMN_STORAGE_KEY);
-    return saved === '1' || saved === '2' || saved === '4' ? saved : '2';
+    return saved === '1' || saved === '2' || saved === '4' ? saved : '1';
   });
+
 
   const headerRef = useRef<HTMLDivElement>(null);
 
