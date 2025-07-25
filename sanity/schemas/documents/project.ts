@@ -256,7 +256,7 @@ export default defineType({
         }),
 
         defineArrayMember({
-          title: "Video",
+          title: "Full Video",
           name: "video",
           type: "mux.video",
           preview: {
@@ -372,6 +372,12 @@ export default defineType({
               description: 'Either use an image or a video on the left side.',
             },
             {
+              title: 'Left Featured',
+              name: 'leftFeatured',
+              type: 'boolean',
+              description: 'Mark the left media item as featured.',
+            },
+            {
               title: 'Right Image',
               name: 'rightImage',
               type: 'image',
@@ -387,16 +393,16 @@ export default defineType({
               description: 'Either use an image or a video on the right side.',
             },
             {
+              title: 'Right Featured',
+              name: 'rightFeatured',
+              type: 'boolean',
+              description: 'Mark the right media item as featured.',
+            },
+            {
               title: 'Caption',
               name: 'caption',
               type: 'string',
               description: '(Optional) Caption below the two media items.',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this media set as featured.',
             },
           ],
           preview: {
@@ -422,7 +428,7 @@ export default defineType({
               const hasRight = !!fields?.rightImage || !!fields?.rightVideo;
               const hasBothLeft = !!fields?.leftImage && !!fields?.leftVideo;
               const hasBothRight = !!fields?.rightImage && !!fields?.rightVideo;
-        
+
               if (!hasLeft || !hasRight) {
                 return 'Both left and right sides must have either an image or a video.';
               }
@@ -434,7 +440,8 @@ export default defineType({
               }
               return true;
             }),
-        })
+        });
+
         
         
         
