@@ -16,13 +16,15 @@ export interface HomePageProps {
 
 export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   // Default to an empty object to allow previews on non-existent documents
-  const { overview = [], showcaseProjects = [] } = data ?? {}
+  const { overview = [], showcaseProjects = [], featuredMedia = [] } = data ?? {}
+
+  console.log('🎬 Featured Media:', featuredMedia)
 
   return (
     <div className="space-y-6 home-page">
       <div className={`mobile-intersector`}></div>
       {/* Header */}
-      <div className="w-full h-[150vh] overflow-hidden">
+      {/* <div className="w-full h-[150vh] overflow-hidden">
         <HeroGallery
         images={[
           { src: '/about-bg.png' },
@@ -33,7 +35,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
    
         ]}
         />
-      </div>
+      </div> */}
       {overview && <Header description={overview} />}
       <div className="w-full h-auto flex pt-5 pb-5 bg-white home-project-title">
         <Reveal element='p' elementClass="text-4xl h-auto">

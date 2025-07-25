@@ -66,6 +66,23 @@ export interface ShowcaseProject {
 
 // Page payloads
 
+
+export interface FeaturedMediaItem {
+  type: 'image' | 'video'
+  projectTitle: string
+  slug: string
+  caption?: string
+  image?: {
+    url: string
+    lqip?: string
+    _id: string
+  }
+  video?: {
+    playbackId: string
+    url: string
+  }
+}
+
 export interface HomePagePayload {
   footer?: PortableTextBlock[]
   overview?: any
@@ -73,7 +90,9 @@ export interface HomePagePayload {
   title?: string
   customLogo?: Image
   _updatedAt?: string
+  featuredMedia?: FeaturedMediaItem[]
 }
+
 
 export interface ProjectsPagePayload {
   _type: string

@@ -39,6 +39,8 @@ export const homePageQuery = groq`
       }
     },
     title,
+
+    
   }
 `
 
