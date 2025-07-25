@@ -375,6 +375,8 @@ export default defineType({
               title: 'Left Featured',
               name: 'leftFeatured',
               type: 'boolean',
+              hidden: ({ parent }) =>
+                !parent?.leftImage && !parent?.leftVideo,
               description: 'Mark the left media item as featured.',
             },
             {
@@ -396,6 +398,8 @@ export default defineType({
               title: 'Right Featured',
               name: 'rightFeatured',
               type: 'boolean',
+              hidden: ({ parent }) =>
+                !parent?.rightImage && !parent?.rightVideo,
               description: 'Mark the right media item as featured.',
             },
             {
@@ -441,6 +445,7 @@ export default defineType({
               return true;
             }),
         });
+
 
         
         
