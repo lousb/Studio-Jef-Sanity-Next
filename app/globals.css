@@ -278,7 +278,8 @@ body:has(.scroll-visible) .project-page-title-info{
   margin-top:0px !important;
 }
 .filters-wrap > div > div{
-  margin-bottom:20px !important;
+  margin-bottom:0px !important;
+  height: fit-content;
   width: 33%;
 }
 .filters-wrap > div{
