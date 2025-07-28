@@ -39,8 +39,79 @@ export const homePageQuery = groq`
       }
     },
     title,
+    "featuredMedia": *[_type == "project"]{
+  title,
+  "slug": slug.current,
+  "content": content[featured == true || leftFeatured == true || rightFeatured == true][]{
+    _type,
+    _key,
+    caption,
+    featured,
+    leftFeatured,
+    rightFeatured,
 
-    
+    featured == true && _type == "hybridMedia" => {
+      media {
+        _type,
+        asset->{
+          _id,
+          url,
+          metadata { lqip }
+        }
+      },
+      video {
+        asset->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId,
+          "aspect_ratio": data.aspect_ratio
+        }
+      }
+    },
+
+    leftFeatured == true && _type == "twoHybridMedia" => {
+      leftImage {
+        _type,
+        asset->{
+          _id,
+          url,
+          metadata { lqip }
+        }
+      },
+      leftVideo {
+        asset->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId,
+          "aspect_ratio": data.aspect_ratio
+        }
+      }
+    },
+
+    rightFeatured == true && _type == "twoHybridMedia" => {
+      rightImage {
+        _type,
+        asset->{
+          _id,
+          url,
+          metadata { lqip }
+        }
+      },
+      rightVideo {
+        asset->{
+          playbackId,
+          assetId,
+          filename,
+          "url": "https://stream.mux.com/" + playbackId,
+          "aspect_ratio": data.aspect_ratio
+        }
+      }
+    }
+  }
+}
+
   }
 `
 

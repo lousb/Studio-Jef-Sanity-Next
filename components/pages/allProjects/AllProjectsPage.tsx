@@ -29,6 +29,9 @@ export function AllProjectsPage({
   });
 
 
+
+
+
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [selectedFilters, setSelectedFilters] = useState({
@@ -103,23 +106,7 @@ export function AllProjectsPage({
     ),
   ];
 
-  useLayoutEffect(() => {
-    if (!headerRef.current) return;
 
-    const el = headerRef.current;
-    gsap.killTweensOf(el); // Stop any ongoing animation
-
-    gsap.fromTo(
-      el,
-      { height: el.offsetHeight },
-      {
-        height: 'auto',
-        duration: 0.5,
-        ease: 'power2.inOut',
-      }
-    );
-  }, [filtersVisible]);
-  
 
   const toggleFilter = (type: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prev) => {
@@ -150,6 +137,45 @@ export function AllProjectsPage({
     return matchesClients && matchesGenres && matchesTechniques && matchesYears;
   });
 
+
+
+  const getAvailableFilterOptions = () => {
+    const available = {
+      clients: new Set<string>(),
+      genres: new Set<string>(),
+      techniques: new Set<string>(),
+      years: new Set<string>(),
+    };
+
+    validProjects.forEach((project) => {
+      const matchesClients =
+        selectedFilters.clients.size === 0 ||
+        project.client?.some((item) => selectedFilters.clients.has(item.title));
+      const matchesGenres =
+        selectedFilters.genres.size === 0 ||
+        project.genre?.some((item) => selectedFilters.genres.has(item.title));
+      const matchesTechniques =
+        selectedFilters.techniques.size === 0 ||
+        project.technique?.some((item) => selectedFilters.techniques.has(item.title));
+      const matchesYears =
+        selectedFilters.years.size === 0 ||
+        selectedFilters.years.has(project.year || 'Unknown');
+
+      const isMatch = matchesClients && matchesGenres && matchesTechniques && matchesYears;
+
+      if (isMatch) {
+        project.client?.forEach((c) => available.clients.add(c.title));
+        project.genre?.forEach((g) => available.genres.add(g.title));
+        project.technique?.forEach((t) => available.techniques.add(t.title));
+        available.years.add(project.year || 'Unknown');
+      }
+    });
+
+    return available;
+  };
+
+  const availableOptions = getAvailableFilterOptions();
+  
   return (
     <div className="space-y-6 all-projects-page">
       {/* Display aggregated lists at the top */}
@@ -176,7 +202,7 @@ export function AllProjectsPage({
       <Header description="All Projects" />
 
       <div ref={headerRef}
-      className="all-projects-header flex flex-row items-end space-x-4"
+      className="all-projects-header flex flex-row space-x-4"
       >
         <div
           className="w-1/5 h-auto cursor-pointer"
@@ -184,103 +210,121 @@ export function AllProjectsPage({
         >
           <Reveal>Filters {filtersVisible ? '-' : '+'}</Reveal>
         </div>
-        {filtersVisible && (
-          <div className="header-wrap w-[80%] mt-2 mb-2">
+        {/* {filtersVisible && ( */}
+          <div className={`header-wrap w-[80%] ${!filtersVisible ? 'filters-invisible' : 'filters-visible'} mt-2 mb-2`}>
             <div className="aggregated-data space-y-4 filters-wrap">
               <div className="text-sm">
-                <div className="flex flex-col space-y-2 text-2xl">
+                <div className="flex flex-col space-y-2 text-xl">
                   <Reveal element='p'>
                     <p>Clients:</p>
                   </Reveal>
                   
-                  <div className='flex flex-col m-0'>
-                  {clients.length > 0
-                    ? clients.map((client) => (
-                        <button
-                          key={client}
-                          className={`inline-block text-2xl ${
-                            selectedFilters.clients.has(client) ? ' select-filter' : ''
-                          }`}
-                          onClick={() => toggleFilter('clients', client)}
-                        >
-                           <Reveal element='p'>
-                          {client}
-                          </Reveal>
-                        </button>
-                      ))
-                    : 'None'}
+                  <div className='flex flex-col'>
+                  {clients.map((client) => {
+                    const isSelected = selectedFilters.clients.has(client);
+                    const isAvailable = availableOptions.clients.has(client);
+
+                    return (
+                      <button
+                        key={client}
+                        className={`inline-block text-xl ${
+                          isSelected ? 'select-filter' : ''
+                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                        onClick={() => {
+                          if (isSelected || isAvailable) toggleFilter('clients', client);
+                        }}
+                        disabled={!isSelected && !isAvailable}
+                      >
+                        <Reveal element="p">{client}</Reveal>
+                      </button>
+                    );
+                  })}
                     </div>
                 </div>
-                <div className="flex flex-col space-y-2 text-2xl">
+                <div className="flex flex-col space-y-2 text-xl">
                 <Reveal element='p'>
                     <p>Genre:</p>
                   </Reveal>
                   <div className='flex flex-col m-0'>
-                  {genres.length > 0
-                    ? genres.map((genre) => (
-                        <button
-                          key={genre}
-                          className={`inline-block text-2xl ${
-                            selectedFilters.genres.has(genre) ? ' select-filter' : ''
-                          }`}
-                          onClick={() => toggleFilter('genres', genre)}
-                        >
-                           <Reveal element='p'>
-                          {genre}
-                          </Reveal>
-                        </button>
-                      ))
-                    : 'None'}
+                  {genres.map((genre) => {
+                    const isSelected = selectedFilters.genres.has(genre);
+                    const isAvailable = availableOptions.genres.has(genre);
+
+                    return (
+                      <button
+                        key={genre}
+                        className={`inline-block text-xl ${
+                          isSelected ? 'select-filter' : ''
+                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                        onClick={() => {
+                          if (isSelected || isAvailable) toggleFilter('genres', genre);
+                        }}
+                        disabled={!isSelected && !isAvailable}
+                      >
+                        <Reveal element="p">{genre}</Reveal>
+                      </button>
+                    );
+                  })}
                     </div>
                 </div>
-                <div className="flex flex-col space-y-2 text-2xl">
+                <div className="flex flex-col space-y-2 text-xl">
                   <Reveal element='p'>
                     <p>Technique:</p>
                   </Reveal>
                   <div className='flex flex-col m-0'>
-                  {techniques.length > 0
-                    ? techniques.map((technique) => (
-                        <button
-                          key={technique}
-                          className={`inline-block text-2xl ${
-                            selectedFilters.techniques.has(technique) ? ' select-filter' : ''
-                          }`}
-                          onClick={() => toggleFilter('techniques', technique)}
-                        >
-                          <Reveal element='p'>
-                          {technique}
-                          </Reveal>
-                        </button>
-                      ))
-                    : 'None'}
+                  {techniques.map((technique) => {
+                    const isSelected = selectedFilters.techniques.has(technique);
+                    const isAvailable = availableOptions.techniques.has(technique);
+
+                    return (
+                      <button
+                        key={technique}
+                        className={`inline-block text-xl ${
+                          isSelected ? 'select-filter' : ''
+                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                        onClick={() => {
+                          if (isSelected || isAvailable) toggleFilter('techniques', technique);
+                        }}
+                        disabled={!isSelected && !isAvailable}
+                      >
+                        <Reveal element="p">{technique}</Reveal>
+                      </button>
+                    );
+                  })}
+
                   </div>
                 </div>
-                <div className="flex flex-col space-y-2 text-2xl">
+                <div className="flex flex-col space-y-2 text-xl">
                 <Reveal element='p'>
                     <p>Year:</p>
                   </Reveal>
                   <div className='flex flex-col m-0'>
-                  {years.length > 0
-                    ? years.map((year) => (
-                        <button
-                          key={year}
-                          className={`inline-block text-2xl ${
-                            selectedFilters.years.has(year) ? 'select-filter' : ''
-                          }`}
-                          onClick={() => toggleFilter('years', year)}
-                        >
-                           <Reveal element='p'>
-                          {year}
-                          </Reveal>
-                        </button>
-                      ))
-                    : 'None'}
+                  {years.map((year) => {
+                    const isSelected = selectedFilters.years.has(year);
+                    const isAvailable = availableOptions.years.has(year);
+
+                    return (
+                      <button
+                        key={year}
+                        className={`inline-block text-xl ${
+                          isSelected ? 'select-filter' : ''
+                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                        onClick={() => {
+                          if (isSelected || isAvailable) toggleFilter('years', year);
+                        }}
+                        disabled={!isSelected && !isAvailable}
+                      >
+                        <Reveal element="p">{year}</Reveal>
+                      </button>
+                    );
+                  })}
+
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        {/* )} */}
         {/* {!filtersVisible && (
           <Reveal element='p' elementClass="text-4xl h-auto">
             Sharing real people to real audiences

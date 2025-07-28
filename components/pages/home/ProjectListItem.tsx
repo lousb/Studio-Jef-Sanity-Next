@@ -317,7 +317,7 @@ function TextBox({
 
           {project.client && project.client.length > 0 && (
             <span
-              className="mt-0 opacity-75 cursor-pointer"
+              className="mt-0 opacity-75 cursor-pointer project-detail"
       
             >
               {typedClients || project.client.map((client, i) => (
@@ -333,7 +333,7 @@ function TextBox({
 
       <div
         ref={yearRef}
-        className="mask-out-page-transition flex pointer-events-all opacity-0 translate-y-full"
+        className="project-detail mask-out-page-transition flex pointer-events-all opacity-0 translate-y-full"
       >
         {project.year}
       </div>

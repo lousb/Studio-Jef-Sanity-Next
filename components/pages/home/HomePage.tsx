@@ -14,11 +14,14 @@ export interface HomePageProps {
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
+
 export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
   // Default to an empty object to allow previews on non-existent documents
   const { overview = [], showcaseProjects = [], featuredMedia = [] } = data ?? {}
 
   console.log('🎬 Featured Media:', featuredMedia)
+
+  
 
   return (
     <div className="space-y-6 home-page">
@@ -26,14 +29,10 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
       {/* Header */}
       {/* <div className="w-full h-[150vh] overflow-hidden">
         <HeroGallery
-        images={[
-          { src: '/about-bg.png' },
-          { src: '/about-bg-2.gif'},
-          { src: '/about-bg-3.gif' },
-          { src: '/about-bg-4.gif' },
-          { src: '/about-bg-5.png' },
+        featuredMedia={
+          featuredMedia
    
-        ]}
+        }
         />
       </div> */}
       {overview && <Header description={overview} />}
@@ -76,5 +75,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     </div>
   )
 }
+
+
 
 export default HomePage

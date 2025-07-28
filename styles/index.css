@@ -81,12 +81,56 @@ body:has(.scroll-visible) .about-link{
 .all-projects-header{
   margin-bottom: 20px !important;
 }
-.select-filter p::after{
-  content:'•';
-  display: inline;
-
+.select-filter p::before{
+  content:'';
+  display: inline-block;
+  position: absolute;
+  height:0.2em;
+  width:0.2em;
+  background-color: black;
+  border-radius: 50px;
+  bottom: 40%;
+  left: -0.5em;
+  transform: translateY(50%);
+  transition: 500ms ease all;
+  opacity: 1;
 }
-
+.select-filter p:hover::before{
+    transition: 500ms ease all ;
+   height:0.1em;
+  width: 0.35em;
+  left: -0.65em;
+}
+.filters-invisible .select-filter p::before{
+  opacity: 0;
+}
+.filters-visible .select-filter p::before{
+  opacity: 1;
+}
+.select-filter p:hover::before{
+  opacity: 1 !important;
+}
+.filters-invisible p{
+  height: 0;
+    padding-bottom: 0em;
+    clip-path: inset(0 0 100% -100%);
+  transition: 500ms ease all  !important;
+}
+.filters-visible p{
+  height: 0;
+  clip-path: inset(0 0 0 -100%);
+  padding-bottom: 1.2em;
+  transition: 500ms ease all  !important ;
+}
+.filters-invisible p{
+  padding-bottom: 0px;
+   clip-path: inset(0 0 100% -100%);
+  overflow: hidden;
+}
+.filters-invisible .select-filter p{
+     clip-path: inset(0 0 0% -100%);
+  padding-bottom: 1.2em !important;
+}
 @media only screen and (max-width: 768px) {
   #initial-loader{
     padding:1rem !important;

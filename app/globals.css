@@ -318,6 +318,9 @@ margin-bottom: -0.3rem;
 .infinite-grid-container .item{
   cursor:pointer;
 }
+.home-page .project-link-wrap > a .mask-out-page-transition{
+  font-size: 1.6rem;
+}
 .home-page .project-link-wrap > a:nth-child(7n+1),
 .home-page .project-link-wrap > a:nth-child(7n+4),
 .home-page .project-link-wrap > a:nth-child(7n+7) {
@@ -330,4 +333,15 @@ margin-bottom: -0.3rem;
 .home-page .project-link-wrap > a:nth-child(7n+5),
 .home-page .project-link-wrap > a:nth-child(7n+6) {
   transform: scale(0.8);
+}
+.home-page .project-link-wrap > a:nth-child(7n+2) .mask-out-page-transition,
+.home-page .project-link-wrap > a:nth-child(7n+3) .mask-out-page-transition,
+.home-page .project-link-wrap > a:nth-child(7n+5) .mask-out-page-transition,
+.home-page .project-link-wrap > a:nth-child(7n+6) .mask-out-page-transition{
+  font-size: calc(1.6rem * 1.2);
+
+}
+
+.header-wrap .flex{
+  margin-top:0 !important;
 }

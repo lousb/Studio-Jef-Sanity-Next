@@ -34,6 +34,7 @@ export function ProjectPage({
   const nextProject = projects[currentProjectIndex + 1] || null
 
   const titleRef = useRef<HTMLDivElement>(null)
+   const titleHeadingRef = useRef<HTMLDivElement>(null)
 
   const [isInfoActive, setIsInfoActive] = useState(true)
   const [hasScrolled, setHasScrolled] = useState(false)
@@ -102,7 +103,7 @@ export function ProjectPage({
     <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
       <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} flex-col`}>
         {/* Title */}
-        <div>
+        <div ref={titleHeadingRef}>
           {title && (
             <Reveal element={'div'} elementClass={'text-2xl md:text-4xl break-words hyphens-auto'}>
               {title}
@@ -117,15 +118,7 @@ export function ProjectPage({
         </div>
 
         <div>
-          <div style={{ marginTop: '1rem', opacity: 0.6 }}>
-            {client?.map((client, i) => (
-              <span key={i}>
-                {client.title}
-                <br />
-              </span>
-            ))}
-          </div>
-          {overview && (
+           {overview && (
             <div className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}>
               <div className="w-full">
                 {/* Overview */}
@@ -152,6 +145,15 @@ export function ProjectPage({
               </div>
             </div>
           )}
+          <div style={{ marginTop: '1rem', marginBottom: '1rem', opacity: 0.6 }}>
+            {client?.map((client, i) => (
+              <span key={i}>
+                {client.title}
+                <br />
+              </span>
+            ))}
+          </div>
+         
         </div>
       </div>
 
@@ -162,7 +164,7 @@ export function ProjectPage({
         <Reveal>{isInfoActive ? 'Info -' : 'Info +'}</Reveal>
       </button>
 
-      <div className={`mb-10 md:mb-20 space-y-6 ${styles.projectPage}`}>
+      <div className={` space-y-6 ${styles.projectPage}`}>
         <div>
           {/* Display project content by type */}
           {content?.map((content, key) => (
