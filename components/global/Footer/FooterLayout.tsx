@@ -41,7 +41,7 @@ export default function Footer(props: FooterProps) {
 
   return (
     <footer className="bottom-0 grid grid-cols-1 md:grid-cols-2 gap-3 px-4 md:px-5 py-2 md:py-5 lg:px-5 bg-white">
-      <div className="text-xl md:text-left md:text-1xl">
+      <div className="text-xl md:text-left md:text-1xl footer-desc">
         <h2>The studio practice of Aaron Bull & Matt Wilson.</h2>
       </div>
       <div className="text-xl md:text-1xl">

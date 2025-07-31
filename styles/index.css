@@ -216,6 +216,17 @@ body:has(.scroll-visible) .about-link{
     font-size: calc(1.2rem) !important;
 
   }
+  .footer-desc{
+    padding-top:20px;
+  }
+  footer{
+    min-height: 60vh;
+    align-items: start;
+    justify-content:end;
+    display:flex !important;
+    flex-direction:column;
+
+  }
   
 }
 @media only screen and (min-width: 1279px) {
