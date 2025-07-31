@@ -212,13 +212,11 @@ body:has(.scroll-visible) .about-link{
   .home-page .project-link-wrap > a:nth-child(7n+6) {
     transform: scale(1) !important;
   }
-  .home-page .project-link-wrap > a:nth-child(7n+2) .mask-out-page-transition,
-  .home-page .project-link-wrap > a:nth-child(7n+3) .mask-out-page-transition,
-  .home-page .project-link-wrap > a:nth-child(7n+5) .mask-out-page-transition,
-  .home-page .project-link-wrap > a:nth-child(7n+6) .mask-out-page-transition{
-    font-size: calc(1.6rem) !important;
+  .mask-out-page-transition{
+    font-size: calc(1.2rem) !important;
 
   }
+  
 }
 @media only screen and (min-width: 1279px) {
 .project-link-wrap.one-column > a:nth-child(1){
