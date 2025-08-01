@@ -209,8 +209,8 @@ mux-player {
   --media-object-position: center;
   /* --controls: none; */
 }
-.hybrid-media mux-player {
-  --controls:none;
+.hybrid-media mux-player, mux-player.hybrid-media {
+  --controls:none !important;
 }
 .about-page .hybrid-media {
   --media-aspect-ratio: auto !important;
