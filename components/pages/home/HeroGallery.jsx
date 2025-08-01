@@ -155,7 +155,7 @@ const HeroGallery = ({ featuredMedia }) => {
     container.innerHTML = ''
     items.current = []
 
-    const spacing = 250
+    const spacing = 150
     const countX = Math.floor(bounds.current.w / spacing)
     const countY = Math.floor(bounds.current.h / spacing)
     const imageCount = mediaItems.length
@@ -214,7 +214,7 @@ const HeroGallery = ({ featuredMedia }) => {
 
         if (isVideo && item.playbackId) {
           const aspectRatio = item.aspectRatio || 16 / 9
-          const h = 140 + seededRandom(seed + 4) * 40
+          const h = 180 + seededRandom(seed + 4) * 40
           const w = h * aspectRatio
           el.innerHTML = `
             <mux-player
@@ -246,7 +246,14 @@ const HeroGallery = ({ featuredMedia }) => {
           }
 
           if (isGif) img.onload = handleReady
-          else img.decode().then(handleReady).catch(() => console.warn('Decode failed:', img.src))
+          else if ('decode' in img) {
+            requestIdleCallback(() => {
+              img.decode().then(handleReady).catch(() => img.onload = handleReady)
+            })
+          } else {
+            img.onload = handleReady
+          }
+
         }
       }
     }
@@ -266,7 +273,8 @@ const HeroGallery = ({ featuredMedia }) => {
       startX: e.clientX,
       startY: e.clientY,
       scrollX: scroll.current.target.x,
-      scrollY: scroll.current.target.y
+      scrollY: scroll.current.target.y,
+      willChange: 'transform'
     })
     mouse.current.press.t = 1
   }
@@ -348,6 +356,13 @@ const HeroGallery = ({ featuredMedia }) => {
       posX = ((posX % gridW) + gridW) % gridW - gridW / 2
       posY = ((posY % gridH) + gridH) % gridH - gridH / 2
 
+      if (
+        posX < -winSize.current.w / 2 - 300 || posX > winSize.current.w / 2 + 300 ||
+        posY < -winSize.current.h / 2 - 300 || posY > winSize.current.h / 2 + 300
+      ) {
+        continue
+      }
+
       if (Math.abs(posX - item.lastX) > 0.5 || Math.abs(posY - item.lastY) > 0.5) {
         item.el.style.transform = `translate(${posX}px, ${posY}px)`
         item.lastX = posX
@@ -368,10 +383,15 @@ const HeroGallery = ({ featuredMedia }) => {
 
     generateItems()
 
+    let resizeTimeout
     const throttledResize = () => {
-      cancelAnimationFrame(animationFrame.current)
-      setTimeout(generateItems, 200)
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(() => {
+        cancelAnimationFrame(animationFrame.current)
+        generateItems()
+      }, 150)
     }
+
 
     window.addEventListener('resize', throttledResize)
     window.addEventListener('wheel', onWheel, { passive: false })
