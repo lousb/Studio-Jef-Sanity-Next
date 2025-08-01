@@ -356,12 +356,7 @@ const HeroGallery = ({ featuredMedia }) => {
       posX = ((posX % gridW) + gridW) % gridW - gridW / 2
       posY = ((posY % gridH) + gridH) % gridH - gridH / 2
 
-      if (
-        posX < -winSize.current.w / 2 - 300 || posX > winSize.current.w / 2 + 300 ||
-        posY < -winSize.current.h / 2 - 300 || posY > winSize.current.h / 2 + 300
-      ) {
-        continue
-      }
+      
 
       if (Math.abs(posX - item.lastX) > 0.5 || Math.abs(posY - item.lastY) > 0.5) {
         item.el.style.transform = `translate(${posX}px, ${posY}px)`
