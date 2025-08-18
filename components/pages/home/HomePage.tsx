@@ -28,12 +28,12 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
       <div className={`mobile-intersector`}></div>
       {/* Header */}
       <div className="w-full h-[150vh] overflow-hidden">
-        {/* <HeroGallery
+        <HeroGallery
         featuredMedia={
           featuredMedia
    
         }
-        /> */}
+        />
       </div>
       {overview && <Header description={overview} />}
       <div className="w-full h-auto flex pt-5 pb-5 bg-white home-project-title">
