@@ -4,8 +4,12 @@ import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { MuxPlayer } from '@mux/mux-player-react'
 import ImageBox from '@/components/shared/ImageBox'
 import ReactDOM from 'react-dom/client'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { FreeMode } from 'swiper/modules'
 
 import gsap from 'gsap'
+import 'swiper/css'
+import 'swiper/css/free-mode'
 
 function seededRandom(seed) {
   return (Math.sin(seed) * 10000) % 1
@@ -692,31 +696,164 @@ const HeroGallery = ({ featuredMedia }) => {
 
     // Always use simple horizontal layout for mobile OR when infinite X mode is active
     if (isMobile || infiniteXMode) {
-      // Simple horizontal row with evenly spaced items
-      const containerWidth = winSize.current.w;
-      const itemWidth = isMobile ? 280 : 200;
-      const itemHeight = isMobile ? 200 : 160;
-      
-      // Calculate even spacing to fill the screen width nicely
-      const visibleItems = Math.ceil(containerWidth / itemWidth) + 1; // Items visible on screen + buffer
-      const totalItems = Math.max(mediaItems.length * 2, visibleItems * 2); // Ensure enough items for smooth loop
-      
-      // Calculate spacing for even distribution
-      const totalItemsWidth = totalItems * itemWidth;
-      const totalGapSpace = Math.max(totalItemsWidth * 0.2, totalItems * 20); // 20% of total width or minimum 20px per item
-      const gap = totalGapSpace / (totalItems - 1);
-      
-      let x = 0;
-      const y = (winSize.current.h - itemHeight) / 2;
+      // Create Swiper for mobile, regular grid for desktop infinite X
+      if (isMobile) {
+        // Create Swiper container for mobile
+        const swiperContainer = document.createElement('div');
+        swiperContainer.className = 'swiper';
+        swiperContainer.style.cssText = `
+          width: 100%;
+          height: 100vh;
+          overflow: hidden;
+        `;
+        
+        const swiperWrapper = document.createElement('div');
+        swiperWrapper.className = 'swiper-wrapper';
+        swiperWrapper.style.cssText = `
+          align-items: center;
+        `;
+        
+        mediaItems.forEach((item, index) => {
+          const slide = document.createElement('div');
+          slide.className = 'swiper-slide';
+          slide.style.cssText = `
+            width: 280px !important;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 40px;
+          `;
+          
+          const mediaEl = document.createElement('div');
+          mediaEl.style.cssText = `
+            width: 280px;
+            height: 200px;
+            background: #000;
+            opacity: 0.95;
+            overflow: hidden;
+            cursor: pointer;
+          `;
+          
+          // Create media content
+          if (item.type === 'video' && item.playbackId) {
+            const player = document.createElement('mux-player');
+            player.className = 'hybrid-media';
+            player.setAttribute('playbook-id', item.playbackId);
+            player.setAttribute('stream-type', 'on-demand');
+            player.setAttribute('muted', '');
+            player.setAttribute('loop', '');
+            player.setAttribute('preload', 'none');
+            player.setAttribute('poster', `https://image.mux.com/${item.playbackId}/thumbnail.jpg?time=1`);
+            player.setAttribute('max-resolution', '240p');
+            Object.assign(player.style, {
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+            });
 
-      for (let i = 0; i < totalItems; i++) {
-        const item = mediaItems[i % mediaItems.length];
-        createMediaElement(item, i, x, y, gap);
-        x += itemWidth + gap;
+            const link = document.createElement('a');
+            link.href = '/projects/' + (item.slug || '#');
+            Object.assign(link.style, {
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
+              position: 'relative',
+            });
+
+            link.appendChild(player);
+            mediaEl.appendChild(link);
+
+            // Intersection Observer
+            const observer = new IntersectionObserver(
+              ([entry]) => {
+                if (entry.isIntersecting) {
+                  player.play().catch(() => {});
+                } else {
+                  player.pause();
+                }
+              },
+              { threshold: 0.1 }
+            );
+            observer.observe(link);
+            
+          } else if (item.type === 'image' && item.asset?.url) {
+            const link = document.createElement('a');
+            link.href = item.linkUrl || ('/projects/' + (item.slug || '#'));
+            Object.assign(link.style, {
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              cursor: 'pointer',
+              position: 'relative',
+            });
+
+            const imgEl = document.createElement('img');
+            imgEl.src = item.asset.url;
+            imgEl.alt = item.caption || 'Gallery Image';
+            Object.assign(imgEl.style, {
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+              pointerEvents: 'none',
+            });
+
+            link.appendChild(imgEl);
+            mediaEl.appendChild(link);
+          }
+          
+          slide.appendChild(mediaEl);
+          swiperWrapper.appendChild(slide);
+        });
+        
+        swiperContainer.appendChild(swiperWrapper);
+        container.appendChild(swiperContainer);
+        
+        // Initialize Swiper
+        setTimeout(() => {
+          import('swiper').then(({ default: Swiper }) => {
+            new Swiper(swiperContainer, {
+              modules: [FreeMode],
+              slidesPerView: 'auto',
+              spaceBetween: 40,
+              freeMode: {
+                enabled: true,
+                sticky: false,
+                momentumRatio: 0.25,
+                momentumVelocityRatio: 0.25,
+              },
+              centeredSlides: false,
+              loop: false,
+              resistance: true,
+              resistanceRatio: 0.25,
+            });
+          });
+        }, 100);
+        
+      } else {
+        // Desktop infinite X mode - locked 40px grid
+        const itemWidth = 200;
+        const itemHeight = 160;
+        const gap = 40; // Fixed 40px gap
+        
+        let x = 0;
+        const y = (winSize.current.h - itemHeight) / 2;
+
+        // Create items with exact 40px spacing
+        const totalItems = mediaItems.length * 3; // Triple items for smooth infinite loop
+        
+        for (let i = 0; i < totalItems; i++) {
+          const item = mediaItems[i % mediaItems.length];
+          createMediaElement(item, i, x, y, gap);
+          x += itemWidth + gap; // Exact spacing
+        }
+
+        bounds.current.w = x - gap; // Remove last gap
+        bounds.current.h = winSize.current.h;
       }
-
-      bounds.current.w = x - gap; // Remove last gap
-      bounds.current.h = winSize.current.h;
     } else {
       // Desktop: Complex grid system (only when not in infinite X mode)
       const gap = 40;
@@ -873,10 +1010,14 @@ const HeroGallery = ({ featuredMedia }) => {
 
   // Main render function that switches based on device and mode
   const render = useCallback(() => {
-    if (isMobile || infiniteXMode) {
-      renderMobile();
+    // Mobile uses Swiper, desktop infinite X uses animation, complex mode uses desktop render
+    if (isMobile) {
+      // Mobile uses Swiper - no animation loop needed
+      return;
+    } else if (infiniteXMode) {
+      renderMobile(); // Use the simple horizontal animation for desktop infinite X
     } else {
-      renderDesktop();
+      renderDesktop(); // Complex desktop interactions
     }
   }, [isMobile, infiniteXMode, renderMobile, renderDesktop])
 
@@ -985,8 +1126,10 @@ const HeroGallery = ({ featuredMedia }) => {
       window.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
     
-    // Start render loop
-    render();
+    // Start render loop (only for non-mobile or desktop infinite X)
+    if (!isMobile || infiniteXMode) {
+      render();
+    }
     
     return () => {
       clearTimeout(animationTimeout);
@@ -1061,8 +1204,8 @@ const HeroGallery = ({ featuredMedia }) => {
           height: '100vh',
           top: 0,
           left: 0,
-          pointerEvents: (isMobile || infiniteXMode) ? 'none' : 'auto', // Disable interactions when in infinite X mode
-          touchAction: (isMobile || infiniteXMode) ? 'pan-y' : (touch.current.preventScroll ? 'none' : 'pan-y'),
+          pointerEvents: isMobile ? 'auto' : ((infiniteXMode) ? 'none' : 'auto'), // Enable pointer events for mobile Swiper
+          touchAction: isMobile ? 'pan-x pan-y' : ((infiniteXMode) ? 'pan-y' : (touch.current.preventScroll ? 'none' : 'pan-y')), // Allow swiper gestures on mobile
         }}
       />
       
