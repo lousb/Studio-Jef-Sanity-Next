@@ -349,3 +349,7 @@ margin-bottom: -0.3rem;
 html:has( .header) #initial-loader{
   display: none !important;
 }
+
+.infinite-grid-container > div:hover{
+  z-index: 99;
+}
