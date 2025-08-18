@@ -601,7 +601,7 @@ const HeroGallery = ({ featuredMedia }) => {
 
       const player = document.createElement('mux-player');
       player.className = 'hybrid-media';
-      player.setAttribute('playbook-id', item.playbackId);
+      player.setAttribute('playback-id', item.playbackId);
       player.setAttribute('stream-type', 'on-demand');
       player.setAttribute('muted', '');
       player.setAttribute('loop', '');
@@ -1245,27 +1245,7 @@ const HeroGallery = ({ featuredMedia }) => {
         </button>
       )}
       
-      {/* Desktop zoom indicator (only in interactive mode) */}
-      {!isMobile && !infiniteXMode && Math.abs(viewport.current.scale - viewport.current.baseScale) > 0.1 && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'rgba(0, 0, 0, 0.7)',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            fontSize: '12px',
-            zIndex: 1000,
-            pointerEvents: 'none',
-            transition: 'opacity 0.3s ease',
-          }}
-        >
-          Double tap to reset zoom
-        </div>
-      )}
+     
     </>
   );
 };
