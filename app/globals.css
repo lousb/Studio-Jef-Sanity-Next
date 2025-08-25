@@ -329,16 +329,10 @@ margin-bottom: -0.3rem;
 }
 
 /* Scale: 2nd, 3rd, 5th, 6th elements in the pattern */
-.home-page .project-link-wrap > a:nth-child(7n+2),
-.home-page .project-link-wrap > a:nth-child(7n+3),
-.home-page .project-link-wrap > a:nth-child(7n+5),
-.home-page .project-link-wrap > a:nth-child(7n+6) {
-  transform: scale(0.8);
+.home-page .scale-down a > div {
+  scale: 0.8;
 }
-.project-link-wrap > a:nth-child(7n+2) .mask-out-page-transition,
-.home-page .project-link-wrap > a:nth-child(7n+3) .mask-out-page-transition,
-.home-page .project-link-wrap > a:nth-child(7n+5) .mask-out-page-transition,
-.home-page .project-link-wrap > a:nth-child(7n+6) .mask-out-page-transition{
+.home-page .scale-down .mask-out-page-transition{
   font-size: calc(1.6rem * 1.2);
 
 }

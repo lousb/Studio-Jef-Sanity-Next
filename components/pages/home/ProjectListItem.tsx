@@ -318,16 +318,18 @@ function TextBox({
           {project.client && project.client.length > 0 && (
             <span
               className="mt-0 opacity-75 cursor-pointer project-detail"
-      
             >
-              {typedClients || project.client.map((client, i) => (
-                <span key={i}>
-                  {client.title}
-                  {i < project.client!.length - 1 ? ', ' : ''}
-                </span>
-              ))}
+              {typedClients || project.client
+                .filter(client => client.title !== project.title) // filter out same-as-project-title
+                .map((client, i, arr) => (
+                  <span key={i}>
+                    {client.title}
+                    {i < arr.length - 1 ? ', ' : ''}
+                  </span>
+                ))}
             </span>
           )}
+
         </div>
       </div>
 

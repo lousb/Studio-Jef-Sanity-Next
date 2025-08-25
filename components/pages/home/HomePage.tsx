@@ -44,30 +44,34 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
       {/* Showcase projects */}
       {showcaseProjects && showcaseProjects.length > 0 && (
         <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 project-link-wrap bg-white">
-          
-          {showcaseProjects.map((project, key) => {
-            const href = resolveHref(project?._type, project?.slug)
-            if (!href) {
-              return null
-            }
+          {showcaseProjects.map((item, key) => {
+            const { project, scaleTile } = item
+            const href = resolveHref(project._type, project.slug)
+
+            if (!href) return null
 
             // Calculate delay for every second item in the row
-            const delay = Math.floor(key / 2) * 0.2 + 0.2;
+            const delay = Math.floor(key / 2) * 0.2 + 0.2
 
             return (
+               <div className={scaleTile ? 'scale-down' : ''}>
               <Link
                 key={key}
                 href={href}
                 data-sanity={encodeDataAttribute?.([
                   'showcaseProjects',
                   key,
+                  'project',
                   'slug',
                 ])}
               >
-                <RevealDiv delay={delay}> {/* Apply calculated delay */}
-                  <ProjectListItem project={project} />
+                <RevealDiv delay={delay}>
+                 
+                    <ProjectListItem project={project} />
+              
                 </RevealDiv>
               </Link>
+              </div>
             )
           })}
         </div>
