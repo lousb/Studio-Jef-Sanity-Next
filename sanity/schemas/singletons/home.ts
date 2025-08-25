@@ -97,7 +97,8 @@ export default defineType({
               name: 'scaleTile',
               title: 'Scale tile',
               type: 'boolean',
-              description: 'If enabled, this will scale the tile down by 20%',
+              description: 'If enabled, this tile will scale down by 20%',
+              initialValue: false,
             },
           ],
           preview: {
