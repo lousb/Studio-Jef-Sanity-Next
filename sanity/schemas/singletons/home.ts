@@ -85,11 +85,37 @@ export default defineType({
       type: 'array',
       of: [
         defineArrayMember({
-          type: 'reference',
-          to: [{ type: 'project' }],
+          type: 'object',
+          fields: [
+            {
+              name: 'project',
+              title: 'Project',
+              type: 'reference',
+              to: [{ type: 'project' }],
+            },
+            {
+              name: 'scaleTile',
+              title: 'Scale tile',
+              type: 'boolean',
+              description: 'If enabled, this will scale the tile down by 20%',
+            },
+          ],
+          preview: {
+            select: {
+              title: 'project.title',
+              scale: 'scaleTile',
+            },
+            prepare({ title, scale }) {
+              return {
+                title,
+                subtitle: scale ? 'Scaled down 20%' : '',
+              }
+            },
+          },
         }),
       ],
     }),
+
   ],
   preview: {
     select: {
