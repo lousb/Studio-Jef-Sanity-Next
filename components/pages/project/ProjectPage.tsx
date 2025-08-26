@@ -100,8 +100,8 @@ export function ProjectPage({
   }, [isInfoActive])
 
   return (
-    <div className={isInfoActive ? styles.infoActive : styles.infoInActive}>
-      <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} flex-col`}>
+    <div className={`${isInfoActive ? `${styles.infoActive} info-active` : styles.infoInActive}`}>
+      <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} project-page-title flex-col`}>
         {/* Title */}
         <div ref={titleHeadingRef}>
           {title && (
@@ -119,7 +119,7 @@ export function ProjectPage({
 
         <div>
            {overview && (
-            <div className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails}`}>
+            <div className={`flex flex-wrap justify-between flex-col md:flex-row ${styles.projectPageDetails} project-page-details`}>
               <div className="w-full">
                 {/* Overview */}
                 <Reveal element={'div'} elementClass={'text-xl md:text-2xl'}>

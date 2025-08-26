@@ -217,7 +217,10 @@ mux-player {
   height: 100vh;
   display: block;
 }
-
+body:has(.scroll-visible) .info-active .project-page-title:first-child{
+  transform:translateY(-5rem) !important;
+  height: calc(100vh - 1.5rem);
+}
 .scroll-visible {
   transform: translateY(-100%) !important;
 }
