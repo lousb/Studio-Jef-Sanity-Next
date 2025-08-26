@@ -161,22 +161,21 @@ export const projectsPageQuery = groq`
 `;
 
 export const moreProjectsQuery = groq`
-  *[_type == "home"][0]{
-    showcaseProjects[]->{
+  *[_type == "project"] | order(_updatedAt desc) {
+    _type,
+    coverImage{
       _type,
-      coverImage{
-        _type,
-        asset,
-        "lqip": asset->metadata.lqip,
-      },
-      overview,
-      "slug": slug.current,
-      title,
-      year,
-      _updatedAt,
+      asset,
+      "lqip": asset->metadata.lqip,
     },
+    overview,
+    "slug": slug.current,
+    title,
+    year,
+    _updatedAt,
   }
 `
+
 
 export const aboutPageQuery = groq`
   *[_type == "about"][0]{

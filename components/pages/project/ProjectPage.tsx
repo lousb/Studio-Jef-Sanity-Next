@@ -14,9 +14,9 @@ import type { ProjectPayload } from '@/types'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
 
-export interface ProjectPageProps {
+interface ProjectPageProps {
   data: ProjectPayload | null
-  moreProjects: HomePagePayload | null
+  moreProjects: ProjectPayload[] // now just an array of projects
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
@@ -26,8 +26,8 @@ export function ProjectPage({
   encodeDataAttribute,
 }: ProjectPageProps) {
   const { year, overview, site, client, title, content, slug } = data ?? {}
-  const { showcaseProjects = [] } = moreProjects ?? {}
-  const projects = moreProjects?.showcaseProjects || []
+
+  const projects = moreProjects || []
   const currentProjectIndex = projects.findIndex((project) => project.slug === slug)
 
   const prevProject = projects[currentProjectIndex - 1] || null
