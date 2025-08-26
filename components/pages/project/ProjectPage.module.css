@@ -16,9 +16,15 @@
 .projectPageTitle:first-child{
   transition: 500ms ease-in-out all, max-width 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s !important;
 }
+
 .infoActive .projectPageTitle{
   max-width: 18vw;
   
+}
+@media only screen and (max-width: 768px) {
+  .infoActive .projectPageTitle {
+    max-width: 90vw !important;
+  }
 }
 .projectPageDetails {
   position: relative;
