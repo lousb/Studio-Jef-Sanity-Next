@@ -206,11 +206,8 @@ body:has(.scroll-visible) .about-link{
   .header-wrap{
     width: 100%;
   }
-  .home-page .project-link-wrap > a:nth-child(7n+2),
-  .home-page .project-link-wrap > a:nth-child(7n+3),
-  .home-page .project-link-wrap > a:nth-child(7n+5),
-  .home-page .project-link-wrap > a:nth-child(7n+6) {
-    transform: scale(1) !important;
+  .home-page .scale-down a > div {
+    scale: 1 !important;
   }
   .mask-out-page-transition{
     font-size: calc(1.2rem) !important;
