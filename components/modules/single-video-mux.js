@@ -15,7 +15,7 @@ const Video = ({ data = {} }) => {
   }
 
   return (
-    <div className="divider">
+    <div className="divider mt-3">
       <Suspense fallback={<div style={{ paddingTop: '56.25%', background: '#eee' }}>Loading video...</div>}>
         <MuxVideoBox
           playbackId={playbackId}

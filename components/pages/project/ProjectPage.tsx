@@ -165,7 +165,7 @@ export function ProjectPage({
       </button>
 
       <div className={` space-y-6 ${styles.projectPage}`}>
-        <div>
+        <div className='relative z-10 bg-white'>
           {/* Display project content by type */}
           {content?.map((content, key) => (
             <RevealDiv delay={0.4} key={key}>
@@ -175,7 +175,10 @@ export function ProjectPage({
         </div>
 
         {/* Previous and next project links */}
-        {projects && <MoreProjects previous={prevProject} next={nextProject} />}
+        <div className='relative z-10 bg-white mt-0'>
+          {projects && <MoreProjects previous={prevProject} next={nextProject} />}
+        </div>
+        
       </div>
     </div>
   )

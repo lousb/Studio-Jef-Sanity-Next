@@ -6,7 +6,7 @@ const Image = ({ data = {} }) => {
   if (!photo) return null
   return (
     
-    <div className="divider">
+    <div className="divider mt-3">
           <SingleImage
             image={photo}
             caption={caption}

@@ -36,7 +36,7 @@ export default function ImageBox({
     urlForImage(rightImage)?.height(height).width(width).fit('crop').url()
 
   return (
-    <div className="mt-5 md:mt-10">
+    <div >
       <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
         <div
           className={`w-full overflow-hidden rounded-[3px] ${classesWrapper}`}

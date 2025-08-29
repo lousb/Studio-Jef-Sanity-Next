@@ -6,7 +6,7 @@ const Video = ({ data = {} }) => {
   if (!videoLink) return null
   return (
     
-    <div className="divider">
+    <div className="divider mt-3">
           <SingleVideo
             videoLink={videoLink}
             caption={caption}

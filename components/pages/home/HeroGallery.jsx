@@ -1224,6 +1224,7 @@ const HeroGallery = ({ featuredMedia }) => {
       {/* Toggle button for desktop only (hidden on screens < 800px) */}
       {!isMobile && (
         <button
+        className="mode-toggle-button"
           onClick={handleModeToggle}
           style={{
             position: 'fixed',

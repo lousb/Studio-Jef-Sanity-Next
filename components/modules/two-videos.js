@@ -6,7 +6,7 @@ const TwoVideos = ({ data = {} }) => {
   if (!videoOneLink) return null
   return (
     
-    <div className="divider">
+    <div className="divider mt-3">
           <TwoVideoBox
             videoOneLink={videoOneLink}
             videoTwoLink={videoTwoLink}

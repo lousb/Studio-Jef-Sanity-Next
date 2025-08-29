@@ -6,7 +6,7 @@ const Image = ({ data = {} }) => {
   if (!photoOne) return null
   return (
     
-    <div className="divider">
+    <div className="divider mt-3">
           <TwoImageBox
             leftImage={photoOne}
             rightImage={photoTwo}

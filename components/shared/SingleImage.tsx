@@ -26,7 +26,7 @@ export default function ImageBox({
   const imageUrl = image && urlForImage(image)?.url()
 
   return (
-    <div className="mt-5 md:mt-10">
+    <div >
       <div className={`w-full overflow-hidden rounded-[3px] ${classesWrapper}`}>
         {imageUrl && (
           <Image

@@ -353,3 +353,15 @@ html:has( .header) #initial-loader{
 .infinite-grid-container > div:hover{
   z-index: 99;
 }
+.page-404 .mode-toggle-button{
+  display: none !important;
+}
+.page-404 .infinite-grid-container, .page-404 div:has( > .infinite-grid-container){
+  pointer-events: none !important;
+}
+.page-404 .infinite-grid-container > div{
+  pointer-events: all !important;
+}
+.mt-0{
+  margin-top:0 !important
+}
