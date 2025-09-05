@@ -13,6 +13,17 @@ export default function LoadingOverlay() {
   const counterRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Check if current URL is /studio or starts with /studio/
+    const currentPath = window.location.pathname
+    const isStudioRoute = currentPath === '/studio' || currentPath.startsWith('/studio/')
+    
+    // If it's a studio route, don't show the loading overlay
+    if (isStudioRoute) {
+      setDone(true)
+      setShouldShow(false)
+      return
+    }
+
     const isMobile = window.matchMedia('(max-width: 768px)').matches
     const initHeader = document.querySelector('#initial-loader') as HTMLElement
     const header = document.querySelector('.header') as HTMLElement
@@ -39,7 +50,6 @@ export default function LoadingOverlay() {
         },
       })
     }
-
 
     const onFullLoad = () => {
       if (showTimeout) clearTimeout(showTimeout)

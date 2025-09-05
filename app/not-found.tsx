@@ -21,15 +21,15 @@ export default async function NotFound() {
           <HeroGallery featuredMedia={featuredMedia} />
         </div>
 
-        <h1 className="text-4xl font-bold mt-6">404 – Page Not Found</h1>
-        <p className="mt-2 text-gray-600">
-          Sorry, we couldn’t find the page you’re looking for.
-        </p>
+        <h1 className="text-4xl mt-6">This page doesn’t exist</h1>
+        <h1 className="text-4xl">
+          Pick a project, stick around.
+        </h1>
         <a
           href="/"
-          className="mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+          className="mt-4 px-4 py-2 back-to-home"
         >
-          Go Home
+          Back to home →
         </a>
       </main>
 

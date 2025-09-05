@@ -25,15 +25,39 @@ export default async function RootLayout({
         }}
         className="bg-primary"
       >
+        <head>
+          {/* Critical CSS to prioritize initial loader rendering */}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              #initial-loader {
+                position: fixed !important;
+                inset: 0 !important;
+                color: black !important;
+                z-index: -1 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 1.25rem !important;
+                font-size: 2.25rem !important;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                opacity: 0 !important;
+                transition: opacity 300ms ease !important;
+                pointer-events: none !important;
+                will-change: opacity !important;
+              }
+            `
+          }} />
+        </head>
+        
         <body>
-          {/* 🟡 Initial HTML Loader with fade-in */}
+          {/* 🟡 Initial HTML Loader with fade-in - now first in DOM */}
           <div
             id="initial-loader"
             style={{
               position: 'fixed',
               inset: 0,
               color: 'black',
-              zIndex: 9999,
+              zIndex: -1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -63,6 +87,7 @@ export default async function RootLayout({
             </svg>
             <div className="loading-counter-init">0%</div>
           </div>
+          
           <script
             dangerouslySetInnerHTML={{
               __html: `
