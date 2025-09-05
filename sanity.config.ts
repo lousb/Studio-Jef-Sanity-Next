@@ -26,7 +26,7 @@ import credits from '@/sanity/schemas/tags/credits'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE ||
-  'Collected | Portolio website editor with Sanity.io'
+  'Aw Studios'
 
 export default defineConfig({
   basePath: studioUrl,
