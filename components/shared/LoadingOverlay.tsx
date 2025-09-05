@@ -17,11 +17,31 @@ export default function LoadingOverlay() {
     const currentPath = window.location.pathname
     const isStudioRoute = currentPath === '/studio' || currentPath.startsWith('/studio/')
     
-    // If it's a studio route, don't show the loading overlay
+    // For studio routes, ALWAYS show the loading animation (remove reload detection entirely)
     if (isStudioRoute) {
-      setDone(true)
-      setShouldShow(false)
-      return
+      console.log('Studio route detected - showing full animation')
+      setShouldShow(true)
+      setDone(false)
+      setProgress(0)
+      
+      // Start progress immediately with full animation
+      let currentProgress = 0
+      intervalRef.current = setInterval(() => {
+        currentProgress += Math.random() * 2 + 1
+        setProgress(currentProgress)
+        
+        if (currentProgress >= 100) {
+          if (intervalRef.current) clearInterval(intervalRef.current)
+          setProgress(100)
+          setTimeout(() => {
+            setDone(true)
+          }, 800)
+        }
+      }, 80)
+      
+      return () => {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+      }
     }
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches
@@ -72,7 +92,9 @@ export default function LoadingOverlay() {
             height: targetHeight,
             duration: 1.2,
             ease: 'power2.inOut',
-            onComplete: () => gsap.to(initHeader, { opacity: 0, duration: 0 }),
+            onComplete: () => {
+              gsap.to(initHeader, { opacity: 0, duration: 0 })
+            },
           })
         }
       }, 30)
