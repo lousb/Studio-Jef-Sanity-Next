@@ -11,6 +11,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   const [done, setDone] = useState(false)
   const [shouldShow, setShouldShow] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const doneTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -18,10 +19,9 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   const imageRef = useRef<HTMLDivElement>(null)
   const imageMaskRef = useRef<HTMLDivElement>(null)
 
-  // Vertical mask animation in
-  // Vertical mask animation in
+  // Vertical mask animation in - only after image is loaded
   useEffect(() => {
-    if (shouldShow && imageMaskRef.current && imageRef.current) {
+    if (shouldShow && imageLoaded && imageMaskRef.current && imageRef.current) {
       // Initial state - image scaled up
       gsap.set(imageRef.current, {
         scale: 1.15
@@ -46,7 +46,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
         ease: 'power3.out'
       })
     }
-  }, [shouldShow])
+  }, [shouldShow, imageLoaded])
 
   useEffect(() => {
     const currentPath = window.location.pathname
@@ -221,6 +221,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
                 maxHeight: '80vh',
                 
               }}
+              onLoad={() => setImageLoaded(true)}
             />
           </div>
         </div>
