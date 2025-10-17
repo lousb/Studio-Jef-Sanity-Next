@@ -4,6 +4,7 @@ import LenisProvider from '@/components/global/LenisProvider'
 import { ViewTransitions } from 'next-view-transitions'
 import { Suspense } from 'react'
 import LoadingOverlay from '@/components/shared/LoadingOverlay'
+import { urlForImage } from '@/sanity/lib/utils'
 
 export default async function RootLayout({
   children,
@@ -14,6 +15,11 @@ export default async function RootLayout({
 
   const rgbaBgColor = `${settings?.bgColor?.r ?? 255}, ${settings?.bgColor?.g ?? 255}, ${settings?.bgColor?.b ?? 255}`
   const rgbaTextColor = `${settings?.textColor?.r ?? 0}, ${settings?.textColor?.g ?? 0}, ${settings?.textColor?.b ?? 0}`
+
+  // Get the loading screen image URL from settings
+  const loadingImageUrl = settings?.ogImage 
+    ? urlForImage(settings.ogImage)?.width(1080).quality(75).url() 
+    : null
 
   return (
     <ViewTransitions>
@@ -61,8 +67,8 @@ export default async function RootLayout({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '1.25rem', // pr-5
-              fontSize: '2.25rem', // Tailwind text-4xl
+              padding: '1.25rem',
+              fontSize: '2.25rem',
               fontFamily:
                 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               opacity: 0,
@@ -99,8 +105,8 @@ export default async function RootLayout({
             }}
           />
 
-          {/* 🟢 React-based loader takes over */}
-          <LoadingOverlay />
+          {/* 🟢 React-based loader takes over - now with dynamic image */}
+          <LoadingOverlay imageUrl={loadingImageUrl} />
           <Suspense fallback={null}>
             <LenisProvider>
               <div className="overlay"></div>

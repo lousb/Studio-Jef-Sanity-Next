@@ -131,7 +131,20 @@ body:has(.scroll-visible) .about-link{
      clip-path: inset(0 0 0% -100%);
   padding-bottom: 1.2em !important;
 }
+
+
+
+
 @media only screen and (max-width: 768px) {
+  .loading-image-mask{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+}
+  .loading-image-mask > div{
+    padding-left: 0% !important;
+  }
   #initial-loader{
     padding:1rem !important;
   }

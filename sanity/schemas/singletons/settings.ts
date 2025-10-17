@@ -68,9 +68,9 @@ export default defineType({
     }),
     defineField({
       name: 'ogImage',
-      title: 'Open Graph Image',
+      title: 'Loading Screen Image',
       type: 'image',
-      description: 'Displayed on social cards and search engine results. It should be 1200 X 630 pixels.',
+      description: 'Loading Screen Image. Displayed on social cards and search engine results. It should be 1200 X 630 pixels.',
       options: {
         hotspot: true,
       },
