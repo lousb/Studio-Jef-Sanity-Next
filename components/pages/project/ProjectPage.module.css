@@ -4,6 +4,14 @@
 .projectPageTitle span {
   overflow: hidden;
 }
+.projectPageTitle p > span{
+  max-height: 120%;
+  height: 1.6rem;
+  display: inline-flex !important;
+}
+.projectPageTitle p > span{
+  font-size: 1.2rem;
+}
 
 .projectPageTitle {
   max-width: 90vw;
@@ -18,18 +26,23 @@
 }
 
 .infoActive .projectPageTitle{
-  max-width: 18vw;
+     min-width: 300px;
+    width: 18vw;
   
 }
 @media only screen and (max-width: 768px) {
   .infoActive .projectPageTitle {
     max-width: 90vw !important;
+    height: auto !important;
   }
 }
 .projectPageDetails {
   position: relative;
   padding-top: calc(120px - 4em);
-  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.1s;
+
+}
+.infoActive .projectPageDetails{
+  
 }
 .columns-header {
   position: absolute;
@@ -54,11 +67,14 @@
 }
 
 
-
+.infoInActive .projectPageDetails{
+  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s all, opacity 0.2s !important;
+  opacity: 0;
+}
 .infoActive .projectPage {
-  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s all;
+  
      margin-top: 0px;
-  width: 80%;
+      width: calc(100% - 320px);
   height: 80%;
   
 }
@@ -72,11 +88,13 @@
 }
 .infoActive .projectPageDetails {
   padding-top: 0;
+  transition: none !important;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 908px) {
   .projectPage {
     width: 100% !important;
+    margin-top: 0 !important;
     height: 100% !important;
   }
   .projectPageTitleInfo {
@@ -86,6 +104,7 @@
     position: relative;
     top: 0;
     max-width: 100%;
+    width: 100% !important;
     height: min-content;
     height: calc(40vh - 24px - 32px);
     display: flex;
@@ -94,6 +113,16 @@
   }
   .projectPageDetails {
     padding: 0px !important;
-    height: 0;
+    height: auto;
+    opacity: 1 !important;
   }
+  .projectPageTitle p > span{
+
+  height: 1.8rem;
+
+}
+.projectPageTitle p > span{
+  font-size: 1.4rem;
+}
+
 }
