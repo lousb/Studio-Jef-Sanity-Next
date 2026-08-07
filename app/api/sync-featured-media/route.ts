@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     p.featuredItems?.forEach((item) => desired.add(`${p._id}::${item._key}`))
   })
 
-  const home = await client.fetch(`*[_type == "home"][0]{ _id, featuredMedia }`)
+  const home = await client.fetch(`*[_type == "home" && !(_id in path("drafts.**"))][0]{ _id, featuredMedia }`)
   if (!home?._id) {
     return NextResponse.json({ error: 'No home document found' }, { status: 404 })
   }
