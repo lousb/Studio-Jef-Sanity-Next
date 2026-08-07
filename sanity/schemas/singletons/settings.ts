@@ -67,6 +67,60 @@ export default defineType({
       ],
     }),
     defineField({
+      name: 'overview',
+      description:
+        'This text is your description. Used for the introduction paragraph at a Home page and also for the <meta> description tag for SEO.',
+      title: 'Introduction text',
+      type: 'object',
+      fields:[
+        {
+        name: 'text',
+        type: 'array',
+        of: [
+          // Paragraphs
+          defineArrayMember({
+            lists: [],
+            marks: {
+              annotations: [
+                {
+                  name: 'link',
+                  type: 'object',
+                  title: 'Link',
+                  fields: [
+                    {
+                      name: 'href',
+                      type: 'url',
+                      title: 'Url',
+                    },
+                  ],
+                },
+              ],
+              decorators: [
+                {
+                  title: 'Italic',
+                  value: 'em',
+                },
+                {
+                  title: 'Strong',
+                  value: 'strong',
+                },
+              ],
+            },
+            styles: [],
+            type: 'block',
+          }),
+        ],
+        validation: (rule) => rule.max(155).required(),
+        },
+        {
+          title: 'Display this introduction on Home page?',
+          description: 'If you turn in off it still be used for SEO description',
+          name: 'displayText',
+          type: 'boolean',
+        },
+      ],
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Loading Screen Image',
       type: 'image',
@@ -84,22 +138,7 @@ export default defineType({
         hotspot: true,
       },
     }),
-    defineField({
-      name: 'bgColor',
-      title: 'Backgroung color',
-      type: 'color',
-    }),
-    defineField({
-      name: 'textColor',
-      title: 'Text color',
-      type: 'color',
-    }),
-    defineField({
-      title: 'Display "Last updated" at the footer of the website',
-      description: 'Turn on to display time whe you last added new project to your Home page',
-      name: 'displayLastUpdated',
-      type: 'boolean',
-    }),
+   
   ],
   preview: {
     prepare() {

@@ -1,0 +1,32 @@
+.hybridMedia {
+  --col: calc((100% - (var(--grid-columns-desktop) - 1) * var(--grid-gutter-desktop)) / var(--grid-columns-desktop));
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1),
+              margin-left 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* View 1 — every image 6 columns, centered */
+:global(.info-active) .hybridMedia {
+  width: calc(6 * var(--col) + 5 * var(--grid-gutter-desktop));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* View 2 — image's own stored width, left aligned */
+:global(.info-inactive) .hybridMedia {
+  width: calc(var(--cols) * var(--col) + (var(--cols) - 1) * var(--grid-gutter-desktop));
+  margin-left: 0;
+  margin-right: 0;
+}
+
+@media (max-width: 767px) {
+  .hybridMedia {
+    --col: calc((100% - (var(--grid-columns-mobile) - 1) * var(--grid-gutter-mobile)) / var(--grid-columns-mobile));
+  }
+
+  :global(.info-active) .hybridMedia,
+  :global(.info-inactive) .hybridMedia {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

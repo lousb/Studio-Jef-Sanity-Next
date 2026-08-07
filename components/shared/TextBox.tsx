@@ -12,7 +12,7 @@ export default function Header(props: TextBoxProps) {
     <div className="my-10 md:my-28">
       {/* Description */}
       {description && (
-        <div className="text-center text-xl md:text-4xl">
+        <div className="text-center text-xl md:text-4xl textbox-container">
           <CustomPortableText value={description} />
         </div>
       )}

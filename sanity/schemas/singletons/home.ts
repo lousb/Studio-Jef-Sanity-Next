@@ -23,99 +23,29 @@ export default defineType({
       title: 'Custom logo (Optional)',
       type: 'image',
     }),
+    
     defineField({
-      name: 'overview',
-      description:
-        'This text is your description. Used for the introduction paragraph at a Home page and also for the <meta> description tag for SEO.',
-      title: 'Introduction text',
+  name: 'featuredMedia',
+  title: 'Featured media',
+  description: 'Auto-synced from project media marked "Featured". Drag to reorder — your order is preserved when new items sync in.',
+  type: 'array',
+  of: [
+    defineArrayMember({
       type: 'object',
-      fields:[
-        {
-        name: 'text',
-        type: 'array',
-        of: [
-          // Paragraphs
-          defineArrayMember({
-            lists: [],
-            marks: {
-              annotations: [
-                {
-                  name: 'link',
-                  type: 'object',
-                  title: 'Link',
-                  fields: [
-                    {
-                      name: 'href',
-                      type: 'url',
-                      title: 'Url',
-                    },
-                  ],
-                },
-              ],
-              decorators: [
-                {
-                  title: 'Italic',
-                  value: 'em',
-                },
-                {
-                  title: 'Strong',
-                  value: 'strong',
-                },
-              ],
-            },
-            styles: [],
-            type: 'block',
-          }),
-        ],
-        validation: (rule) => rule.max(155).required(),
-        },
-        {
-          title: 'Display this introduction on Home page?',
-          description: 'If you turn in off it still be used for SEO description',
-          name: 'displayText',
-          type: 'boolean',
-        },
+      name: 'featuredMediaItem',
+      fields: [
+        { name: 'project', type: 'reference', to: [{ type: 'project' }], readOnly: true },
+        { name: 'mediaKey', title: 'Media key', type: 'string', readOnly: true },
       ],
+      preview: {
+        select: { projectTitle: 'project.title', coverImage: 'project.coverImage' },
+        prepare({ projectTitle, coverImage }) {
+          return { title: projectTitle || 'Untitled project', media: coverImage }
+        },
+      },
     }),
-    defineField({
-      name: 'showcaseProjects',
-      title: 'Showcase projects',
-      description:
-        'These are the projects that will appear on your home page. First create your set of projects and then add to the list below. You can rearrange the display order by dragging each project.',
-      type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          fields: [
-            {
-              name: 'project',
-              title: 'Project',
-              type: 'reference',
-              to: [{ type: 'project' }],
-            },
-            {
-              name: 'scaleTile',
-              title: 'Scale tile',
-              type: 'boolean',
-              description: 'If enabled, this tile will scale down by 20%',
-              initialValue: false,
-            },
-          ],
-          preview: {
-            select: {
-              title: 'project.title',
-              scale: 'scaleTile',
-            },
-            prepare({ title, scale }) {
-              return {
-                title,
-                subtitle: scale ? 'Scaled down 20%' : '',
-              }
-            },
-          },
-        }),
-      ],
-    }),
+  ],
+}),
 
   ],
   preview: {

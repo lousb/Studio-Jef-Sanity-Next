@@ -24,6 +24,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/global/LenisProvider.tsx", "components/global/Reveal.js", "components/pages/home/HeroGallery.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/global/LenisProvider.tsx", "components/global/Reveal.js", "components/pages/home/HeroGallery.jsx", "lib/gridWidth.ts"],
   "exclude": ["node_modules"]
 }

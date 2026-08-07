@@ -180,185 +180,54 @@ export function AllProjectsPage({
     <div className="space-y-6 all-projects-page">
       {/* Display aggregated lists at the top */}
 
-      <div className={`mobile-intersector`}></div>
-      <div className="columns-header flex space-x-2 font-medium">
-        {(['1', '2', '4'] as const).map((num) => (
-          <RevealDiv
-            element="span"
-            delay={0}
-            elementClass={`text-1xl ${columns === num ? 'text-gray-400' : ''}`}
-          >
-            <button
-              key={num}
-              className={`text-1xl ${columns === num ? 'text-gray-400' : ''}`}
-              onClick={() => setColumns(num)}
-            >
-              {num === '1' ? 'One' : num === '2' ? 'Two' : 'Four'}
-            </button>
-          </RevealDiv>
-        ))}
-      </div>
+      
 
-      <Header description="All Projects" />
 
-      <div ref={headerRef}
-      className="all-projects-header flex flex-row space-x-4"
-      >
-        <div
-          className="w-1/5 h-auto cursor-pointer"
-          onClick={() => setFiltersVisible((prev) => !prev)}
-        >
-          <Reveal>Filters {filtersVisible ? '-' : '+'}</Reveal>
-        </div>
-        {/* {filtersVisible && ( */}
-          <div className={`header-wrap w-[80%] ${!filtersVisible ? 'filters-invisible' : 'filters-visible'} mt-2 mb-2`}>
-            <div className="aggregated-data space-y-4 filters-wrap">
-              <div className="text-sm">
-                <div className="flex flex-col space-y-2 text-xl">
-                  <Reveal element='p'>
-                    <p>Clients:</p>
-                  </Reveal>
-                  
-                  <div className='flex flex-col'>
-                  {clients.map((client) => {
-                    const isSelected = selectedFilters.clients.has(client);
-                    const isAvailable = availableOptions.clients.has(client);
-
-                    return (
-                      <button
-                        key={client}
-                        className={`inline-block text-xl ${
-                          isSelected ? 'select-filter' : ''
-                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
-                        onClick={() => {
-                          if (isSelected || isAvailable) toggleFilter('clients', client);
-                        }}
-                        disabled={!isSelected && !isAvailable}
-                      >
-                        <Reveal element="p">{client}</Reveal>
-                      </button>
-                    );
-                  })}
-                    </div>
-                </div>
-                <div className="flex flex-col space-y-2 text-xl">
-                <Reveal element='p'>
-                    <p>Genre:</p>
-                  </Reveal>
-                  <div className='flex flex-col m-0'>
-                  {genres.map((genre) => {
-                    const isSelected = selectedFilters.genres.has(genre);
-                    const isAvailable = availableOptions.genres.has(genre);
-
-                    return (
-                      <button
-                        key={genre}
-                        className={`inline-block text-xl ${
-                          isSelected ? 'select-filter' : ''
-                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
-                        onClick={() => {
-                          if (isSelected || isAvailable) toggleFilter('genres', genre);
-                        }}
-                        disabled={!isSelected && !isAvailable}
-                      >
-                        <Reveal element="p">{genre}</Reveal>
-                      </button>
-                    );
-                  })}
-                    </div>
-                </div>
-                <div className="flex flex-col space-y-2 text-xl">
-                  <Reveal element='p'>
-                    <p>Technique:</p>
-                  </Reveal>
-                  <div className='flex flex-col m-0'>
-                  {techniques.map((technique) => {
-                    const isSelected = selectedFilters.techniques.has(technique);
-                    const isAvailable = availableOptions.techniques.has(technique);
-
-                    return (
-                      <button
-                        key={technique}
-                        className={`inline-block text-xl ${
-                          isSelected ? 'select-filter' : ''
-                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
-                        onClick={() => {
-                          if (isSelected || isAvailable) toggleFilter('techniques', technique);
-                        }}
-                        disabled={!isSelected && !isAvailable}
-                      >
-                        <Reveal element="p">{technique}</Reveal>
-                      </button>
-                    );
-                  })}
-
-                  </div>
-                </div>
-                <div className="flex flex-col space-y-2 text-xl">
-                <Reveal element='p'>
-                    <p>Year:</p>
-                  </Reveal>
-                  <div className='flex flex-col m-0'>
-                  {years.map((year) => {
-                    const isSelected = selectedFilters.years.has(year);
-                    const isAvailable = availableOptions.years.has(year);
-
-                    return (
-                      <button
-                        key={year}
-                        className={`inline-block text-xl ${
-                          isSelected ? 'select-filter' : ''
-                        } ${!isSelected && !isAvailable ? 'text-gray-400 cursor-not-allowed opacity-50' : ''}`}
-                        onClick={() => {
-                          if (isSelected || isAvailable) toggleFilter('years', year);
-                        }}
-                        disabled={!isSelected && !isAvailable}
-                      >
-                        <Reveal element="p">{year}</Reveal>
-                      </button>
-                    );
-                  })}
-
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        {/* )} */}
-        {/* {!filtersVisible && (
-          <Reveal element='p' elementClass="text-4xl h-auto">
-            Sharing real people to real audiences
-          </Reveal>
-        )} */}
-      </div>
+    
 
       {filteredProjects.length > 0 ? (
-        <div
-          ref={gridRef}
-          className={`project-link-wrap grid gap-5 ${columnClass}`}
-        >
-          {filteredProjects.map((project, key) => {
-            const href = resolveHref(project._type, project.slug);
-            if (!href) return null;
-            const delay = (key / filteredProjects.length) * 0.5;
-            return (
-              <Link
-                key={key}
-                href={href}
-                data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
-              >
-                <div className="project-item-animate">
-                  <RevealDiv delay={delay}>
-                    <ProjectListItem project={project} />
-                  </RevealDiv>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="text-center text-gray-500">No published projects found.</div>
-      )}
+ <div className="flex flex-col justify-center min-h-[100vh] mt-0">
+ <div
+    ref={gridRef}
+    className="grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)] gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)] gap-y-4 items-center"
+  >
+  
+
+    {filteredProjects.flatMap((project, key) => {
+  const href = resolveHref(project._type, project.slug);
+  if (!href) return [];
+  const delay = (key / filteredProjects.length) * 0.5;
+
+  return Array.from({ length: 5 }).map((_, repeatIndex) => (
+    <Link
+      key={`${key}-${repeatIndex}`}
+      href={href}
+      data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
+      className="project-item-animate contents"
+    >
+      <span className="text-body-01 [grid-column:1/2]">
+        {key}
+      </span>
+      <span className="text-body-01 [grid-column:2/5]">
+        {project.title}
+      </span>
+      <span className="text-body-01 [grid-column:7/9]">
+        {project.projectType?.map((t) => t.title).join(', ') || '—'}
+      </span>
+      <span className="text-body-01 capitalize [grid-column:19/21]">
+        {project.status?.replace('-', ' ') || '—'}
+      </span>
+      <span className="text-body-01 [grid-column:23/25] text-right">
+        {project.year || '—'}
+      </span>
+    </Link>
+  ));
+})}
+  </div>
+  </div>
+) : (
+  <div className="text-center text-gray-500">No published projects found.</div>
+)}
     </div>
   );
 }

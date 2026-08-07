@@ -37,87 +37,33 @@ export const homePageQuery = groq`
         "slug": slug.current,
         title,
         year,
+        status,
+        size,
+        location,
+        projectType[]->{
+          title
+        },
+        architects[]->{
+          title
+        },
         client[]->{
           title
         }
       }
     },
     title,
-    "featuredMedia": *[_type == "project"]{
+    featuredMedia[]{
+    mediaKey,
+    "block": project->content[_key == ^.mediaKey][0]{
+      _key,
+      "image": media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      caption,
       title,
-      "slug": slug.current,
-      "content": content[featured == true || leftFeatured == true || rightFeatured == true][]{
-        _type,
-        _key,
-        caption,
-        featured,
-        leftFeatured,
-        rightFeatured,
-
-        featured == true && _type == "hybridMedia" => {
-          media {
-            _type,
-            asset->{
-              _id,
-              url,
-              metadata { lqip }
-            }
-          },
-          video {
-            asset->{
-              playbackId,
-              assetId,
-              filename,
-              "url": "https://stream.mux.com/" + playbackId,
-              "aspect_ratio": data.aspect_ratio
-            }
-          }
-        },
-
-        leftFeatured == true && _type == "twoHybridMedia" => {
-          leftImage {
-            _type,
-            asset->{
-              _id,
-              url,
-              metadata { lqip }
-            }
-          },
-          leftVideo {
-            asset->{
-              playbackId,
-              assetId,
-              filename,
-              "url": "https://stream.mux.com/" + playbackId,
-              "aspect_ratio": data.aspect_ratio
-            }
-          }
-        },
-
-        rightFeatured == true && _type == "twoHybridMedia" => {
-          rightImage {
-            _type,
-            asset->{
-              _id,
-              url,
-              metadata { lqip }
-            }
-          },
-          rightVideo {
-            asset->{
-              playbackId,
-              assetId,
-              filename,
-              "url": "https://stream.mux.com/" + playbackId,
-              "aspect_ratio": data.aspect_ratio
-            }
-          }
-        }
-      }
+      width
     }
   }
+  }
 `
-
 
 export const projectsPageQuery = groq`
 *[_type == "project" && defined(slug) && defined(title)]{
@@ -145,6 +91,15 @@ export const projectsPageQuery = groq`
   },
   overview,
   year,
+  status,
+  size,
+  location,
+  projectType[]->{
+    title
+  },
+  architects[]->{
+    title
+  },
   genre[]->{
     title
   },
@@ -158,24 +113,40 @@ export const projectsPageQuery = groq`
     title
   }
 }
-`;
+`
 
 export const moreProjectsQuery = groq`
   *[_type == "project"] | order(_updatedAt desc) {
     _type,
-    coverImage{
-      _type,
-      asset,
-      "lqip": asset->metadata.lqip,
+    coverImage {
+      media {
+        _type,
+        asset->{
+          _id,
+          url,
+          metadata {
+            lqip
+          }
+        }
+      },
+      video {
+        asset->{
+          playbackId,
+          "aspect_ratio": data.aspect_ratio,
+          "url": "https://stream.mux.com/" + playbackId
+        }
+      }
     },
     overview,
     "slug": slug.current,
     title,
     year,
+    status,
+    size,
+    location,
     _updatedAt,
   }
 `
-
 
 export const aboutPageQuery = groq`
   *[_type == "about"][0]{
@@ -220,35 +191,42 @@ export const projectBySlugQuery = groq`
   *[_type == "project" && slug.current == $slug][0] {
     _id,
     year,
+    status,
+    size,
+    location,
+    projectType[]->{
+      title
+    },
+    architects[]->{
+      title
+    },
     client[]->{
       title
     },
-   coverImage {
-     media {
-       _type,
-       asset->{
-         _id,
-         url,
-         metadata {
-           lqip
-         }
-       }
-     },
-     video {
-       asset->{
-         playbackId,
-         aspect_ratio,
-         "url": "https://stream.mux.com/" + playbackId
-       }
-     }
-   },
+    coverImage {
+      media {
+        _type,
+        asset->{
+          _id,
+          url,
+          metadata {
+            lqip
+          }
+        }
+      },
+      video {
+        asset->{
+          playbackId,
+          aspect_ratio,
+          "url": "https://stream.mux.com/" + playbackId
+        }
+      }
+    },
     description,
     overview,
     site,
     "slug": slug.current,
     title,
-
-  
 
     content[]{
       _type == 'singleImage' => {
@@ -302,7 +280,7 @@ export const projectBySlugQuery = groq`
           assetId,
           filename,
           "url": "https://stream.mux.com/" + playbackId,
-           "aspect_ratio": data.aspect_ratio
+          "aspect_ratio": data.aspect_ratio
         },
         caption,
       },
@@ -311,6 +289,8 @@ export const projectBySlugQuery = groq`
         _key,
         caption,
         featured,
+        title,
+        width,
         media{
           _type,
           asset,
@@ -364,14 +344,12 @@ export const projectBySlugQuery = groq`
   }
 `
 
-
 export const projectPaths = groq`
   *[_type == "project" && slug.current != null].slug.current
 `
 
 export const settingsQuery = groq`
   *[_type == "settings"][0]{
-    footer,
     "menuItems": {
       "page": menuItems[_type == 'reference']->{
         _type,
@@ -384,18 +362,11 @@ export const settingsQuery = groq`
         url,
       },
     },
+    overview{
+      text,
+      displayText,
+    },
     ogImage,
     favIcon,
-    bgColor {
-      'r': rgb.r,
-      'g': rgb.g,
-      'b': rgb.b,
-    },
-    textColor {
-      'r': rgb.r,
-      'g': rgb.g,
-      'b': rgb.b,
-    },
-    displayLastUpdated,
   }
 `

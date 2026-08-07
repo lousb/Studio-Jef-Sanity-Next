@@ -26,7 +26,7 @@ export default function MuxVideoBox({ playbackId, caption, title, aspectRatio = 
   return (
     <div>
       <div
-        className="w-full overflow-hidden rounded-[3px] bg-gray-50"
+        className="w-full overflow-hidden  bg-gray-50"
         style={{
           position: 'relative',
           width: '100%',

@@ -27,7 +27,7 @@ export default function ImageBox({
 
   return (
     <div >
-      <div className={`w-full overflow-hidden rounded-[3px] ${classesWrapper}`}>
+      <div className={`w-full overflow-hidden  ${classesWrapper}`}>
         {imageUrl && (
           <Image
             alt={alt}

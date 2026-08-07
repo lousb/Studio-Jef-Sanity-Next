@@ -32,11 +32,6 @@ export default async function NotFound() {
           Back to home →
         </a>
       </main>
-
-      {/* Footer always comes after the 100vh block */}
-      <div className='relative z-50 bg-white'>
-        <Footer />
-      </div>
       
     </div>
   )

@@ -88,7 +88,6 @@ body:has(.scroll-visible) .about-link{
   height:0.2em;
   width:0.2em;
   background-color: black;
-  border-radius: 50px;
   bottom: 40%;
   left: -0.5em;
   transform: translateY(50%);
@@ -121,6 +120,12 @@ body:has(.scroll-visible) .about-link{
   clip-path: inset(0 0 0 -100%);
   padding-bottom: 1.2em;
   transition: 500ms ease all  !important ;
+}
+.textbox-container p:not(:last-child) {
+  margin-bottom: 1rem;
+}
+.fit-content{
+  width: fit-content;
 }
 .filters-invisible p{
   padding-bottom: 0px;
@@ -222,10 +227,7 @@ body:has(.scroll-visible) .about-link{
   .home-page .scale-down a > div {
     scale: 1 !important;
   }
-  .mask-out-page-transition{
-    font-size: calc(1.2rem) !important;
-
-  }
+ 
   .footer-desc{
     padding-top:20px;
   }

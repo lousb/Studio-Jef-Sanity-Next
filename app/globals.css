@@ -1,13 +1,81 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+
+  font-family: 'ABC Diatype';
+  src: url('/fonts/ABCDiatype-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 
 :root {
   view-transition-name: root;
+
+  /* Typography — Body-01 / Desktop B1 */
+  --font-body: 'ABC Diatype', sans-serif;
+  --text-body-01-size: 12px;
+  --text-body-01-weight: 700;
+  --text-body-01-letter-spacing: 0em;
+  --text-body-01-line-height: normal;
+
+  /* Grid — desktop */
+  --grid-columns-desktop: 24;
+  --grid-margin-desktop: 10px;
+  --grid-gutter-desktop: 10px;
+
+  /* Grid — mobile */
+  --grid-columns-mobile: 8;
+  --grid-margin-mobile: 20px;
+  --grid-gutter-mobile: 5px;
+
+  --bp-desktop: 768px;
 }
+
+.text-body-01 {
+  font-family: var(--font-body);
+  font-size: var(--text-body-01-size);
+  font-weight: var(--text-body-01-weight);
+  letter-spacing: var(--text-body-01-letter-spacing);
+  line-height: var(--text-body-01-line-height);
+  text-decoration: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  column-gap: var(--grid-gutter-mobile);
+  padding-inline: var(--grid-margin-mobile);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+    column-gap: var(--grid-gutter-desktop);
+    padding-inline: var(--grid-margin-desktop);
+  }
+}
+
+html,
+body {
+  font-family: var(--font-body) !important;
+  font-size: var(--text-body-01-size) !important;
+  font-weight: var(--text-body-01-weight) !important;
+  letter-spacing: var(--text-body-01-letter-spacing) !important;
+  line-height: var(--text-body-01-line-height) !important;
+}
+*, div{
+  padding: 0;
+  margin: 0;
+}
+
+
 .header img{
   z-index: 9999;
-
+  width:42vw;
   position: fixed
 }
 
@@ -40,6 +108,10 @@ html {
   z-index: 999;
   view-transition-name: z-index;
   transition: 500ms ease-in-out transform;
+  mix-blend-mode: difference;
+}
+.header a, .header h2{
+  color:white !important;
 }
 .header img {
   transition: 500ms ease-in-out transform;
@@ -52,12 +124,37 @@ html {
   animation: fade-in 0.6s linear;
   cursor: wait !important;
 }
-
-
+.hybrid-media{
+  position:relative;
+  transform:translateX(0px);
+  left:0px;
+  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s all !important;
+}
+.info-active .hybrid-media{
+    transform:translateX(50%);
+  left:calc(25% + 8px);
+}
 
 html:has(::view-transition) {
   cursor: wait !important;
 }
+
+.project-page-meta{
+  display: flex;
+  gap:10px;
+  flex-direction: column;
+}
+.project-page-figures{
+  position:fixed;
+  left:10px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:900;
+}
+
+
+
+
 
 @keyframes fade-out {
   from {
@@ -172,6 +269,9 @@ html:has(::view-transition) {
   animation: slide-in 1s ease-in-out;
   animation-delay: 0.6s;
 }
+.page-wrap{
+  
+}
 .page-wrap:has(.about-page) {
   overflow: hidden;
   margin-top: 0;
@@ -193,10 +293,7 @@ body:has(.about-page) .header::before {
 .about-page {
   padding-top: 80px;
 }
-* {
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
+
 mux-player {
   --playback-rate-menu-button: none;
   --pip-button: none;
@@ -209,6 +306,7 @@ mux-player {
   --media-object-position: center;
   /* --controls: none; */
 }
+
 .hybrid-media mux-player, mux-player.hybrid-media {
   --controls:none !important;
 }
@@ -217,37 +315,8 @@ mux-player {
   height: 100vh;
   display: block;
 }
-@media only screen and (min-width: 768px) {
-body:has(.scroll-visible) .info-active .project-page-title:first-child{
-  transform:translateY(-5rem) !important;
-  height: calc(100vh - 1.5rem);
-}
-}
 
-.scroll-visible {
-  transform: translateY(-100%) !important;
-}
-.scroll-visible img {
-  transform: translateY(200%) !important;
-}
-body:has(.scroll-visible) .columns-header {
-  transform: translateY(-200%) !important;
-}
-body:has(.scroll-visible) .project-page-title-info{
-  transform: translateY(-200%) !important;
-}
-.header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  pointer-events: none;
-  z-index: 90;
-  transition: 500ms ease-in-out transform;
-}
+
 .header > div,
 .header a {
   z-index: 999;
@@ -256,6 +325,7 @@ body:has(.scroll-visible) .project-page-title-info{
 }
 .project-page-title-info{
   transition: 500ms ease-in-out transform;
+  
 }
 .columns-header{
   position: fixed;
@@ -325,9 +395,7 @@ margin-bottom: -0.3rem;
 .infinite-grid-container .item{
   cursor:pointer;
 }
-.project-link-wrap > a .mask-out-page-transition{
-  font-size: 1.6rem;
-}
+
 .project-link-wrap > a:nth-child(7n+1),
 .project-link-wrap > a:nth-child(7n+4),
 .project-link-wrap > a:nth-child(7n+7) {
@@ -337,10 +405,6 @@ margin-bottom: -0.3rem;
 /* Scale: 2nd, 3rd, 5th, 6th elements in the pattern */
 .home-page .scale-down a > div {
   scale: 0.8;
-}
-.home-page .scale-down .mask-out-page-transition{
-  font-size: calc(1.6rem * 1.2);
-
 }
 
 .header-wrap .flex{
@@ -364,4 +428,69 @@ html:has( .header) #initial-loader{
 }
 .mt-0{
   margin-top:0 !important
+}
+
+.debug-grid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  column-gap: var(--grid-gutter-mobile);
+  padding-inline: var(--grid-margin-mobile);
+}
+
+
+
+.debug-grid-col {
+  background: rgba(255, 0, 0, 0.1);
+  height: 100vh;
+}
+
+/* hide columns beyond the mobile count */
+.debug-grid-col:nth-child(n + 9) {
+  display: none;
+}
+
+
+
+.fixed-logo{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin-top: 0px;
+  opacity: 100%;
+  transform: translate(-50%, -50%);
+  transition: 500ms ease-in-out opacity, 500ms ease-in-out margin !important;
+  mix-blend-mode: difference;
+  filter: invert(1);
+
+
+
+}
+.scroll-visible .fixed-logo {
+  margin-top: -20px ;
+  opacity: 0%;
+}
+
+
+
+@media (min-width: 768px) {
+  .debug-grid-overlay {
+    grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+    column-gap: var(--grid-gutter-desktop);
+    padding-inline: var(--grid-margin-desktop);
+  }
+
+  .debug-grid-col:nth-child(n + 9) {
+    display: block;
+  }
+}
+
+html.resizing,
+html.resizing * {
+  transition: none !important;
+  animation: none !important;
 }

@@ -87,9 +87,9 @@ const TwoHybridMedia = ({ data }) => {
 
   return (
     <div className="divider mt-3">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[3px] overflow-hidden hybrid-media">
-        <div className='rounded-[3px] overflow-hidden'>{left}</div>
-        <div className='rounded-[3px] overflow-hidden'>{right}</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4  overflow-hidden hybrid-media">
+        <div className=' overflow-hidden'>{left}</div>
+        <div className=' overflow-hidden'>{right}</div>
       </div>
       {caption && (
         <div className="mt-2 md:mt-4 text-lg md:text-2xl">{caption}</div>

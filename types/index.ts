@@ -27,115 +27,132 @@ export interface LinkItem {
 }
 
 export interface ShowcaseProject {
-  _type: string;
-  title?: string;
-  year?: string;
-  slug?: string;
-  overview?: PortableTextBlock[];
-  _updatedAt?: string;
-  tags?: string[];
-   client?: { title: string }[] // Clients
-
+  _type: string
+  title?: string
+  year?: string
+  slug?: string
+  overview?: PortableTextBlock[]
+  _updatedAt?: string
+  tags?: string[]
+  client?: { title: string }[]
+  status?: string
+  size?: string
+  location?: string
+  projectType?: { title: string }[]
+  architects?: { title: string }[]
   coverImage?: {
     media?: {
-      _type: 'image';
+      _type: 'image'
       asset: {
-        _ref?: string;
-        _type?: string;
+        _ref?: string
+        _type?: string
         metadata?: {
           dimensions?: {
-            width: number;
-            height: number;
-          };
-          lqip?: string;
-        };
-        url?: string;
-      };
-      lqip?: string;
-    };
+            width: number
+            height: number
+          }
+          lqip?: string
+        }
+        url?: string
+      }
+      lqip?: string
+    }
     video?: {
       asset: {
-        playbackId?: string;
-        status?: string;
-        aspect_ratio?: string;
-        url?: string;
-      };
-    };
-  };
+        playbackId?: string
+        status?: string
+        aspect_ratio?: string
+        url?: string
+      }
+    }
+  }
 }
 
 // Page payloads
 
-
 export interface FeaturedMediaItem {
-  type: 'image' | 'video'
-  projectTitle: string
-  slug: string
-  caption?: string
-  image?: {
-    url: string
-    lqip?: string
-    _id: string
-  }
-  video?: {
-    playbackId: string
-    url: string
+  mediaKey?: string
+  block?: {
+    _key: string
+    image?: {
+      asset?: {
+        _id: string
+        url: string
+        metadata?: {
+          dimensions?: { width: number; height: number; aspectRatio?: number }
+          lqip?: string
+        }
+      }
+    }
+    caption?: string
+    title?: string
+    width?: '8col' | '16col' | '24col'
   }
 }
 
 export interface HomePagePayload {
   footer?: PortableTextBlock[]
-  overview?: any
-  showcaseProjects?: ShowcaseProject[]
+  overview?: {
+    text?: PortableTextBlock[]
+    displayText?: boolean
+  }
   title?: string
   customLogo?: Image
   _updatedAt?: string
   featuredMedia?: FeaturedMediaItem[]
 }
 
-
 export interface ProjectsPagePayload {
   _type: string
   coverImage?: {
     image?: {
       asset?: {
-        _ref?: string;
-        _type?: string;
+        _ref?: string
+        _type?: string
         metadata?: {
           dimensions?: {
-            width: number;
-            height: number;
-          };
-          lqip?: string;
-          // add other metadata fields here if you want
-        };
-      };
-    };
+            width: number
+            height: number
+          }
+          lqip?: string
+        }
+      }
+    }
     video?: {
       asset?: {
-        playbackId?: string;
-        status?: string;
-      };
-    };
-  };
+        playbackId?: string
+        status?: string
+      }
+    }
+  }
   overview?: PortableTextBlock[]
   slug?: string
-  tags?: string[] // General tags
-  genre?: { title: string }[] // Genres
-  technique?: { title: string }[] // Techniques
-  client?: { title: string }[] // Clients
-  credits?: { title: string }[] // Credits
+  tags?: string[]
+  genre?: { title: string }[]
+  technique?: { title: string }[]
+  client?: { title: string }[]
+  credits?: { title: string }[]
   title?: string
   year?: string
+  status?: string
+  size?: string
+  location?: string
+  projectType?: { title: string }[]
+  architects?: { title: string }[]
   _updatedAt?: string
 }
 
 export interface ProjectPayload {
   year?: string
+  status?: string
+  size?: string
+  location?: string
+  projectType?: { title: string }[]
+  architects?: { title: string }[]
   coverImage?: Image
   description?: PortableTextBlock[]
   overview?: PortableTextBlock[]
-   client?: { title: string }[] // Clients
+  client?: { title: string }[]
   site?: {
     urltitle?: string
     url: string
@@ -149,14 +166,14 @@ export interface ProjectPayload {
 export interface Content {
   _type: string
   _key: string
-  // Fields for singleImage
   photo?: {
     asset?: {
       url?: string
     }
   }
   caption?: string
-  // Fields for twoImages
+  title?: string
+  width?: string
   photoOne?: {
     asset?: {
       url?: string
@@ -167,11 +184,8 @@ export interface Content {
       url?: string
     }
   }
-  // Fields for textBlock
   textBlock?: object[]
-  // Fields for singleVideo
   videoLink?: string
-  // Fields for video
   video?: {
     asset?: {
       playbackId?: string
@@ -180,7 +194,6 @@ export interface Content {
       status?: string
     }
   }
-  // Fields for twoVideos
   videoOneLink?: string
   videoTwoLink?: string
 }
@@ -190,20 +203,13 @@ export interface SettingsPayload {
     page?: PageItem[]
     link?: LinkItem[]
   }
+  overview?: {
+    text?: PortableTextBlock[]
+    displayText?: boolean
+  }
   ogImage?: Image
   favIcon?: Image
   title?: string
-  bgColor: {
-    r?: string
-    g?: string
-    b?: string
-  }
-  textColor: {
-    r?: string
-    g?: string
-    b?: string
-  }
-  displayLastUpdated: boolean
 }
 
 export interface AboutPayload {

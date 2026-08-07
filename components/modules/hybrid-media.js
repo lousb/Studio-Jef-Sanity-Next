@@ -1,62 +1,53 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React from 'react';
 import ImageBox from '../shared/ImageBox';
+import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth';
 
-const MuxPlayer = lazy(() => import('@mux/mux-player-react'));
+const HybridMedia = ({ data, isInfoActive }) => {
+  const { media, caption, title, width, featured } = data || {};
 
-const HybridMedia = ({ data }) => {
-  const { media, video, caption } = data || {};
-  const muxAsset = video?.asset;
+  if (!media?.asset) return null;
 
-  const [isClient, setIsClient] = useState(false);
+  const cols = COLUMN_NUM_MAP[width] ?? 24;
+  const dimensions = media.asset.metadata?.dimensions;
+  const aspectRatio = dimensions
+    ? `${dimensions.width} / ${dimensions.height}`
+    : undefined;
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const aspectRatio = muxAsset?.aspect_ratio || '16:9';
-  const [width, height] = aspectRatio.split(':').map(Number);
-  const paddingBottom = (height / width) * 100;
+  const wrapperStyle = isInfoActive
+    ? {
+        width: colsToWidth(6),
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        transition: 'width 0.6s cubic-bezier(0.65,0,0.35,1), margin 0.6s cubic-bezier(0.65,0,0.35,1)',
+      }
+    : {
+        width: colsToWidth(cols),
+        marginLeft: 0,
+        marginRight: 'auto',
+        transition: 'width 0.6s cubic-bezier(0.65,0,0.35,1), margin 0.6s cubic-bezier(0.65,0,0.35,1)',
+      };
 
   return (
-    <div className="divider mt-3 hybrid-media">
-      {muxAsset?.playbackId ? (
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            paddingBottom: `${paddingBottom}%`,
-          }}
-        >
-          {isClient ? (
-            <Suspense fallback={<div></div>}>
-              <MuxPlayer
-                playbackId={muxAsset.playbackId}
-                metadata={{ video_title: 'Hybrid Video' }}
-                streamType="on-demand"
-                accentColor="#ea580c"
-                autoPlay="muted"
-                loop="true"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                }}
-              />
-            </Suspense>
-          ) : null}
-        </div>
-      ) : media?.asset ? (
+    <div
+      className="divider mt-3 hybrid-media"
+      style={wrapperStyle}
+      data-featured={featured || undefined}
+    >
+      <div style={{ width: '100%', height: 'auto', aspectRatio }}>
         <ImageBox
           image={{
             asset: media.asset,
             lqip: media.asset.metadata?.lqip,
           }}
-          alt={caption || 'Hybrid Image'}
+          alt={title || caption || 'Project image'}
           caption={caption}
         />
-      ) : null}
+      </div>
+      {title && (
+        <div className="hybrid-media-title text-sm opacity-60 mt-2">
+          {title}
+        </div>
+      )}
     </div>
   );
 };

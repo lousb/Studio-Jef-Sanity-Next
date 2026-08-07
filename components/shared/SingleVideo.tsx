@@ -19,7 +19,7 @@ export default function VideoBox({ videoLink, caption }: VideoBoxProps) {
   return (
     <div >
       <div
-        className={`w-full overflow-hidden rounded-[3px] bg-gray-50 aspect-video`}
+        className={`w-full overflow-hidden  bg-gray-50 aspect-video`}
       >
         {isClient ? (
           <ReactPlayer

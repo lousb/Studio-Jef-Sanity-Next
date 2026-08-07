@@ -5,6 +5,7 @@ import { ViewTransitions } from 'next-view-transitions'
 import { Suspense } from 'react'
 import LoadingOverlay from '@/components/shared/LoadingOverlay'
 import { urlForImage } from '@/sanity/lib/utils'
+import GridOverlay from '@/components/global/GridOverlay'
 
 export default async function RootLayout({
   children,
@@ -13,22 +14,18 @@ export default async function RootLayout({
 }) {
   const [{ data: settings }] = await Promise.all([loadSettings()])
 
-  const rgbaBgColor = `${settings?.bgColor?.r ?? 255}, ${settings?.bgColor?.g ?? 255}, ${settings?.bgColor?.b ?? 255}`
-  const rgbaTextColor = `${settings?.textColor?.r ?? 0}, ${settings?.textColor?.g ?? 0}, ${settings?.textColor?.b ?? 0}`
-
+  
   // Get the loading screen image URL from settings
   const loadingImageUrl = settings?.ogImage 
     ? urlForImage(settings.ogImage)?.width(1080).quality(75).url() 
     : null
 
+    
+
   return (
     <ViewTransitions>
       <html
         lang="en"
-        style={{
-          ['--color-primary' as any]: rgbaBgColor,
-          ['--color-secondary' as any]: rgbaTextColor,
-        }}
         className="bg-primary"
       >
         <head>
@@ -56,7 +53,6 @@ export default async function RootLayout({
         </head>
         
         <body>
-          {/* 🟡 Initial HTML Loader with fade-in - now first in DOM */}
           <div
             id="initial-loader"
             style={{
@@ -107,6 +103,7 @@ export default async function RootLayout({
 
           {/* 🟢 React-based loader takes over - now with dynamic image */}
           <LoadingOverlay imageUrl={loadingImageUrl} />
+          <GridOverlay />
           <Suspense fallback={null}>
             <LenisProvider>
               <div className="overlay"></div>
@@ -114,6 +111,22 @@ export default async function RootLayout({
               {children}
             </LenisProvider>
           </Suspense>
+            <script
+  dangerouslySetInnerHTML={{
+    __html: `
+      (function () {
+        var resizeTimeout;
+        window.addEventListener('resize', function () {
+          document.documentElement.classList.add('resizing');
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(function () {
+            document.documentElement.classList.remove('resizing');
+          }, 150);
+        });
+      })();
+    `,
+  }}
+/>
         </body>
       </html>
     </ViewTransitions>

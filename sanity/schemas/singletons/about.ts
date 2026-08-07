@@ -59,66 +59,6 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'aboutMedia',
-      title: 'About Media',
-      description: '(Optional) Use either an image or a video for your About page.',
-      type: 'object',
-      icon: ImageIcon,
-      fields: [
-        {
-          title: 'Image',
-          name: 'media',
-          type: 'image',
-          options: { hotspot: true },
-          hidden: ({ parent }) => !!parent?.video,
-          description: 'Use either an image or a video, not both.',
-        },
-        {
-          title: 'Video',
-          name: 'video',
-          type: 'mux.video',
-          hidden: ({ parent }) => !!parent?.media,
-          description: 'Use either a video or an image, not both.',
-        },
-      ],
-      preview: {
-        select: {
-          media: 'media',
-          playbackId: 'video.asset.playbackId',
-        },
-        prepare({ media, playbackId }) {
-          if (playbackId) {
-            return {
-              title: 'Video',
-              subtitle: playbackId,
-            }
-          }
-          if (media) {
-            return {
-              title: 'Image',
-              subtitle: 'Image selected',
-              media,
-            }
-          }
-          return {
-            title: 'No media selected',
-          }
-        },
-      },
-      validation: (Rule) =>
-        Rule.custom((fields) => {
-          const hasImage = !!fields?.media
-          const hasVideo = !!fields?.video
-          if (hasImage && hasVideo) {
-            return 'Only one: image or video, not both.'
-          }
-          if (!hasImage && !hasVideo) {
-            return 'Please select either an image or a video.'
-          }
-          return true
-        }),
-    }),
-    defineField({
       name: 'aboutLinks',
       title: 'External links',
       description: '(Optional) Here you can add a list of external links, it will be displayed below your About description text.',

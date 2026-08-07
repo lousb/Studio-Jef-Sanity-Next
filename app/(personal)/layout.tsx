@@ -39,9 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
           default: homePage.title || 'Personal website',
         }
       : undefined,
-    description: homePage?.overview?.text
-      ? toPlainText(homePage.overview.text)
-      : undefined,
+    description: settings?.overview?.text
+  ? toPlainText(settings.overview.text)
+  : undefined,
     openGraph: {
       images: ogImage ? [ogImage] : [],
     },
@@ -74,18 +74,18 @@ export default async function IndexRoute({
   const showcaseProjects = homePage?.showcaseProjects || []
   const projectCount = showcaseProjects.length
 
+  
+
   return (
     <>
       <div className="flex min-h-screen flex-col text-secondary">
         <Suspense>
-          <Navbar />
+          <Navbar/>
         </Suspense>
-        <div className="page-wrap mt-16 flex-grow px-4 md:px-5 lg:px-5 min-h-screen">
+        <div className="page-wrap flex-grow  min-h-screen">
           <Suspense>{children}</Suspense>
         </div>
-        <Suspense>
-          <Footer />
-        </Suspense>
+
       </div>
       {draftMode().isEnabled && <LiveVisualEditing />}
     </>

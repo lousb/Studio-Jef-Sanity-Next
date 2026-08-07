@@ -6,28 +6,21 @@
 }
 .projectPageTitle p > span{
   max-height: 120%;
-  height: 1.6rem;
+  height: 1.2rem;
   display: inline-flex !important;
 }
-.projectPageTitle p > span{
-  font-size: 1.2rem;
-}
+
 
 .projectPageTitle {
-  max-width: 90vw;
-  position: fixed;
-  justify-content: space-between;
-  height: calc(100vh - 6.5rem);
-  top: 6.5rem;
+
   transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) all 1s !important;
 }
 .projectPageTitle:first-child{
   transition: 500ms ease-in-out all, max-width 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s !important;
 }
 
-.infoActive .projectPageTitle{
-     min-width: 300px;
-    width: 18vw;
+.projectPageTitle{
+    width: 100vw;
   
 }
 @media only screen and (max-width: 768px) {
@@ -36,19 +29,12 @@
     height: auto !important;
   }
 }
-.projectPageDetails {
-  position: relative;
-  padding-top: calc(120px - 4em);
 
-}
-.infoActive .projectPageDetails{
-  
-}
+
 .columns-header {
   position: absolute;
 }
 .projectPage {
-  float: right;
   z-index: 99;
   width: 80%;
   height: 80%;
@@ -58,12 +44,12 @@
 }
 .projectPageTitleInfo {
   position: fixed;
-  top: calc(120px - 120px);
-  margin-left: 59vw;
+  bottom: 10px;
+  left: 10px;
   cursor: pointer;
   z-index: 9999;
-
-  font-size: 16px !important;
+  mix-blend-mode: difference;
+  color: white
 }
 
 
@@ -72,13 +58,40 @@
   opacity: 0;
 }
 .infoActive .projectPage {
-  
-     margin-top: 0px;
-      width: calc(100% - 320px);
-  height: 80%;
+
+      width: calc(100% - 20px);
   
 }
+.projectPageDetails {
+  position: fixed;
+  bottom: 0;
+  height: calc(100% - 60px);
+  width: calc(100% - 20px);
+  margin-inline: 10px;
+  z-index: 99;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns-desktop), 1fr);
+  gap: var(--grid-gutter-desktop);
+}
+.projectPageDetailsInner{
+  justify-content: space-between;
+}
+
+.projectPageDetails > * {
+  grid-column: 19 / 25;
+}
+
+@media (max-width: 767px) {
+  .projectPageDetails {
+    grid-template-columns: repeat(var(--grid-columns-mobile), 1fr);
+  }
+
+  .projectPageDetails > * {
+    grid-column: 1 / -1;
+  }
+}
  .projectPage {
+  margin-inline: 10px;
  margin-top: 7.8rem;
 }
 

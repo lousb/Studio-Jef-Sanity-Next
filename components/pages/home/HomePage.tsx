@@ -1,77 +1,61 @@
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import {Link} from 'next-view-transitions'
 
-import { ProjectListItem } from '@/components/pages/home/ProjectListItem'
 import { Header } from '@/components/shared/Header'
-import { resolveHref } from '@/sanity/lib/utils'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
-import HeroGallery from './HeroGallery'
-import Reveal from '@/components/global/Reveal'
+import ImageBox from '@/components/shared/ImageBox'
+import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth'
 
 export interface HomePageProps {
   data: HomePagePayload | null
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
-
 export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
-  // Default to an empty object to allow previews on non-existent documents
-  const { overview = [], showcaseProjects = [], featuredMedia = [] } = data ?? {}
-
-  console.log('🎬 Featured Media:', featuredMedia)
-
-  
+  const { overview = [], featuredMedia = [] } = data ?? {}
 
   return (
     <div className="space-y-6 home-page">
       <div className={`mobile-intersector`}></div>
-      {/* Header */}
-      {/* <div className="w-full h-[150vh] overflow-hidden">
-        <HeroGallery
-        featuredMedia={
-          featuredMedia
-   
-        }
-        />
-      </div> */}
+
       {overview && <Header description={overview} />}
-      <div className="w-full h-auto flex pt-5 pb-5 bg-white home-project-title">
-        <Reveal element='p' elementClass="text-4xl h-auto">
-          Featured projects
-        </Reveal>
-      </div>
-      {/* Showcase projects */}
-      {showcaseProjects && showcaseProjects.length > 0 && (
-        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 project-link-wrap bg-white">
-          {showcaseProjects.map((item, key) => {
-            const { project, scaleTile } = item
-            const href = resolveHref(project._type, project.slug)
 
-            if (!href) return null
+      {/* Featured media — same width/alignment logic as project page View 2 */}
+      {featuredMedia?.length > 0 && (
+        <div className="home-featured-media space-y-6 bg-white">
+          {featuredMedia.map((item, i) => {
+            const block = item?.block
+            if (!block?.image?.asset) return null
 
-            // Calculate delay for every second item in the row
-            const delay = Math.floor(key / 2) * 0.2 + 0.2
+            const cols = block.width ? COLUMN_NUM_MAP[block.width] ?? 24 : 24
+            const dimensions = block.image.asset.metadata?.dimensions
+            const aspectRatio = dimensions
+              ? `${dimensions.width} / ${dimensions.height}`
+              : undefined
 
             return (
-               <div className={scaleTile ? 'scale-down' : ''}>
-              <Link
-                key={key}
-                href={href}
-                data-sanity={encodeDataAttribute?.([
-                  'showcaseProjects',
-                  key,
-                  'project',
-                  'slug',
-                ])}
-              >
-                <RevealDiv delay={delay}>
-                 
-                    <ProjectListItem project={project} />
-              
-                </RevealDiv>
-              </Link>
-              </div>
+              <RevealDiv delay={0.2} key={item.mediaKey || i}>
+                <div
+                  className="hybrid-media"
+                  style={{ width: colsToWidth(cols), marginLeft: 0, marginRight: 'auto' }}
+                >
+                  <div style={{ width: '100%', height: 'auto', aspectRatio }}>
+                    <ImageBox
+                      image={{
+                        asset: block.image.asset,
+                        lqip: block.image.asset.metadata?.lqip,
+                      }}
+                      alt={block.title || block.caption || 'Featured project image'}
+                      caption={block.caption}
+                    />
+                  </div>
+                  {block.title && (
+                    <div className="hybrid-media-title text-sm opacity-60 mt-2">
+                      {block.title}
+                    </div>
+                  )}
+                </div>
+              </RevealDiv>
             )
           })}
         </div>
@@ -79,7 +63,5 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     </div>
   )
 }
-
-
 
 export default HomePage

@@ -30,68 +30,13 @@ export default defineType({
     }),
     
     defineField({
-      name: 'coverImage',
-      title: 'Cover Media',
-      description:
-        'This media will be used as the cover for the project. You can select either an image or a video, not both.',
-      type: 'object',
-      icon: ImageIcon,
-      fields: [
-        {
-          title: 'Image',
-          name: 'media',
-          type: 'image',
-          options: { hotspot: true },
-          hidden: ({ parent }) => !!parent?.video,
-          description: 'Use either an image or a video, not both.',
-        },
-        {
-          title: 'Video',
-          name: 'video',
-          type: 'mux.video',
-          hidden: ({ parent }) => !!parent?.media,
-          description: 'Use either a video or an image, not both.',
-        },
-      ],
-      validation: (Rule) =>
-        Rule.custom((fields) => {
-          const hasImage = !!fields?.media;
-          const hasVideo = !!fields?.video;
-          if (hasImage && hasVideo) {
-            return 'Only one: image or video, not both.';
-          }
-          if (!hasImage && !hasVideo) {
-            return 'Please select either an image or a video.';
-          }
-          return true;
-        }),
-      preview: {
-        select: {
-          media: 'media',
-          playbackId: 'video.asset.playbackId',
-        },
-        prepare({ media, playbackId }) {
-          if (playbackId) {
-            return {
-              title: 'Video',
-              subtitle: playbackId,
-            };
-          }
-          if (media) {
-            return {
-              title: 'Image',
-              subtitle: 'Image selected',
-              media,
-            };
-          }
-          return {
-            title: 'Cover Media',
-            subtitle: 'No media selected',
-          };
-        },
-      },
-    }),
-
+  name: 'coverImage',
+  title: 'Cover Image',
+  description: 'This image will be used as the cover for the project.',
+  type: 'image',
+  options: { hotspot: true },
+  validation: (rule) => rule.required(),
+}),
     defineField({
       name: 'overview',
       description:
@@ -129,6 +74,45 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+  name: 'status',
+  title: 'Status',
+  type: 'string',
+  options: {
+    list: [
+      { title: 'Completed', value: 'completed' },
+      { title: 'In Progress', value: 'in-progress' },
+      { title: 'Concept', value: 'concept' },
+    ],
+    layout: 'radio',
+  },
+}),
+defineField({
+  name: 'size',
+  title: 'Size',
+  description: 'e.g. 90m²',
+  type: 'string',
+}),
+defineField({
+  name: 'location',
+  title: 'Location',
+  description: 'e.g. Bondi Junction, Sydney',
+  type: 'string',
+}),
+defineField({
+  name: 'projectType',
+  title: 'Project Type',
+  type: 'array',
+  of: [{ type: 'reference', to: [{ type: 'projectType' }] }],
+  description: 'Pick from existing project types or add a new one.',
+}),
+defineField({
+  name: 'architects',
+  title: 'Architect(s)',
+  type: 'array',
+  of: [{ type: 'reference', to: [{ type: 'architect' }] }],
+  description: 'Pick from existing architects or add a new one.',
+}),
+    defineField({
       name: 'site',
       title: 'Website link',
       description: '(Optional) External link related to your project, it is displayed below your project overview text.',
@@ -150,43 +134,8 @@ export default defineType({
       ],
     }),
 
-    // Inline tags
-    defineField({
-      name: 'genre',
-      title: 'Genre',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'genre' }] },
-      ],
-      description: 'Pick from existing genres or add a new one.',
-    }),
-    defineField({
-      name: 'technique',
-      title: 'Technique',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'technique' }] },
-      ],
-      description: 'Pick from existing techniques or add a new one.',
-    }),
-    defineField({
-      name: 'client',
-      title: 'Client',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'client' }] },
-      ],
-      description: 'Pick from existing clients or add a new one.',
-    }),
-    defineField({
-      name: 'credits',
-      title: 'Credits',
-      type: 'array',
-      of: [
-        { type: 'reference', to: [{ type: 'credits' }] },
-      ],
-      description: 'Pick from existing credits or add a new one.',
-    }),
+
+
      
 
     // Content blocks
@@ -255,196 +204,63 @@ export default defineType({
           },
         }),
 
-        defineArrayMember({
-          title: "Full Video",
-          name: "video",
-          type: "mux.video",
-          preview: {
-            select: {
-              playbackId: "asset.playbackId",
-              title: "title",
-            },
-            prepare({ playbackId, title }) {
-              return {
-                title: title || "Untitled Video",
-                subtitle: playbackId ? `${playbackId}` : "No video selected",
-              };
-            },
-          },
-        }),
-
+       
 
         defineArrayMember({
-          name: 'hybridMedia',
-          title: 'Media',
-          type: 'object',
-          icon: ImageIcon,
-          fields: [
-            {
-              title: 'Image',
-              name: 'media',
-              type: 'image',
-              options: { hotspot: true },
-              hidden: ({ parent }) => !!parent?.video,
-              description: 'Use either an image or a video, not both.',
-            },
-            {
-              title: 'Video',
-              name: 'video',
-              type: 'mux.video',
-              hidden: ({ parent }) => !!parent?.media,
-              description: 'Use either a video or an image, not both.',
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below the media.',
-            },
-            {
-              title: 'Featured',
-              name: 'featured',
-              type: 'boolean',
-              description: 'Mark this media as featured.',
-            },
-          ],
-          preview: {
-            select: {
-              media: 'media',
-              playbackId: 'video.asset.playbackId',
-            },
-            prepare({ media, playbackId }) {
-              if (playbackId) {
-                return {
-                  title: 'Video',
-                  subtitle: playbackId,
-                };
-              }
-              if (media) {
-                return {
-                  title: 'Image',
-                  subtitle: 'Image selected',
-                  media,
-                };
-              }
-              return {
-                title: 'Hybrid Media',
-                subtitle: 'No media selected',
-              };
-            },
-          },
-          validation: (Rule) =>
-            Rule.custom((fields: any) => {
-              const hasImage = !!fields?.media;
-              const hasVideo = !!fields?.video;
-              if (hasImage && hasVideo) {
-                return 'Only one: image or video, not both.';
-              }
-              if (!hasImage && !hasVideo) {
-                return 'Please select either an image or a video.';
-              }
-              return true;
-            }),
-        }),
+  name: 'hybridMedia',
+  title: 'Media',
+  type: 'object',
+  icon: ImageIcon,
+  fields: [
+    {
+      title: 'Image',
+      name: 'media',
+      type: 'image',
+      options: { hotspot: true },
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
+      title: 'Caption',
+      name: 'caption',
+      type: 'string',
+      description: '(Optional) Caption below the media.',
+    },
+    {
+      title: 'Featured',
+      name: 'featured',
+      type: 'boolean',
+      description: 'Mark this media as featured. This will display on the home page',
+    },
+    {
+      title: 'Width',
+      name: 'width',
+      type: 'string',
+      options: {
+        list: [
+          { title: '8 Columns', value: '8col' },
+          { title: '16 Columns', value: '16col' },
+          { title: '24 Columns (Full Width)', value: '24col' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'fullwidth',
+    },
+  ],
+  preview: {
+    select: { media: 'media' },
+    prepare({ media }) {
+      return {
+        title: 'Image',
+        subtitle: media ? 'Image selected' : 'No media selected',
+        media,
+      };
+    },
+  },
+}),
         
 
 
 
-        defineArrayMember({
-          name: 'twoHybridMedia',
-          title: 'Double Media',
-          type: 'object',
-          icon: ImageIcon,
-          fields: [
-            {
-              title: 'Left Image',
-              name: 'leftImage',
-              type: 'image',
-              options: { hotspot: true },
-              hidden: ({ parent }) => !!parent?.leftVideo,
-              description: 'Either use an image or a video on the left side.',
-            },
-            {
-              title: 'Left Video',
-              name: 'leftVideo',
-              type: 'mux.video',
-              hidden: ({ parent }) => !!parent?.leftImage,
-              description: 'Either use an image or a video on the left side.',
-            },
-            {
-              title: 'Left Featured',
-              name: 'leftFeatured',
-              type: 'boolean',
-              hidden: ({ parent }) =>
-                !parent?.leftImage && !parent?.leftVideo,
-              description: 'Mark the left media item as featured.',
-            },
-            {
-              title: 'Right Image',
-              name: 'rightImage',
-              type: 'image',
-              options: { hotspot: true },
-              hidden: ({ parent }) => !!parent?.rightVideo,
-              description: 'Either use an image or a video on the right side.',
-            },
-            {
-              title: 'Right Video',
-              name: 'rightVideo',
-              type: 'mux.video',
-              hidden: ({ parent }) => !!parent?.rightImage,
-              description: 'Either use an image or a video on the right side.',
-            },
-            {
-              title: 'Right Featured',
-              name: 'rightFeatured',
-              type: 'boolean',
-              hidden: ({ parent }) =>
-                !parent?.rightImage && !parent?.rightVideo,
-              description: 'Mark the right media item as featured.',
-            },
-            {
-              title: 'Caption',
-              name: 'caption',
-              type: 'string',
-              description: '(Optional) Caption below the two media items.',
-            },
-          ],
-          preview: {
-            select: {
-              leftImage: 'leftImage',
-              leftPlaybackId: 'leftVideo.asset.playbackId',
-              rightImage: 'rightImage',
-              rightPlaybackId: 'rightVideo.asset.playbackId',
-            },
-            prepare({ leftImage, leftPlaybackId, rightImage, rightPlaybackId }) {
-              const leftLabel = leftPlaybackId ? 'Video' : leftImage ? 'Image' : 'None';
-              const rightLabel = rightPlaybackId ? 'Video' : rightImage ? 'Image' : 'None';
-              return {
-                title: 'Two Hybrid Media',
-                subtitle: `Left: ${leftLabel}, Right: ${rightLabel}`,
-                media: leftImage || rightImage || undefined,
-              };
-            },
-          },
-          validation: (Rule) =>
-            Rule.custom((fields) => {
-              const hasLeft = !!fields?.leftImage || !!fields?.leftVideo;
-              const hasRight = !!fields?.rightImage || !!fields?.rightVideo;
-              const hasBothLeft = !!fields?.leftImage && !!fields?.leftVideo;
-              const hasBothRight = !!fields?.rightImage && !!fields?.rightVideo;
-
-              if (!hasLeft || !hasRight) {
-                return 'Both left and right sides must have either an image or a video.';
-              }
-              if (hasBothLeft) {
-                return 'Only one media type (image or video) allowed on the left side.';
-              }
-              if (hasBothRight) {
-                return 'Only one media type (image or video) allowed on the right side.';
-              }
-              return true;
-            }),
-        }),
 
 
         

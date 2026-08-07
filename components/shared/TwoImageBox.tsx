@@ -39,7 +39,7 @@ export default function ImageBox({
     <div >
       <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
         <div
-          className={`w-full overflow-hidden rounded-[3px] ${classesWrapper}`}
+          className={`w-full overflow-hidden  ${classesWrapper}`}
         >
           {leftImageUrl && (
             <Image
@@ -59,7 +59,7 @@ export default function ImageBox({
           )}
         </div>
         <div
-          className={`w-full overflow-hidden rounded-[3px] ${classesWrapper}`}
+          className={`w-full overflow-hidden  ${classesWrapper}`}
         >
           {rightImageUrl && (
             <Image

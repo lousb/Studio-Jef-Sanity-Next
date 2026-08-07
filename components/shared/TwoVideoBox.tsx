@@ -26,7 +26,7 @@ export default function VideoBox({
     <div >
       <div className="grid gap-5 grid-cols-1 xl:grid-cols-2">
         <div
-          className={`w-full overflow-hidden rounded-[3px] bg-gray-50 aspect-video`}
+          className={`w-full overflow-hidden  bg-gray-50 aspect-video`}
         >
           {isClient ? (
             <ReactPlayer
@@ -40,7 +40,7 @@ export default function VideoBox({
           )}
         </div>
         <div
-          className={`w-full overflow-hidden rounded-[3px] bg-gray-50 aspect-video`}
+          className={`w-full overflow-hidden  bg-gray-50 aspect-video`}
         >
           {isClient ? (
             <ReactPlayer
