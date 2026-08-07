@@ -32,12 +32,21 @@ export async function POST(req: NextRequest) {
     p.featuredItems?.forEach((item) => desired.add(`${p._id}::${item._key}`))
   })
 
-  const home = await client.fetch(`*[_type == "home" && !(_id in path("drafts.**"))][0]{ _id, featuredMedia }`)
-  if (!home?._id) {
+  const homeDocs: { _id: string; featuredMedia?: any[] }[] = await client.fetch(
+    `*[_type == "home"]{ _id, featuredMedia }`
+  )
+
+  if (!homeDocs?.length) {
     return NextResponse.json({ error: 'No home document found' }, { status: 404 })
   }
 
-  const existing = home.featuredMedia || []
+  // Prefer the draft as the source of truth for existing order, since that's what Studio shows.
+  // Fall back to published if no draft exists.
+  const draft = homeDocs.find((d) => d._id.startsWith('drafts.'))
+  const published = homeDocs.find((d) => !d._id.startsWith('drafts.'))
+  const source = draft || published
+
+  const existing = source?.featuredMedia || []
   const existingKeys = new Set(
     existing.map((item: any) => `${item.project._ref}::${item.mediaKey}`)
   )
@@ -58,7 +67,15 @@ export async function POST(req: NextRequest) {
       }
     })
 
-  await client.patch(home._id).set({ featuredMedia: [...kept, ...additions] }).commit()
+  const finalList = [...kept, ...additions]
 
-  return NextResponse.json({ ok: true, count: kept.length + additions.length })
+  // Patch every existing version (draft and/or published) so Studio reflects it
+  // regardless of which one is currently open in the editor.
+  const tx = client.transaction()
+  homeDocs.forEach((doc) => {
+    tx.patch(doc._id, (p) => p.set({ featuredMedia: finalList }))
+  })
+  await tx.commit()
+
+  return NextResponse.json({ ok: true, count: finalList.length, patchedDocs: homeDocs.map((d) => d._id) })
 }

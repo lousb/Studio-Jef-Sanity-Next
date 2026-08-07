@@ -27,8 +27,14 @@ export default defineType({
     defineField({
   name: 'featuredMedia',
   title: 'Featured media',
-  description: 'Auto-synced from project media marked "Featured". Drag to reorder — your order is preserved when new items sync in.',
+  description: 'Auto-synced from project media marked "Featured". Drag to reorder.',
   type: 'array',
+  components: {
+    input: (props) => props.renderDefault({
+      ...props,
+      arrayFunctions: () => null, // hides the "+ Add item" toolbar; drag handles on each row are unaffected
+    }),
+  },
   of: [
     defineArrayMember({
       type: 'object',
