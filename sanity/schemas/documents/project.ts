@@ -247,13 +247,16 @@ defineField({
     },
   ],
   preview: {
-    select: { media: 'media' },
-    prepare({ media }) {
+    select: {
+      media: 'media',
+      caption: 'caption',
+      featured: 'featured',
+    },
+    prepare({ media, caption, featured }) {
       return {
-        title: 'Image',
-        subtitle: media ? 'Image selected' : 'No media selected',
+        title: featured ? `Featured: ${caption || 'Untitled'}` : caption || 'Untitled',
         media,
-      };
+      }
     },
   },
 }),

@@ -1,3 +1,4 @@
+import { FeaturedMediaPreview } from '@/sanity/components/FeaturedMediaPreview'
 import { HomeIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
@@ -37,19 +38,16 @@ export default defineType({
   },
   of: [
     defineArrayMember({
-      type: 'object',
-      name: 'featuredMediaItem',
-      fields: [
-        { name: 'project', type: 'reference', to: [{ type: 'project' }], readOnly: true },
-        { name: 'mediaKey', title: 'Media key', type: 'string', readOnly: true },
-      ],
-      preview: {
-        select: { projectTitle: 'project.title', coverImage: 'project.coverImage' },
-        prepare({ projectTitle, coverImage }) {
-          return { title: projectTitle || 'Untitled project', media: coverImage }
-        },
-      },
-    }),
+  type: 'object',
+  name: 'featuredMediaItem',
+  fields: [
+    { name: 'project', type: 'reference', to: [{ type: 'project' }], readOnly: true },
+    { name: 'mediaKey', title: 'Media key', type: 'string', readOnly: true },
+  ],
+  components: {
+    preview: FeaturedMediaPreview,
+  },
+}),
   ],
 }),
 
