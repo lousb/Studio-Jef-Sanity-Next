@@ -3,7 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader';
-import { Link } from 'next-view-transitions';
+import Link from 'next/link';
 
 import { ProjectListItem } from '@/components/pages/home/ProjectListItem';
 import { Header } from '@/components/shared/Header';
@@ -11,6 +11,7 @@ import { resolveHref } from '@/sanity/lib/utils';
 import RevealDiv from '@/components/global/revealDiv';
 import Reveal from '@/components/global/Reveal';
 import type { ProjectsPagePayload } from '@/types';
+import { ProjectHoverPreview, getPreviewImages } from '@/components/pages/home/ProjectHoverPreview';
 
 const COLUMN_STORAGE_KEY = 'projectGridColumns';
 
@@ -28,10 +29,6 @@ export function AllProjectsPage({
     return saved === '1' || saved === '2' || saved === '4' ? saved : '1';
   });
 
-
-
-
-
   const headerRef = useRef<HTMLDivElement>(null);
 
   const [selectedFilters, setSelectedFilters] = useState({
@@ -45,6 +42,9 @@ export function AllProjectsPage({
   const [filtersVisible, setFiltersVisible] = useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
+
+  // which project row (by index into filteredProjects) is currently hovered
+  const [hoveredKey, setHoveredKey] = useState<number | null>(null);
 
   useEffect(() => {
     localStorage.setItem(COLUMN_STORAGE_KEY, columns);
@@ -85,7 +85,7 @@ export function AllProjectsPage({
       )
     ),
   ];
-  
+
   const genres = [
     ...new Set(
       validProjects.flatMap((project) =>
@@ -105,8 +105,6 @@ export function AllProjectsPage({
       validProjects.map((project) => project.year || 'Unknown')
     ),
   ];
-
-
 
   const toggleFilter = (type: keyof typeof selectedFilters, value: string) => {
     setSelectedFilters((prev) => {
@@ -136,8 +134,6 @@ export function AllProjectsPage({
 
     return matchesClients && matchesGenres && matchesTechniques && matchesYears;
   });
-
-
 
   const getAvailableFilterOptions = () => {
     const available = {
@@ -175,59 +171,65 @@ export function AllProjectsPage({
   };
 
   const availableOptions = getAvailableFilterOptions();
-  
+
   return (
     <div className="space-y-6 all-projects-page">
       {/* Display aggregated lists at the top */}
 
-      
-
-
-    
-
       {filteredProjects.length > 0 ? (
- <div className="flex flex-col justify-center min-h-[100vh] mt-0">
- <div
-    ref={gridRef}
-    className="grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)] gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)] gap-y-4 items-center"
-  >
-  
+        <div className="flex flex-col justify-center min-h-[100vh] mt-0">
+          <div
+            ref={gridRef}
+            className="grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)] gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)] gap-y-4 items-center"
+          >
+            {filteredProjects.flatMap((project, key) => {
+              const href = resolveHref(project._type, project.slug);
+              if (!href) return [];
+              const delay = (key / filteredProjects.length) * 0.5;
 
-    {filteredProjects.flatMap((project, key) => {
-  const href = resolveHref(project._type, project.slug);
-  if (!href) return [];
-  const delay = (key / filteredProjects.length) * 0.5;
+              return Array.from({ length: 5 }).map((_, repeatIndex) => (
+                <Link
+                  key={`${key}-${repeatIndex}`}
+                  href={href}
+                  data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
+                  className="project-item-animate contents"
+                  onMouseEnter={() => setHoveredKey(key)}
+                  onMouseLeave={() =>
+                    setHoveredKey((current) => (current === key ? null : current))
+                  }
+                >
+                  <span className="text-body-01 [grid-column:1/2]">
+                    {key}
+                  </span>
+                  <span className="text-body-01 [grid-column:2/5]">
+                    {project.title}
+                  </span>
+                  <span className="text-body-01 [grid-column:7/9]">
+                    {project.projectType?.map((t) => t.title).join(', ') || '—'}
+                  </span>
+                  <span className="text-body-01 capitalize [grid-column:19/21]">
+                    {project.status?.replace('-', ' ') || '—'}
+                  </span>
+                  <span className="text-body-01 [grid-column:23/25] text-right">
+                    {project.year || '—'}
+                  </span>
+                </Link>
+              ));
+            })}
+          </div>
 
-  return Array.from({ length: 5 }).map((_, repeatIndex) => (
-    <Link
-      key={`${key}-${repeatIndex}`}
-      href={href}
-      data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
-      className="project-item-animate contents"
-    >
-      <span className="text-body-01 [grid-column:1/2]">
-        {key}
-      </span>
-      <span className="text-body-01 [grid-column:2/5]">
-        {project.title}
-      </span>
-      <span className="text-body-01 [grid-column:7/9]">
-        {project.projectType?.map((t) => t.title).join(', ') || '—'}
-      </span>
-      <span className="text-body-01 capitalize [grid-column:19/21]">
-        {project.status?.replace('-', ' ') || '—'}
-      </span>
-      <span className="text-body-01 [grid-column:23/25] text-right">
-        {project.year || '—'}
-      </span>
-    </Link>
-  ));
-})}
-  </div>
-  </div>
-) : (
-  <div className="text-center text-gray-500">No published projects found.</div>
-)}
+          <ProjectHoverPreview
+            images={
+              hoveredKey !== null
+                ? getPreviewImages(filteredProjects[hoveredKey]?.previewMedia)
+                : []
+            }
+            active={hoveredKey !== null}
+          />
+        </div>
+      ) : (
+        <div className="text-center text-gray-500">No published projects found.</div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,13 @@
 import React from 'react';
 import ImageBox from '../shared/ImageBox';
 import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth';
+import { useFigureHover } from '@/components/pages/project/FigureHoverContext'
+
+const EASE = 'cubic-bezier(0.32, 0, 0.15, 1)';
 
 const HybridMedia = ({ data, isInfoActive }) => {
   const { media, caption, title, width, featured } = data || {};
+  const { setHoveredCaption } = useFigureHover();
 
   if (!media?.asset) return null;
 
@@ -13,25 +17,30 @@ const HybridMedia = ({ data, isInfoActive }) => {
     ? `${dimensions.width} / ${dimensions.height}`
     : undefined;
 
+  const EASE = 'cubic-bezier(0.32, 0, 0.15, 1)';
+
   const wrapperStyle = isInfoActive
     ? {
         width: colsToWidth(6),
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        transition: 'width 0.6s cubic-bezier(0.65,0,0.35,1), margin 0.6s cubic-bezier(0.65,0,0.35,1)',
+        marginLeft: `calc((100% - ${colsToWidth(6)}) / 2)`,
+        marginRight: `calc((100% - ${colsToWidth(6)}) / 2)`,
+        transition: `width 1s ${EASE}, margin 1s ${EASE}`,
       }
     : {
         width: colsToWidth(cols),
         marginLeft: 0,
-        marginRight: 'auto',
-        transition: 'width 0.6s cubic-bezier(0.65,0,0.35,1), margin 0.6s cubic-bezier(0.65,0,0.35,1)',
+        marginRight: 0,
+        transition: `width 1s ${EASE}, margin 1s ${EASE}`,
       };
 
   return (
     <div
-      className="divider mt-3 hybrid-media"
+      className="divider hybrid-media mb-[10px]"
       style={wrapperStyle}
       data-featured={featured || undefined}
+      data-media-block
+      onMouseEnter={() => caption && setHoveredCaption(caption)}
+      onMouseLeave={() => caption && setHoveredCaption(null)}
     >
       <div style={{ width: '100%', height: 'auto', aspectRatio }}>
         <ImageBox

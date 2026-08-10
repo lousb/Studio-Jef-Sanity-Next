@@ -9,6 +9,7 @@ import { PortableText } from '@portabletext/react'
 import { urlForLogo } from '@/sanity/lib/utils'
 import type { LinkItem, PageItem, SettingsPayload } from '@/types'
 import Reveal from '../Reveal'
+import { useLenis } from '../LenisProvider'
 
 interface NavbarProps {
   data: SettingsPayload
@@ -29,29 +30,49 @@ export default function Navbar(props: NavbarProps) {
   const logoImageUrl = customLogo && urlForLogo(customLogo)?.url()
 
   const [isVisible, setIsVisible] = useState(true)
+  const lenis = useLenis()
 
-  const MIN_VIEWPORT = 517
-const MAX_VIEWPORT = 1920
-
-const MIN_VW = 88.8
-const MAX_VW = 35.6770833
-
-const [logoWidth, setLogoWidth] = useState('685px')
-
-
+  const [logoWidth, setLogoWidth] = useState('685px')
 
   useEffect(() => {
-    let lastScrollY = window.scrollY
+    if (!lenis) return
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      setIsVisible(currentScrollY < lastScrollY || currentScrollY === 0)
-      lastScrollY = currentScrollY
+    setIsVisible(true)
+
+    let lastScrollY: number | null = null
+
+    const handleScroll = ({ scroll }: { scroll: number }) => {
+      // ignore programmatic jumps from InfiniteLoop's teleport — just resync silently
+      if ((lenis as any).__isProgrammaticJump) {
+        lastScrollY = scroll
+        return
+      }
+
+      if (lastScrollY === null) {
+        lastScrollY = scroll
+        return
+      }
+
+      const delta = scroll - lastScrollY
+
+      if (scroll <= 0) {
+        setIsVisible(true)
+        lastScrollY = scroll
+        return
+      }
+
+      if (Math.abs(delta) < 50) return
+
+      setIsVisible(delta < 0)
+      lastScrollY = scroll
     }
 
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    lenis.on('scroll', handleScroll)
+
+    return () => {
+      lenis.off('scroll', handleScroll)
+    }
+  }, [lenis])
 
   return (
     <div
@@ -63,21 +84,13 @@ const [logoWidth, setLogoWidth] = useState('685px')
         ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
     >
       <div className="flex flex-wrap flex-col gap-[10px] md:mt-0 md:text-1xl w-full">
-        <Link
-          href="/"
-          className="h-full text-1xl hover:text-secondary md:text-1xl"
-        >
+        <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">
           Home
         </Link>
         {isProjectsPage ? (
-          <span className="text-gray-400 cursor-default">
-            Projects
-          </span>
+          <span className="text-gray-400 cursor-default">Projects</span>
         ) : (
-          <Link
-            href="/projects"
-            className="h-full text-1xl hover:text-secondary md:text-1xl"
-          >
+          <Link href="/projects" className="h-full text-1xl hover:text-secondary md:text-1xl">
             Projects
           </Link>
         )}
@@ -85,10 +98,7 @@ const [logoWidth, setLogoWidth] = useState('685px')
         {isAboutPage ? (
           <span className="text-gray-400 cursor-default pl-2">Studio</span>
         ) : (
-          <Link
-            href="/about"
-            className="h-full text-1xl hover:text-secondary md:text-1xl"
-          >
+          <Link href="/about" className="h-full text-1xl hover:text-secondary md:text-1xl">
             Studio
           </Link>
         )}
@@ -102,12 +112,12 @@ const [logoWidth, setLogoWidth] = useState('685px')
 
       {customLogo ? (
         <Image
-  src={logoImageUrl}
-  alt="Logo"
-  width={685}
-  height={274}
-  className="fixed-logo h-auto"
-/>
+          src={logoImageUrl}
+          alt="Logo"
+          width={685}
+          height={274}
+          className="fixed-logo h-auto"
+        />
       ) : null}
     </div>
   )

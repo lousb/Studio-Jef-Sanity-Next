@@ -44,6 +44,12 @@ export default defineType({
     { name: 'project', type: 'reference', to: [{ type: 'project' }], readOnly: true },
     { name: 'mediaKey', title: 'Media key', type: 'string', readOnly: true },
   ],
+  preview: {
+    select: {
+      project: 'project',
+      mediaKey: 'mediaKey',
+    },
+  },
   components: {
     preview: FeaturedMediaPreview,
   },

@@ -1,19 +1,37 @@
 "use client";
 
 import Lenis from "lenis";
-import { useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  PropsWithChildren,
+} from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { PropsWithChildren } from "react";
+
+type LenisWithJumpFlag = Lenis & { __isProgrammaticJump?: boolean };
+
+const LenisContext = createContext<LenisWithJumpFlag | null>(null);
+export const useLenis = () => useContext(LenisContext);
 
 const LenisProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const lenisRef = useRef<Lenis | null>(null);
+  const lenisRef = useRef<LenisWithJumpFlag | null>(null);
+  const [lenisInstance, setLenisInstance] = useState<LenisWithJumpFlag | null>(null);
 
   const isStudio = pathname.startsWith("/studio");
 
   useEffect(() => {
-    if (isStudio) return; // Skip initializing Lenis in Sanity Studio
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isStudio) return;
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -21,9 +39,10 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
       gestureOrientation: "vertical",
       smoothWheel: true,
       touchMultiplier: 2,
-    });
+    }) as LenisWithJumpFlag;
 
     lenisRef.current = lenis;
+    setLenisInstance(lenis);
 
     const raf = (time: number) => {
       lenis.raf(time);
@@ -34,6 +53,8 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
 
     return () => {
       lenis.destroy();
+      lenisRef.current = null;
+      setLenisInstance(null);
     };
   }, [isStudio]);
 
@@ -41,19 +62,19 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
     if (isStudio) return;
 
     const handleNavigation = () => {
-      if (lenisRef.current) {
-        lenisRef.current.stop();
-      }
+      lenisRef.current?.stop();
       window.scrollTo(0, 0);
-      if (lenisRef.current) {
-        lenisRef.current.start();
-      }
+      lenisRef.current?.start();
     };
 
     handleNavigation();
   }, [pathname, searchParams, isStudio]);
 
-  return <>{children}</>;
+  return (
+    <LenisContext.Provider value={lenisInstance}>
+      {children}
+    </LenisContext.Provider>
+  );
 };
 
 export default LenisProvider;

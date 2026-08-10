@@ -30,8 +30,8 @@ const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0
         // fallback animate container if no words found
         gsap.fromTo(
           el,
-          { y: 50, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1, ease: 'power3.out' }
+          { opacity: 0 },
+          { opacity: 1, duration: 1, ease: 'power3.out' }
         )
       }
     }

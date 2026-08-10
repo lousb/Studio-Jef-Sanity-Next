@@ -1,4 +1,5 @@
 .projectPage {
+    margin: 10px;
 }
 .projectPageTitle p,
 .projectPageTitle span {
@@ -54,7 +55,7 @@
 
 
 .infoInActive .projectPageDetails{
-  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s all, opacity 0.2s !important;
+  transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) 0.2s all, opacity 0s !important;
   opacity: 0;
 }
 .infoActive .projectPage {
@@ -90,10 +91,7 @@
     grid-column: 1 / -1;
   }
 }
- .projectPage {
-  margin-inline: 10px;
- margin-top: 7.8rem;
-}
+
 
 .infoInActive .projectPage {
   width: 100%;

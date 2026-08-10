@@ -52,8 +52,12 @@ export const homePageQuery = groq`
       }
     },
     title,
-    featuredMedia[]{
+   featuredMedia[]{
     mediaKey,
+    "project": project->{
+      title,
+      slug
+    },
     "block": project->content[_key == ^.mediaKey][0]{
       _key,
       "image": media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
@@ -65,6 +69,7 @@ export const homePageQuery = groq`
   }
 `
 
+// sanity/lib/queries.ts
 export const projectsPageQuery = groq`
 *[_type == "project" && defined(slug) && defined(title)]{
   _type,
@@ -87,6 +92,23 @@ export const projectsPageQuery = groq`
         "aspect_ratio": data.aspect_ratio,
         "url": "https://stream.mux.com/" + playbackId
       }
+    }
+  },
+  "previewMedia": content[_type in ["hybridMedia", "twoHybridMedia"]][0...4]{
+    _type,
+    _key,
+    media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+    caption,
+    title,
+    mediaOne{
+      media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      caption,
+      title
+    },
+    mediaTwo{
+      media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      caption,
+      title
     }
   },
   overview,

@@ -72,6 +72,10 @@ export interface ShowcaseProject {
 
 export interface FeaturedMediaItem {
   mediaKey?: string
+  project?: {
+    title?: string
+    slug?: { current: string }
+  }
   block?: {
     _key: string
     image?: {
@@ -102,6 +106,33 @@ export interface HomePagePayload {
   featuredMedia?: FeaturedMediaItem[]
 }
 
+export interface PreviewMediaBlock {
+  _type: 'hybridMedia' | 'twoHybridMedia'
+  _key?: string
+  media?: { asset?: PreviewMediaAsset }
+  caption?: string
+  title?: string
+  mediaOne?: {
+    media?: { asset?: PreviewMediaAsset }
+    caption?: string
+    title?: string
+  }
+  mediaTwo?: {
+    media?: { asset?: PreviewMediaAsset }
+    caption?: string
+    title?: string
+  }
+}
+
+export interface PreviewMediaAsset {
+  _id: string
+  url: string
+  metadata?: {
+    dimensions?: { width: number; height: number }
+    lqip?: string
+  }
+}
+
 export interface ProjectsPagePayload {
   _type: string
   coverImage?: {
@@ -125,6 +156,7 @@ export interface ProjectsPagePayload {
       }
     }
   }
+  previewMedia?: PreviewMediaBlock[]
   overview?: PortableTextBlock[]
   slug?: string
   tags?: string[]
