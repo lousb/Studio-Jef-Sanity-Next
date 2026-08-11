@@ -32,7 +32,7 @@ import { syncFeaturedMediaAction } from './sanity/actions/syncFeaturedMediaActio
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE ||
-  'Louis Wyeth Portfolio'
+  'Studio Jef'
 
 export default defineConfig({
   basePath: studioUrl,
@@ -48,7 +48,7 @@ export default defineConfig({
     return prev
   },
 },
-  icon: Logo,
+ 
   schema: {
   types: [
     // Singletons
