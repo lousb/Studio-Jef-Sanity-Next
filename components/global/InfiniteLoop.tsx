@@ -10,18 +10,19 @@ type LenisInternals = Lenis & {
   __isProgrammaticJump?: boolean;
 };
 
-// Ignore layout deltas smaller than this — mobile browsers report
-// spurious sub-pixel resizes (font swap rounding, chrome animating).
-const RESIZE_THRESHOLD = 1;
+// Ignore layout deltas smaller than this — sub-pixel rounding noise.
+const RESIZE_THRESHOLD = 2;
+
+// A measured size has to stay put for this long before we act on it.
+// Mobile Safari/Chrome fire several resize events in a row while the
+// address bar animates in/out — react to the settled size, not every
+// intermediate frame, or you get a correction mid-scroll.
+const SETTLE_MS = 120;
 
 function getViewportHeight() {
   return window.visualViewport?.height ?? window.innerHeight;
 }
 
-// How many copies do we need on EACH side of the "real" copy so that a
-// user can scroll at least one full viewport in either direction before
-// hitting the edge of the rendered track? +1 is a safety margin so fast
-// flicks/momentum never outrun the buffer and show blank space.
 function computeCopiesPerSide(itemHeight: number, viewportHeight: number) {
   if (!itemHeight || itemHeight <= 0) return 1;
   return Math.max(1, Math.ceil(viewportHeight / itemHeight) + 1);
@@ -33,8 +34,7 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
   const isJumpingRef = useRef(false);
   const readyRef = useRef(false);
   const isTouchingRef = useRef(false);
-  const pendingMeasureRef = useRef(false);
-  const measureRafRef = useRef<number | null>(null);
+  const settleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const jumpTokenRef = useRef(0);
   const copiesPerSideRef = useRef(1);
   const pendingTeleportRef = useRef<{ ratio: number } | null>(null);
@@ -56,29 +56,33 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
     isJumpingRef.current = true;
     l.__isProgrammaticJump = true; // flag BEFORE scrollTo so the synchronous 'scroll' event sees it
 
-    const animated = l.animatedScroll ?? l.scroll ?? 0;
-    const target = l.targetScroll ?? animated;
-    const pending = target - animated;
+    const animated = Number.isFinite(l.animatedScroll) ? l.animatedScroll : (l.scroll ?? 0);
+    const target = Number.isFinite(l.targetScroll) ? l.targetScroll : animated;
+    const pending = Number.isFinite(target - animated) ? target - animated : 0;
 
     l.scrollTo(pos, { immediate: true, force: true });
     l.targetScroll = pos + pending;
 
     requestAnimationFrame(() => {
-      // only the most recent jump releases the lock — guards against an
-      // overlapping teleport clearing it too early
+      // only the most recent jump releases the lock
       if (jumpTokenRef.current !== token) return;
       isJumpingRef.current = false;
       l.__isProgrammaticJump = false;
     });
   }, []);
 
-  const scheduleMeasure = useCallback((fn: () => void) => {
-    if (pendingMeasureRef.current) return;
-    pendingMeasureRef.current = true;
-    measureRafRef.current = requestAnimationFrame(() => {
-      pendingMeasureRef.current = false;
+  // Debounced measure: waits for size to stop changing before reacting.
+  // Pass immediate=true for the very first measurement on mount.
+  const scheduleMeasure = useCallback((fn: () => void, immediate = false) => {
+    if (settleTimerRef.current) {
+      clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
+    }
+    if (immediate) {
       fn();
-    });
+      return;
+    }
+    settleTimerRef.current = setTimeout(fn, SETTLE_MS);
   }, []);
 
   useEffect(() => {
@@ -86,8 +90,6 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
     const l = lenis as LenisInternals;
     const single = singleRef.current;
 
-    // If a previous render changed the copy count, the DOM now matches
-    // it — apply whatever teleport was waiting on that re-render.
     if (pendingTeleportRef.current) {
       const { ratio } = pendingTeleportRef.current;
       pendingTeleportRef.current = null;
@@ -123,20 +125,21 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
 
       if (!copiesChanged && !heightChanged) return;
 
-      // Don't yank scroll position mid-touch — the browser will fight a
-      // programmatic scrollTo against a live finger and produce jank.
-      // Re-check on touchend instead.
+      // Never yank scroll position while a finger is down — the browser
+      // (or Lenis' own momentum) will fight a programmatic scrollTo and
+      // it shows up as a stutter. The debounce below re-checks once
+      // touch and resize activity both go quiet.
       if (isTouchingRef.current) return;
 
       const oldCenterStart = copiesPerSideRef.current * prevH;
-      const ratio = (l.scroll - oldCenterStart) / prevH;
+      const ratio = prevH > 0 ? (l.scroll - oldCenterStart) / prevH : 0;
 
       heightRef.current = h;
 
       if (copiesChanged) {
         copiesPerSideRef.current = neededCopiesPerSide;
         pendingTeleportRef.current = { ratio };
-        setCopiesPerSide(neededCopiesPerSide); // triggers re-render with new copy count
+        setCopiesPerSide(neededCopiesPerSide);
       } else {
         lenis.resize();
         teleport(neededCopiesPerSide * h + ratio * h);
@@ -145,7 +148,7 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
 
     const ro = new ResizeObserver(() => scheduleMeasure(measure));
     ro.observe(single);
-    scheduleMeasure(measure);
+    scheduleMeasure(measure, true); // first pass runs immediately, no debounce
 
     const onViewportChange = () => scheduleMeasure(measure);
     window.addEventListener("resize", onViewportChange);
@@ -154,10 +157,14 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
 
     const onTouchStart = () => {
       isTouchingRef.current = true;
+      if (settleTimerRef.current) {
+        clearTimeout(settleTimerRef.current);
+        settleTimerRef.current = null;
+      }
     };
     const onTouchEnd = () => {
       isTouchingRef.current = false;
-      scheduleMeasure(measure); // re-check in case a resize landed mid-touch
+      scheduleMeasure(measure); // re-check once things settle
     };
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
@@ -171,8 +178,7 @@ export function InfiniteLoop({ children }: PropsWithChildren) {
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("touchcancel", onTouchEnd);
-      if (measureRafRef.current !== null) cancelAnimationFrame(measureRafRef.current);
-      pendingMeasureRef.current = false;
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     };
   }, [lenis, copiesPerSide, teleport, scheduleMeasure]);
 
