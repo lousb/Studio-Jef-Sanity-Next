@@ -1,44 +1,92 @@
-import Image from 'next/image'
+'use client'
 
+import { useState } from 'react'
+import Image from 'next/image'
 import { urlForImage } from '@/sanity/lib/utils'
 
 interface ImageBoxProps {
-  image?: { asset?: any; lqip?: any }
+  image?: {
+    asset?: {
+      _ref?: string
+      _type?: 'reference'
+      url?: string
+      metadata?: {
+        dimensions?: {
+          width: number
+          height: number
+        }
+      }
+    }
+    lqip?: any
+  }
   alt?: string
-  width?: number
-  height?: number
   size?: string
   classesWrapper?: string
+  caption?: string
   previewImageUrl?: any
+  'data-sanity'?: string
 }
 
-export default function ImageBox({
+export default function AboutImageBox({
   image,
   alt = 'About image',
-  width = 3500,
-  height = 2000,
   size = '(min-width: 1200px) 33vw, (min-width: 768px) 50vw, 100vw',
   classesWrapper,
   previewImageUrl = image?.lqip,
+  ...props
 }: ImageBoxProps) {
-  const imageUrl = image && urlForImage(image)?.url()
+  const imageUrl = image?.asset?.url || urlForImage(image as any)?.fit('max').auto('format').url();
+
+  const [loaded, setLoaded] = useState(false)
+
+  const isGif = imageUrl?.endsWith('.gif')
+  const isAnimatedWebP = imageUrl?.endsWith('.webp') && imageUrl.includes('animation')
+
+  const metadata = image?.asset?.metadata?.dimensions
+  const width = metadata?.width || 1000
+  const height = metadata?.height || 1000
+  const aspectRatio = metadata ? `${width} / ${height}` : undefined
 
   return (
-    <div className={`w-full overflow-hidden  ${classesWrapper}`}>
+    <div
+      className={`w-full overflow-hidden relative ${classesWrapper}`}
+      data-sanity={props['data-sanity']}
+      style={{
+        aspectRatio,
+        backgroundImage: previewImageUrl ? `url(${previewImageUrl})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
       {imageUrl && (
-        <Image
-          alt={alt}
-          width={width}
-          height={height}
-          style={{
-            width: '100%',
-            height: 'auto',
-          }}
-          sizes={size}
-          src={imageUrl}
-          placeholder="blur"
-          blurDataURL={previewImageUrl}
-        />
+        isGif || isAnimatedWebP ? (
+          <img
+            src={imageUrl}
+            alt={alt}
+            className="w-full h-full object-cover"
+            onLoad={() => setLoaded(true)}
+            style={{
+              opacity: loaded ? 1 : 0,
+              transition: 'opacity 0.4s linear',
+            }}
+          />
+        ) : (
+          <Image
+            src={imageUrl}
+            alt={alt}
+            width={width}
+            height={height}
+            sizes={size}
+            className="w-full h-full object-cover"
+            placeholder={previewImageUrl ? 'blur' : 'empty'}
+            blurDataURL={previewImageUrl}
+            onLoad={() => setLoaded(true)}
+            style={{
+              opacity: loaded ? 1 : 0,
+              transition: 'opacity 0.4s linear',
+            }}
+          />
+        )
       )}
     </div>
   )

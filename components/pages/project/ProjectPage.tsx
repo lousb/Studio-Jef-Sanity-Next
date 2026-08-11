@@ -63,6 +63,7 @@ function ProjectPageInner({
   encodeDataAttribute,
 }: ProjectPageProps) {
   const {
+    customIndex,
     year,
     overview,
     site,
@@ -282,13 +283,15 @@ function ProjectPageInner({
             {overview && (
               <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details`}>
                 <div className="w-full">
-                  <Reveal element={'div'} elementClass={''}>
+                  
                     <CustomPortableText value={overview} />
-                  </Reveal>
+                  
 
                   {site && (
                     <div className="mt-3">
+                      
                       {site && (
+                        
                         <Link
                           target="_blank"
                           className=" break-words  underline"
@@ -306,6 +309,11 @@ function ProjectPageInner({
             )}
 
             <div ref={titleHeadingRef}>
+              {customIndex !== undefined && customIndex !== null && (
+                <Reveal element="div" elementClass="opacity-60">
+                  {String(customIndex).padStart(3, '0')}
+                </Reveal>
+              )}
               {title && (
                 <Reveal element={'div'} elementClass={' break-words hyphens-auto'}>
                   {title}

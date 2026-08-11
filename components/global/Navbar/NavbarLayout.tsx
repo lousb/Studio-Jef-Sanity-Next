@@ -83,7 +83,7 @@ export default function Navbar(props: NavbarProps) {
         py-4 items-start
         ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
     >
-      <div className="flex flex-wrap flex-col gap-[10px] md:mt-0 md:text-1xl w-full">
+      <div className="flex flex-wrap flex-col  md:mt-0 md:text-1xl w-full">
         <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">
           Home
         </Link>
@@ -96,7 +96,7 @@ export default function Navbar(props: NavbarProps) {
         )}
 
         {isAboutPage ? (
-          <span className="text-gray-400 cursor-default pl-2">Studio</span>
+          <span className="text-gray-400 cursor-default">Studio</span>
         ) : (
           <Link href="/about" className="h-full text-1xl hover:text-secondary md:text-1xl">
             Studio

@@ -151,6 +151,7 @@ body, .project-page-media {
   overflow-anchor: auto;
 }
 
+
 .project-page-details{
   pointer-events:none;
 }
@@ -499,10 +500,26 @@ html:has( .header) #initial-loader{
   .debug-grid-col:nth-child(n + 9) {
     display: block;
   }
+  
+}
+@media only screen and (max-width: 768px) {
+  .fixed-logo{
+    width: 88vw !important;
+  }
+  body{
+    display:none !important;
+  }
 }
 
 html.resizing,
 html.resizing * {
   transition: none !important;
   animation: none !important;
+}
+
+.main-desc{
+  z-index: 9999;
+  display: block;
+  position: relative;
+  pointer-events: all;
 }

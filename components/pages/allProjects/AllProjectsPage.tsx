@@ -182,14 +182,14 @@ export function AllProjectsPage({
             ref={gridRef}
             className="grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)] gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)] gap-y-4 items-center"
           >
-            {filteredProjects.flatMap((project, key) => {
+            {filteredProjects.map((project, key) => {
               const href = resolveHref(project._type, project.slug);
-              if (!href) return [];
+              if (!href) return null;
               const delay = (key / filteredProjects.length) * 0.5;
 
-              return Array.from({ length: 5 }).map((_, repeatIndex) => (
+              return (
                 <Link
-                  key={`${key}-${repeatIndex}`}
+                  key={key}
                   href={href}
                   data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
                   className="project-item-animate contents"
@@ -199,7 +199,9 @@ export function AllProjectsPage({
                   }
                 >
                   <span className="text-body-01 [grid-column:1/2]">
-                    {key}
+                    {project.customIndex !== undefined && project.customIndex !== null
+                      ? String(project.customIndex).padStart(3, '0')
+                      : key}
                   </span>
                   <span className="text-body-01 [grid-column:2/5]">
                     {project.title}
@@ -214,7 +216,7 @@ export function AllProjectsPage({
                     {project.year || '—'}
                   </span>
                 </Link>
-              ));
+              );
             })}
           </div>
 

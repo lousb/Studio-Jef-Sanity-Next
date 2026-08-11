@@ -73,6 +73,7 @@ export const homePageQuery = groq`
 export const projectsPageQuery = groq`
 *[_type == "project" && defined(slug) && defined(title)]{
   _type,
+  customIndex,
   title,
   slug,
   coverImage {
@@ -176,8 +177,10 @@ export const aboutPageQuery = groq`
     title,
     customLogo,
     overview,
-    aboutMedia{
+    media[]{
       _type,
+      _key,
+      caption,
       media{
         asset->{
           _id,
@@ -186,17 +189,11 @@ export const aboutPageQuery = groq`
             lqip
           }
         }
-      },
-      video{
-        asset->{
-          playbackId,
-          assetId,
-          filename,
-          "url": "https://stream.mux.com/" + playbackId,
-          "aspect_ratio": data.aspect_ratio
-        }
       }
     },
+    services,
+    press,
+    location,
     aboutLinks[]{
       _type,
       title,
@@ -212,6 +209,7 @@ export const homePageTitleQuery = groq`
 export const projectBySlugQuery = groq`
   *[_type == "project" && slug.current == $slug][0] {
     _id,
+    customIndex,
     year,
     status,
     size,

@@ -59,6 +59,68 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'media',
+      title: 'Media',
+      description: '(Optional) A list of images to display on your About page.',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          name: 'aboutMedia',
+          title: 'Image',
+          type: 'object',
+          icon: ImageIcon,
+          fields: [
+            {
+              title: 'Image',
+              name: 'media',
+              type: 'image',
+              options: { hotspot: true },
+              validation: (rule) => rule.required(),
+            },
+            {
+              title: 'Caption',
+              name: 'caption',
+              type: 'string',
+              description: '(Optional) Caption below the media.',
+            },
+          ],
+          preview: {
+            select: {
+              media: 'media',
+              caption: 'caption',
+            },
+            prepare({ media, caption }) {
+              return {
+                title: caption || 'Untitled',
+                media,
+              }
+            },
+          },
+        }),
+      ],
+    }),
+    defineField({
+      name: 'services',
+      title: 'Services',
+      description: '(Optional) A list of services you offer.',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'press',
+      title: 'Press',
+      description: '(Optional) A list of press mentions or publications.',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
+      name: 'location',
+      title: 'Location',
+      description: '(Optional) A list of locations.',
+      type: 'array',
+      of: [{ type: 'string' }],
+    }),
+    defineField({
       name: 'aboutLinks',
       title: 'External links',
       description: '(Optional) Here you can add a list of external links, it will be displayed below your About description text.',

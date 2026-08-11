@@ -13,13 +13,10 @@ export default async function NotFound() {
 
   return (
     <div className="page-404">
-      <Navbar />
 
       {/* Full viewport height */}
       <main className="relative h-screen flex flex-col items-center justify-center text-center overflow-hidden">
-        <div className="absolute inset-0 z-10 overflow-hidden">
-          <HeroGallery featuredMedia={featuredMedia} />
-        </div>
+        
 
         <h1 className="text-4xl mt-6">This page doesn’t exist</h1>
         <h1 className="text-4xl">

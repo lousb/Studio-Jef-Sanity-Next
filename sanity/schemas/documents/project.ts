@@ -10,6 +10,12 @@ export default defineType({
   // liveEdit: true,
   fields: [
     defineField({
+      name: 'customIndex',
+      description: 'A custom numerical index.',
+      title: 'Custom Index',
+      type: 'number',
+    }),
+    defineField({
       name: 'title',
       description: 'This field is the title of your project.',
       title: 'Title',

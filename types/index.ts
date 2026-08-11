@@ -135,6 +135,7 @@ export interface PreviewMediaAsset {
 
 export interface ProjectsPagePayload {
   _type: string
+  customIndex?: number
   coverImage?: {
     image?: {
       asset?: {
@@ -175,6 +176,7 @@ export interface ProjectsPagePayload {
 }
 
 export interface ProjectPayload {
+  customIndex?: number
   year?: string
   status?: string
   size?: string
@@ -244,28 +246,19 @@ export interface SettingsPayload {
   title?: string
 }
 
-export interface AboutPayload {
-  overview?: PortableTextBlock[]
+export type AboutPayload = {
   title?: string
-  aboutMedia?: {
-    media?: {
-      asset: Image & {
-        metadata?: {
-          lqip?: string
-        }
-      }
-      width?: number
-      height?: number
-    }
-    video?: {
-      asset: {
-        playbackId: string
-        assetId?: string
-        filename?: string
-        url?: string
-        aspect_ratio?: string
-      }
-    }
-  }
-  aboutLinks?: LinkItem[]
+  overview?: any[]
+  media?: {
+    _key?: string
+    media: { asset: any; hotspot?: any }
+    caption?: string
+  }[]
+  services?: string[]
+  press?: string[]
+  location?: string[]
+  aboutLinks?: {
+    title: string
+    url: string
+  }[]
 }
