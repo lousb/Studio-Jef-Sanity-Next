@@ -30,9 +30,23 @@ export default function Navbar(props: NavbarProps) {
   const logoImageUrl = customLogo && urlForLogo(customLogo)?.url()
 
   const [isVisible, setIsVisible] = useState(true)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrollReady, setIsScrollReady] = useState(false)
   const lenis = useLenis()
 
   const [logoWidth, setLogoWidth] = useState('685px')
+
+  // close the mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [pathname])
+
+  // hold off on scroll-based show/hide until 1s after load
+  useEffect(() => {
+    setIsScrollReady(false)
+    const timer = setTimeout(() => setIsScrollReady(true), 1000)
+    return () => clearTimeout(timer)
+  }, [pathname])
 
   useEffect(() => {
     if (!lenis) return
@@ -55,6 +69,12 @@ export default function Navbar(props: NavbarProps) {
 
       const delta = scroll - lastScrollY
 
+      // grace period: keep navbar visible, just track position
+      if (!isScrollReady) {
+        lastScrollY = scroll
+        return
+      }
+
       if (scroll <= 0) {
         setIsVisible(true)
         lastScrollY = scroll
@@ -72,7 +92,7 @@ export default function Navbar(props: NavbarProps) {
     return () => {
       lenis.off('scroll', handleScroll)
     }
-  }, [lenis])
+  }, [lenis, isScrollReady])
 
   return (
     <div
@@ -83,25 +103,45 @@ export default function Navbar(props: NavbarProps) {
         py-4 items-start
         ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
     >
-      <div className="flex flex-wrap flex-col  md:mt-0 md:text-1xl w-full">
-        <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">
-          Home
-        </Link>
-        {isProjectsPage ? (
-          <span className="text-gray-400 cursor-default">Projects</span>
-        ) : (
-          <Link href="/projects" className="h-full text-1xl hover:text-secondary md:text-1xl">
-            Projects
-          </Link>
-        )}
+      <div className="flex absolute top-[10px] left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
+        {/* Mobile trigger */}
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          className="md:hidden text-1xl hover:text-secondary"
+          aria-expanded={isMenuOpen}
+        >
+          Menu
+        </button>
 
-        {isAboutPage ? (
-          <span className="text-gray-400 cursor-default">Studio</span>
-        ) : (
-          <Link href="/about" className="h-full text-1xl hover:text-secondary md:text-1xl">
-            Studio
+        {/* Link list: centered + collapsible on mobile, original inline layout on desktop */}
+        <div
+          className={`
+            ${isMenuOpen ? 'flex' : 'hidden'}
+            md:flex
+            flex-col items-center text-center gap-2 mt-3
+            md:flex-col md:items-start md:text-left md:gap-0 md:mt-0
+          `}
+        >
+          <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">
+            Home
           </Link>
-        )}
+          {isProjectsPage ? (
+            <span className="text-gray-400 cursor-default">Projects</span>
+          ) : (
+            <Link href="/projects" className="h-full text-1xl hover:text-secondary md:text-1xl">
+              Projects
+            </Link>
+          )}
+
+          {isAboutPage ? (
+            <span className="text-gray-400 cursor-default">Studio</span>
+          ) : (
+            <Link href="/about" className="h-full text-1xl hover:text-secondary md:text-1xl">
+              Studio
+            </Link>
+          )}
+        </div>
       </div>
 
       {data?.overview?.text && (

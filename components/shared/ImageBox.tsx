@@ -65,10 +65,7 @@ export default function ImageBox({
             alt={alt}
             className="w-full h-full object-cover"
             onLoad={() => setLoaded(true)}
-            style={{
-              opacity: loaded ? 1 : 0,
-              transition: 'opacity 0.4s linear',
-            }}
+            
           />
         ) : (
           <Image
@@ -81,10 +78,7 @@ export default function ImageBox({
             placeholder={previewImageUrl ? 'blur' : 'empty'}
             blurDataURL={previewImageUrl}
             onLoad={() => setLoaded(true)}
-            style={{
-              opacity: loaded ? 1 : 0,
-              transition: 'opacity 0.4s linear',
-            }}
+            
           />
         )
       )}

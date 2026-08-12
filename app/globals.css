@@ -67,13 +67,16 @@ body {
   font-weight: var(--text-body-01-weight) !important;
   letter-spacing: var(--text-body-01-letter-spacing) !important;
   line-height: var(--text-body-01-line-height) !important;
+  overscroll-behavior-y: none;
 }
 *, div{
   padding: 0;
   margin: 0;
 }
 
-
+img{
+  aspect-ratio: attr(width) / attr(height);
+}
 .header img{
   z-index: 9999;
   width:42vw;
@@ -506,8 +509,8 @@ html:has( .header) #initial-loader{
   .fixed-logo{
     width: 88vw !important;
   }
-  body{
-    display:none !important;
+  .main-desc{
+    display: none !important;
   }
 }
 

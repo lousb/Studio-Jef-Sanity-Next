@@ -25,7 +25,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
     <div className="space-y-6 home-page">
       <InfiniteLoop>
         <div className={`mobile-intersector`}></div>
-        <RevealDiv delay={0.2}>
+    
           {overview && <Header description={overview} />}
 
           {/* Featured media — same width/alignment logic as project page View 2 */}
@@ -80,7 +80,6 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
               })}
             </div>
           )}
-        </RevealDiv>
       </InfiniteLoop>
 
       <CursorLabel

@@ -20,6 +20,7 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lenisRef = useRef<LenisWithJumpFlag | null>(null);
+  const prevPathname = useRef(pathname);
   const [lenisInstance, setLenisInstance] = useState<LenisWithJumpFlag | null>(null);
 
   const isStudio = pathname.startsWith("/studio");
@@ -39,6 +40,9 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
       gestureOrientation: "vertical",
       smoothWheel: true,
       touchMultiplier: 2,
+      infinite: true,
+      syncTouch: true,
+      syncTouchLerp: 0.075,
     }) as LenisWithJumpFlag;
 
     lenisRef.current = lenis;
@@ -58,16 +62,17 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
     };
   }, [isStudio]);
 
+  // Only reset scroll on a genuine route change — not on searchParams-only
+  // updates (tracking params, filters, soft navs), which caused random
+  // scroll-to-0 jumps mid-session on infinite-scroll pages.
   useEffect(() => {
     if (isStudio) return;
+    if (prevPathname.current === pathname) return;
+    prevPathname.current = pathname;
 
-    const handleNavigation = () => {
-      lenisRef.current?.stop();
-      window.scrollTo(0, 0);
-      lenisRef.current?.start();
-    };
-
-    handleNavigation();
+    lenisRef.current?.stop();
+    window.scrollTo(0, 0);
+    lenisRef.current?.start();
   }, [pathname, searchParams, isStudio]);
 
   return (

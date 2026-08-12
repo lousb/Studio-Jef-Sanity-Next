@@ -81,10 +81,7 @@ export default function AboutImageBox({
             placeholder={previewImageUrl ? 'blur' : 'empty'}
             blurDataURL={previewImageUrl}
             onLoad={() => setLoaded(true)}
-            style={{
-              opacity: loaded ? 1 : 0,
-              transition: 'opacity 0.4s linear',
-            }}
+            
           />
         )
       )}
