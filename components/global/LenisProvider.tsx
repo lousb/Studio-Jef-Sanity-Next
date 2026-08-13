@@ -40,7 +40,14 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
       gestureOrientation: "vertical",
       smoothWheel: true,
       touchMultiplier: 2,
-      infinite: true,
+      // Removed infinite: true — InfiniteLoop already implements infinite
+      // scroll manually via DOM duplication + its own scrollTo calibration.
+      // Having Lenis ALSO wrap scroll on total document height was a second,
+      // competing system: Lenis's modulo wrap doesn't know where any single
+      // item boundary is (it just wraps on document.scrollHeight, which
+      // includes the title/meta content above the loop too), so its wrap
+      // point rarely lined up with InfiniteLoop's — that mismatch was the
+      // source of the "teleporting to some other index" jump.
       syncTouch: true,
       syncTouchLerp: 0.075,
     }) as LenisWithJumpFlag;

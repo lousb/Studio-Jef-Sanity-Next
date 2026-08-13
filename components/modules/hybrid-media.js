@@ -12,6 +12,7 @@ const HybridMedia = ({ data, isInfoActive }) => {
   if (!media?.asset) return null;
 
   const cols = COLUMN_NUM_MAP[width] ?? 24;
+  const mobileCols = Math.max(1, Math.round(cols / 3)); // 12→4, 18→6, 24→8
   const dimensions = media.asset.metadata?.dimensions;
   const aspectRatio = dimensions
     ? `${dimensions.width} / ${dimensions.height}`
@@ -20,18 +21,20 @@ const HybridMedia = ({ data, isInfoActive }) => {
   const EASE = 'cubic-bezier(0.32, 0, 0.15, 1)';
 
   const wrapperStyle = isInfoActive
-    ? {
-        width: colsToWidth(6),
-        marginLeft: `calc((100% - ${colsToWidth(6)}) / 2)`,
-        marginRight: `calc((100% - ${colsToWidth(6)}) / 2)`,
-        transition: `width 1s ${EASE}, margin 1s ${EASE}`,
-      }
-    : {
-        width: colsToWidth(cols),
-        marginLeft: 0,
-        marginRight: 0,
-        transition: `width 1s ${EASE}, margin 1s ${EASE}`,
-      };
+  ? {
+      width: colsToWidth(6),
+      marginLeft: `calc((100% - ${colsToWidth(6)}) / 2)`,
+      marginRight: `calc((100% - ${colsToWidth(6)}) / 2)`,
+      transition: `width 1s ${EASE}, margin 1s ${EASE}`,
+      '--hm-mobile-cols': mobileCols,
+    }
+  : {
+      width: colsToWidth(cols),
+      marginLeft: 0,
+      marginRight: 0,
+      transition: `width 1s ${EASE}, margin 1s ${EASE}`,
+      '--hm-mobile-cols': mobileCols,
+    };
 
   return (
     <div
@@ -39,6 +42,7 @@ const HybridMedia = ({ data, isInfoActive }) => {
       style={wrapperStyle}
       data-featured={featured || undefined}
       data-media-block
+      data-info-active={isInfoActive ? 'true' : 'false'}
       onMouseEnter={() => caption && setHoveredCaption(caption)}
       onMouseLeave={() => caption && setHoveredCaption(null)}
     >

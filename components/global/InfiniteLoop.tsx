@@ -1,6 +1,15 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, useCallback, PropsWithChildren } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useCallback,
+  PropsWithChildren,
+} from "react";
 import { useLenis } from "./LenisProvider";
 
 const SETTLE_MS = 120;
@@ -15,168 +24,220 @@ function computeCopiesPerSide(itemHeight: number, viewportHeight: number) {
   return Math.max(1, Math.ceil(viewportHeight / itemHeight) + 4);
 }
 
-export function InfiniteLoop({ children }: PropsWithChildren) {
-  const itemRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const readyRef = useRef(false);
-  const lastHeightRef = useRef(0);
-  const [copiesPerSide, setCopiesPerSide] = useState(1);
-  const [viewportH, setViewportH] = useState(0);
-  const [ready, setReady] = useState(false);
+export interface InfiniteLoopHandle {
+  suspend: () => void;
+  resume: () => void;
+}
 
-  const lenis = useLenis();
+export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
+  function InfiniteLoop({ children }, ref) {
+    const itemRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const readyRef = useRef(false);
+    const lastHeightRef = useRef(0);
+    const suspendedRef = useRef(false);
+    const [copiesPerSide, setCopiesPerSide] = useState(1);
+    const [viewportH, setViewportH] = useState(0);
+    const [ready, setReady] = useState(false);
 
-  const withJumpFlag = useCallback((fn: () => void) => {
-    if (!lenis) return fn();
-    (lenis as any).__isProgrammaticJump = true;
-    fn();
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        (lenis as any).__isProgrammaticJump = false;
-      });
-    });
-  }, [lenis]);
+    const lenis = useLenis();
 
-  const measure = useCallback(() => {
-    const item = itemRef.current;
-    if (!item || !lenis) return;
+    const withJumpFlag = useCallback(
+      (fn: () => void) => {
+        if (!lenis) return fn();
+        (lenis as any).__isProgrammaticJump = true;
+        fn();
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            (lenis as any).__isProgrammaticJump = false;
+          });
+        });
+      },
+      [lenis]
+    );
 
-    // Measure the real item's natural height, releasing any prior clamp
-    // first so we're reading true content height each time.
-    item.style.height = "auto";
-    item.style.overflow = "visible";
-    const h = item.getBoundingClientRect().height;
-    if (h <= 0) return;
+    const measure = useCallback(() => {
+      if (suspendedRef.current) return;
 
-    const vh = getViewportHeight();
-    setViewportH(vh);
+      const item = itemRef.current;
+      if (!item || !lenis) return;
 
-    if (readyRef.current) {
-      const oldH = lastHeightRef.current;
-      const delta = Math.abs(h - oldH);
+      item.style.height = "auto";
+      item.style.overflow = "visible";
+      const h = item.getBoundingClientRect().height;
+      if (h <= 0) return;
 
-      if (delta < HEIGHT_TOLERANCE_PX) {
-        containerRef.current?.style.setProperty("--loop-item-h", `${oldH}px`);
+      const vh = getViewportHeight();
+      setViewportH(vh);
+
+      if (readyRef.current) {
+        const oldH = lastHeightRef.current;
+        const delta = Math.abs(h - oldH);
+
+        if (delta < HEIGHT_TOLERANCE_PX) {
+          containerRef.current?.style.setProperty("--loop-item-h", `${oldH}px`);
+          return;
+        }
+
+        withJumpFlag(() => {
+          lenis.stop();
+          containerRef.current?.style.setProperty("--loop-item-h", `${h}px`);
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              lenis.resize();
+              const currentScroll = lenis.scroll;
+              const ratio = h / oldH;
+              const targetScroll = Math.round(currentScroll * ratio);
+              lenis.scrollTo(targetScroll, { immediate: true, force: true });
+              lenis.start();
+            });
+          });
+        });
+
+        lastHeightRef.current = h;
+        return;
+      }
+
+      containerRef.current?.style.setProperty("--loop-item-h", `${h}px`);
+
+      const needed = computeCopiesPerSide(h, vh);
+      if (needed !== copiesPerSide) {
+        setCopiesPerSide(needed);
         return;
       }
 
       withJumpFlag(() => {
-        lenis.stop();
-        containerRef.current?.style.setProperty("--loop-item-h", `${h}px`);
-
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             lenis.resize();
-            const currentScroll = lenis.scroll;
-            const ratio = h / oldH;
-            const targetScroll = Math.round(currentScroll * ratio);
-            lenis.scrollTo(targetScroll, { immediate: true, force: true });
-            lenis.start();
+            lenis.scrollTo(needed * h, { immediate: true, force: true });
+            lastHeightRef.current = h;
+            readyRef.current = true;
+            setReady(true);
           });
         });
       });
+    }, [lenis, copiesPerSide, withJumpFlag]);
 
-      lastHeightRef.current = h;
-      return;
-    }
+    // --- suspend/resume: dedicated, no ratio-scroll math ---
 
-    containerRef.current?.style.setProperty("--loop-item-h", `${h}px`);
+    const suspend = useCallback(() => {
+      suspendedRef.current = true;
+      // Hard freeze — stop Lenis immediately so nothing can scroll while the
+      // CSS width/alignment transition plays out. We deliberately do NOT try
+      // to compensate for the transition's own resize activity: a view toggle
+      // keeps the same images in frame, so there's nothing to compensate for.
+      lenis?.stop();
+    }, [lenis]);
 
-    const needed = computeCopiesPerSide(h, vh);
-    if (needed !== copiesPerSide) {
-      setCopiesPerSide(needed);
-      return;
-    }
+    const resume = useCallback(() => {
+      suspendedRef.current = false;
 
-    withJumpFlag(() => {
+      const item = itemRef.current;
+      if (!item || !lenis) return;
+
+      item.style.height = "auto";
+      item.style.overflow = "visible";
+      const h = item.getBoundingClientRect().height;
+
+      if (h > 0) {
+        containerRef.current?.style.setProperty("--loop-item-h", `${h}px`);
+        lastHeightRef.current = h;
+      }
+
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           lenis.resize();
-          lenis.scrollTo(needed * h, { immediate: true, force: true });
-          lastHeightRef.current = h;
-          readyRef.current = true;
-          setReady(true);
+          // Re-sync Lenis's internal scroll target to the ACTUAL current
+          // position. After stop() -> resize(), Lenis's cached target can
+          // drift from real scrollY (limits changed under it while stopped).
+          // Starting without this resync leaves it lerping toward a stale
+          // target, which clamps future scroll short of the real DOM edge —
+          // that's what was cutting the infinite-loop buffer short.
+          lenis.scrollTo(lenis.scroll, { immediate: true, force: true });
+          lenis.start();
         });
       });
-    });
-  }, [lenis, copiesPerSide, withJumpFlag]);
+    }, [lenis]);
 
-  useLayoutEffect(() => {
-    const container = containerRef.current;
-    const fontsReady = document.fonts?.ready ?? Promise.resolve();
-    const imgs = container ? Array.from(container.querySelectorAll("img")) : [];
-    const imagesReady = Promise.all(
-      imgs.map((img) =>
-        img.complete
-          ? Promise.resolve()
-          : new Promise<void>((res) => {
-              img.addEventListener("load", () => res(), { once: true });
-              img.addEventListener("error", () => res(), { once: true });
-            })
-      )
-    );
-    Promise.all([fontsReady, imagesReady]).then(measure);
-  }, [measure]);
+    useImperativeHandle(ref, () => ({ suspend, resume }), [suspend, resume]);
 
-  useEffect(() => {
-    if (!itemRef.current) return;
-    const scheduleMeasure = () => {
-      if (settleTimer.current) clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(measure, SETTLE_MS);
+    useLayoutEffect(() => {
+      const container = containerRef.current;
+      const fontsReady = document.fonts?.ready ?? Promise.resolve();
+      const imgs = container ? Array.from(container.querySelectorAll("img")) : [];
+      const imagesReady = Promise.all(
+        imgs.map(
+          (img) =>
+            img.complete
+              ? Promise.resolve()
+              : new Promise<void>((res) => {
+                  img.addEventListener("load", () => res(), { once: true });
+                  img.addEventListener("error", () => res(), { once: true });
+                })
+        )
+      );
+      Promise.all([fontsReady, imagesReady]).then(measure);
+    }, [measure]);
+
+    useEffect(() => {
+      if (!itemRef.current) return;
+      const scheduleMeasure = () => {
+        if (settleTimer.current) clearTimeout(settleTimer.current);
+        settleTimer.current = setTimeout(measure, SETTLE_MS);
+      };
+      const ro = new ResizeObserver(scheduleMeasure);
+      ro.observe(itemRef.current);
+      window.addEventListener("resize", scheduleMeasure);
+      window.addEventListener("orientationchange", scheduleMeasure);
+      window.visualViewport?.addEventListener("resize", scheduleMeasure);
+      return () => {
+        ro.disconnect();
+        window.removeEventListener("resize", scheduleMeasure);
+        window.removeEventListener("orientationchange", scheduleMeasure);
+        window.visualViewport?.removeEventListener("resize", scheduleMeasure);
+        if (settleTimer.current) clearTimeout(settleTimer.current);
+      };
+    }, [measure]);
+
+    const totalCopies = copiesPerSide * 2 + 1;
+    const centerIndex = copiesPerSide;
+    const lastIndex = totalCopies - 1;
+
+    const naturalStyle = {
+      height: "var(--loop-item-h)",
+      overflow: "hidden" as const,
+      overflowAnchor: "none" as const,
     };
-    const ro = new ResizeObserver(scheduleMeasure);
-    ro.observe(itemRef.current);
-    window.addEventListener("resize", scheduleMeasure);
-    window.addEventListener("orientationchange", scheduleMeasure);
-    window.visualViewport?.addEventListener("resize", scheduleMeasure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", scheduleMeasure);
-      window.removeEventListener("orientationchange", scheduleMeasure);
-      window.visualViewport?.removeEventListener("resize", scheduleMeasure);
-      if (settleTimer.current) clearTimeout(settleTimer.current);
+
+
+    const wrapSeamStyle = {
+      height: "var(--loop-item-h)",
+      maxHeight: viewportH ? `${viewportH}px` : "100dvh",
+      overflow: "hidden" as const,
+      overflowAnchor: "none" as const,
     };
-  }, [measure]);
 
-  const totalCopies = copiesPerSide * 2 + 1;
-  const centerIndex = copiesPerSide;
-  const lastIndex = totalCopies - 1;
-
-  // Normal copies: natural content height (via the measured CSS var).
-  const naturalStyle = {
-    height: "var(--loop-item-h)",
-    overflow: "hidden" as const,
-  };
-
-  // The final duplicate before the wrap point only: capped at one
-  // viewport, clipped (not stretched) so short content is untouched
-  // and tall content shows just its top slice — matching the exact
-  // frame visible at scroll:0 on first load, so the teleport lands
-  // on a visually identical frame.
-  const wrapSeamStyle = {
-    height: "var(--loop-item-h)",
-    maxHeight: viewportH ? `${viewportH}px` : "100dvh",
-    overflow: "hidden" as const,
-  };
-
-  return (
-    <div ref={containerRef} style={{ visibility: ready ? "visible" : "hidden" }}>
-      {Array.from({ length: totalCopies }, (_, i) => {
-        if (i === centerIndex) {
+    return (
+      <div ref={containerRef} style={{ visibility: ready ? "visible" : "hidden", overflowAnchor: "none" }}>
+        {Array.from({ length: totalCopies }, (_, i) => {
+          if (i === centerIndex) {
+            return (
+              <div ref={itemRef} key={i} style={naturalStyle}>
+                {children}
+              </div>
+            );
+          }
+          const style = i === lastIndex ? wrapSeamStyle : naturalStyle;
           return (
-            <div ref={itemRef} key={i} style={naturalStyle}>
+            <div aria-hidden="true" key={i} style={{ ...style }}>
               {children}
             </div>
           );
-        }
-        const style = i === lastIndex ? wrapSeamStyle : naturalStyle;
-        return (
-          <div aria-hidden="true" key={i} style={{ ...style, pointerEvents: "none" }}>
-            {children}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+        })}
+      </div>
+    );
+  }
+);

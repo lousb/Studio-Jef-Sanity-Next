@@ -59,6 +59,11 @@
   }
 }
 
+.loop-container,
+.loop-container * {
+  overflow-anchor: none;
+}
+
 html,
 body {
   background:white;
@@ -525,4 +530,33 @@ html.resizing * {
   display: block;
   position: relative;
   pointer-events: all;
+}
+
+@media (max-width: 767px) {
+  .hybrid-media {
+    --hm-mobile-col-w: calc(
+      (100% - 2 * var(--grid-margin-mobile) - 7 * var(--grid-gutter-mobile)) / 8
+    );
+    --hm-mobile-w4: calc(var(--hm-mobile-col-w) * 4 + var(--grid-gutter-mobile) * 3);
+  }
+
+  /* View 1 — always fixed 4-of-8, centered, regardless of the image's own width */
+  .hybrid-media[data-info-active='true'] {
+    width: var(--hm-mobile-w4) !important;
+    margin-left: calc(((100% - var(--hm-mobile-w4)) / 2) - 20px) !important;
+    margin-right: calc((100% - var(--hm-mobile-w4)) / 2) !important;
+  }
+
+  /* View 2 — variable width per image: 4, 6, or 8 of 8, left-aligned */
+  .hybrid-media[data-info-active='false'] {
+    width: calc(
+      var(--hm-mobile-col-w) * var(--hm-mobile-cols) +
+      var(--grid-gutter-mobile) * (var(--hm-mobile-cols) - 1)
+    ) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .project-page-figures{
+    left:20px !important;
+  }
 }

@@ -14,7 +14,7 @@ import type { ProjectPayload } from '@/types'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
 import { FigureHoverProvider, useFigureHover } from './FigureHoverContext'
-import { InfiniteLoop } from '@/components/global/InfiniteLoop'
+import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
 import { useLenis } from '@/components/global/LenisProvider'
 
 interface ProjectPageProps {
@@ -83,11 +83,13 @@ function ProjectPageInner({
 
   const prevProject = projects[currentProjectIndex - 1] || null
   const nextProject = projects[currentProjectIndex + 1] || null
+const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
 
   const figures = getFigures(content)
 
   const titleRef = useRef<HTMLDivElement>(null)
   const titleHeadingRef = useRef<HTMLDivElement>(null)
+  const infiniteLoopRef = useRef<InfiniteLoopHandle>(null)
 
   const [isInfoActive, setIsInfoActive] = useState(true)
   const [hasScrolled, setHasScrolled] = useState(false)
@@ -97,62 +99,64 @@ function ProjectPageInner({
   const { hoveredCaption } = useFigureHover()
   const lenis = useLenis()
 
+  // On page mount / navigation: pin scroll to top, re-pinning if content
+  // height keeps changing (InfiniteLoop cloning in, images loading).
   useEffect(() => {
-  let cancelled = false
-  let settleTimer: ReturnType<typeof setTimeout> | null = null
-  let observer: ResizeObserver | null = null
+    let cancelled = false
+    let settleTimer: ReturnType<typeof setTimeout> | null = null
+    let observer: ResizeObserver | null = null
 
-  const forceTop = () => {
-    if (cancelled) return
-    if (lenis) {
-      lenis.resize()
-      lenis.scrollTo(0, { immediate: true, force: true })
-    } else {
-      window.scrollTo(0, 0)
-    }
-  }
-
-  const watchAndPin = () => {
-    if (cancelled) return
-    forceTop()
-
-    const target = document.documentElement
-    let lastHeight = target.scrollHeight
-
-    const scheduleStop = () => {
-      if (settleTimer) clearTimeout(settleTimer)
-      settleTimer = setTimeout(() => {
-        observer?.disconnect()
-      }, 500)
-    }
-
-    observer = new ResizeObserver(() => {
+    const forceTop = () => {
       if (cancelled) return
-      const newHeight = target.scrollHeight
-      if (newHeight !== lastHeight) {
-        lastHeight = newHeight
-        forceTop() // content grew/shrank (InfiniteLoop cloning, images loading) — re-pin
+      if (lenis) {
+        lenis.resize()
+        lenis.scrollTo(0, { immediate: true, force: true })
+      } else {
+        window.scrollTo(0, 0)
       }
+    }
+
+    const watchAndPin = () => {
+      if (cancelled) return
+      forceTop()
+
+      const target = document.documentElement
+      let lastHeight = target.scrollHeight
+
+      const scheduleStop = () => {
+        if (settleTimer) clearTimeout(settleTimer)
+        settleTimer = setTimeout(() => {
+          observer?.disconnect()
+        }, 500)
+      }
+
+      observer = new ResizeObserver(() => {
+        if (cancelled) return
+        const newHeight = target.scrollHeight
+        if (newHeight !== lastHeight) {
+          lastHeight = newHeight
+          forceTop() // content grew/shrank (InfiniteLoop cloning, images loading) — re-pin
+        }
+        scheduleStop()
+      })
+
+      observer.observe(target)
       scheduleStop()
-    })
+    }
 
-    observer.observe(target)
-    scheduleStop()
-  }
+    const anyDoc = document as any
+    if (anyDoc.startViewTransition && anyDoc.__nextViewTransition) {
+      anyDoc.__nextViewTransition.finished?.then(watchAndPin).catch(watchAndPin)
+    } else {
+      requestAnimationFrame(watchAndPin)
+    }
 
-  const anyDoc = document as any
-  if (anyDoc.startViewTransition && anyDoc.__nextViewTransition) {
-    anyDoc.__nextViewTransition.finished?.then(watchAndPin).catch(watchAndPin)
-  } else {
-    requestAnimationFrame(watchAndPin)
-  }
-
-  return () => {
-    cancelled = true
-    observer?.disconnect()
-    if (settleTimer) clearTimeout(settleTimer)
-  }
-}, [slug, lenis])
+    return () => {
+      cancelled = true
+      observer?.disconnect()
+      if (settleTimer) clearTimeout(settleTimer)
+    }
+  }, [slug, lenis])
 
   useEffect(() => {
     const visible = isInfoActive || !hasScrolled
@@ -194,92 +198,90 @@ function ProjectPageInner({
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
-  const TRANSITION_DELAY_MS = 200
-  const TRANSITION_DURATION_MS = 800
-  const TOTAL_MS = TRANSITION_DELAY_MS + TRANSITION_DURATION_MS + 100 // small buffer
-
+  // View 1 / View 2 toggle: HybridMedia blocks resize via a 1s CSS
+  // transition (width/margin). That reflow is already smooth on its own
+  // — the only thing we need to do is stop InfiniteLoop from ALSO trying
+  // to compensate for the same resize (it has its own ResizeObserver on
+  // the same content), then let it do one clean re-sync once the CSS
+  // transition has actually finished.
   useEffect(() => {
-    if (!lenis) return
-
-    const blocks = Array.from(document.querySelectorAll('[data-media-block]'))
+    const blocks = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
     if (!blocks.length) return
 
-    // anchor = first block at or below viewport top
-    const anchor = blocks.find((el) => el.getBoundingClientRect().bottom > 0)
-    if (!anchor) return
+    infiniteLoopRef.current?.suspend()
 
-    let prevTop = anchor.getBoundingClientRect().top
-    const start = performance.now()
+    let pending = blocks.length
+    const onEnd = (e: TransitionEvent) => {
+      if (!['width', 'margin-left', 'margin-right'].includes(e.propertyName)) return
+      pending -= 1
+      if (pending <= 0) finish()
+    }
+    blocks.forEach((el) => el.addEventListener('transitionend', onEnd as any))
 
-    const tick = () => {
-      const elapsed = performance.now() - start
+    // Safety net in case a transitionend never fires (interrupted
+    // transition, display swap, etc.) — matches the ~1s CSS duration
+    // plus buffer, so we don't leave InfiniteLoop suspended forever.
+    const safety = setTimeout(finish, 1400)
 
-      const newTop = anchor.getBoundingClientRect().top
-      const delta = newTop - prevTop
-      if (delta !== 0) {
-        lenis.scrollTo(lenis.scroll + delta, { immediate: true, force: true })
-      }
-      prevTop = anchor.getBoundingClientRect().top
-
-      if (elapsed >= TOTAL_MS) {
-        gsap.ticker.remove(tick)
-      }
+    let finished = false
+    function finish() {
+      if (finished) return
+      finished = true
+      blocks.forEach((el) => el.removeEventListener('transitionend', onEnd as any))
+      clearTimeout(safety)
+      infiniteLoopRef.current?.resume()
     }
 
-    gsap.ticker.add(tick)
+    return () => finish()
+  }, [isInfoActive])
 
-    return () => gsap.ticker.remove(tick)
-  }, [isInfoActive, lenis])
-
+  // On page navigation: reset scroll once the new content's real height
+  // is in place (Lenis caches the old page's scroll limits until resize()
+  // runs, so scrollTo(0) before that can get silently corrected back).
   useEffect(() => {
-  let cancelled = false
+    let cancelled = false
 
-  const resetScroll = () => {
-    if (cancelled) return
-    if (lenis) {
-      // New page content = new document height. Lenis is caching the
-      // OLD page's limits until this runs, so scrollTo(0) before this
-      // can get silently corrected back to an old-page position.
-      lenis.resize()
-      lenis.scrollTo(0, { immediate: true, force: true })
-    } else {
-      window.scrollTo(0, 0)
+    const resetScroll = () => {
+      if (cancelled) return
+      if (lenis) {
+        lenis.resize()
+        lenis.scrollTo(0, { immediate: true, force: true })
+      } else {
+        window.scrollTo(0, 0)
+      }
     }
-  }
 
-  // If a View Transition is in flight (client-side nav via next-view-transitions),
-  // wait for it to finish before resetting — otherwise the transition's own
-  // snapshot/restore can win the race against our scrollTo.
-  const anyDoc = document as any
-  if (anyDoc.startViewTransition && anyDoc.__nextViewTransition) {
-    anyDoc.__nextViewTransition.finished?.then(resetScroll).catch(resetScroll)
-  } else {
-    // Fallback: still wait a frame for layout to settle post-mount.
-    requestAnimationFrame(resetScroll)
-  }
+    const anyDoc = document as any
+    if (anyDoc.startViewTransition && anyDoc.__nextViewTransition) {
+      anyDoc.__nextViewTransition.finished?.then(resetScroll).catch(resetScroll)
+    } else {
+      requestAnimationFrame(resetScroll)
+    }
 
-  return () => {
-    cancelled = true
-  }
-}, [slug, lenis])
+    return () => {
+      cancelled = true
+    }
+  }, [slug, lenis])
 
   return (
     <div className={`${isInfoActive ? `${styles.infoActive} info-active` : `${styles.infoInActive} info-inactive`}`}>
       <div className={` space-y-6 project-page-media ${styles.projectPage}`}>
         <div className='relative z-10 bg-white'>
-          <InfiniteLoop> 
+          <InfiniteLoop ref={infiniteLoopRef}>
             {content?.map((content, key) => (
-        
+
                 <Module content={content} isInfoActive={isInfoActive} />
-        
+
             ))}
           </InfiniteLoop>
         </div>
       </div>
 
       <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} project-page-title flex-col`}>
-        <div className={`project-page-details ${styles.projectPageDetails}`}>
-          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
+<div
+  className={`project-page-details ${styles.projectPageDetails} ${styles.detailsPanel}`}
+  data-mobile-open={isMobileDetailsOpen ? 'true' : 'false'}
+>          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
             {overview && (
               <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details`}>
                 <div className="w-full">
@@ -406,6 +408,14 @@ function ProjectPageInner({
           <Reveal>View 2</Reveal>
         </button>
       </div>
+
+      <button
+  type="button"
+  onClick={() => setIsMobileDetailsOpen((v) => !v)}
+  className={styles.mobileInfoToggle}
+>
+  Information
+</button>
     </div>
   )
 }
