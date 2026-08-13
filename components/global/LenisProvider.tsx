@@ -16,6 +16,13 @@ type LenisWithJumpFlag = Lenis & { __isProgrammaticJump?: boolean };
 const LenisContext = createContext<LenisWithJumpFlag | null>(null);
 export const useLenis = () => useContext(LenisContext);
 
+// Coarse pointer + no hover = touch device (phones/tablets), not just a
+// narrow window — this avoids misclassifying a resized desktop browser.
+function isTouchDevice() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
 const LenisProvider = ({ children }: PropsWithChildren) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -34,23 +41,37 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (isStudio) return;
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      touchMultiplier: 2,
-      // Removed infinite: true — InfiniteLoop already implements infinite
-      // scroll manually via DOM duplication + its own scrollTo calibration.
-      // Having Lenis ALSO wrap scroll on total document height was a second,
-      // competing system: Lenis's modulo wrap doesn't know where any single
-      // item boundary is (it just wraps on document.scrollHeight, which
-      // includes the title/meta content above the loop too), so its wrap
-      // point rarely lined up with InfiniteLoop's — that mismatch was the
-      // source of the "teleporting to some other index" jump.
-      syncTouch: true,
-      syncTouchLerp: 0.075,
-    }) as LenisWithJumpFlag;
+    const mobile = isTouchDevice();
+
+    const lenis = new Lenis(
+      mobile
+        ? {
+            // Mobile: stay close to native scroll feel. syncTouch keeps
+            // content tracking the finger 1:1 during the drag itself —
+            // the smoothing only kicks in on release, as light extra
+            // momentum/settle rather than a full smoothed scroll.
+            orientation: "vertical",
+            gestureOrientation: "vertical",
+            smoothWheel: false,
+            touchMultiplier: 1,
+            syncTouch: true,
+            // Low lerp = fast, near-instant settle — just enough
+            // rounding on release to not feel abrupt, without the
+            // rubbery lag a full `duration` tween has on touch.
+            syncTouchLerp: 0.075,
+            touchInertiaMultiplier: 20,
+            lerp: 0.12,
+          }
+        : {
+            duration: 1.2,
+            orientation: "vertical",
+            gestureOrientation: "vertical",
+            smoothWheel: true,
+            touchMultiplier: 2,
+            syncTouch: true,
+            syncTouchLerp: 0.075,
+          }
+    ) as LenisWithJumpFlag;
 
     lenisRef.current = lenis;
     setLenisInstance(lenis);
