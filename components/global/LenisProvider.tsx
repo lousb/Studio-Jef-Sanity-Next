@@ -59,8 +59,8 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
             // rounding on release to not feel abrupt, without the
             // rubbery lag a full `duration` tween has on touch.
             syncTouchLerp: 0.075,
-            touchInertiaMultiplier: 20,
-            lerp: 0.12,
+            touchInertiaMultiplier: 15,
+            lerp: 0.8,
           }
         : {
             duration: 1.2,
