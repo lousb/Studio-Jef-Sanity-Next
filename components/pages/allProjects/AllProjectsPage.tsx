@@ -14,6 +14,7 @@ import type { ProjectsPagePayload } from '@/types';
 import { ProjectHoverPreview, getPreviewImages } from '@/components/pages/home/ProjectHoverPreview';
 import type { FlatPreviewImage } from '@/components/pages/home/ProjectHoverPreview';
 import { InfiniteLoopHorizontal } from '@/components/global/InfiniteLoopHorizontal';
+import { InfiniteLoop } from '@/components/global/InfiniteLoop';
 import { useIsMobile } from '@/components/global/useIsMobile';
 import ImageBox from '@/components/shared/ImageBox';
 
@@ -48,6 +49,62 @@ function MobileImageScroller({
         );
       })}
     </InfiniteLoopHorizontal>
+  );
+}
+
+// Single project row — shared by both mobile and desktop rendering paths
+function ProjectRow({
+  project,
+  href,
+  encodedSlug,
+  isMobile,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  project: ProjectsPagePayload;
+  href: string;
+  encodedSlug?: ReturnType<EncodeDataAttributeCallback>;
+  isMobile: boolean;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  const mobilePreviewImages = getPreviewImages(project.previewMedia, Infinity); // mobile strip — ALL images
+
+  return (
+    <Link
+      href={href}
+      data-sanity={encodedSlug}
+      className="project-item-animate contents"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
+      <span className="text-body-01 [grid-column:1/2]">
+        {project.customIndex !== undefined && project.customIndex !== null
+          ? String(project.customIndex).padStart(3, '0')
+          : ''}
+      </span>
+
+      <span className="text-body-01 [grid-column:2/8] min-[768px]:[grid-column:2/22]">
+        {project.title}
+      </span>
+
+      <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
+        {project.projectType?.map((t) => t.title).join(', ') || '—'}
+      </span>
+
+      <span className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]">
+        {project.status?.replace('-', ' ') || '—'}
+      </span>
+
+      <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right">
+        {project.year || '—'}
+      </span>
+
+      {/* Mobile-only horizontal preview strip, spans the full row width (8-col mobile grid) */}
+      <div className="md:hidden [grid-column:1/9] pb-4 pt-1">
+        <MobileImageScroller images={mobilePreviewImages} />
+      </div>
+    </Link>
   );
 }
 
@@ -211,68 +268,65 @@ export function AllProjectsPage({
 
   const availableOptions = getAvailableFilterOptions();
 
+  if (isMobile === null) return null; // avoid hydration flash before viewport is measured, matches AboutPage pattern
+
   return (
     <div className="space-y-6 all-projects-page">
       {/* Display aggregated lists at the top */}
 
       {filteredProjects.length > 0 ? (
         <div className="flex flex-col justify-center min-h-[100vh] mt-0">
-          <div
-            ref={gridRef}
-            className="grid gap-y-4 items-center"
-          >
-            {filteredProjects.map((project, key) => {
-              const href = resolveHref(project._type, project.slug);
-              if (!href) return null;
-              const delay = (key / filteredProjects.length) * 0.5;
-              const previewImages = getPreviewImages(project.previewMedia); // desktop hover — capped at 3
-              const mobilePreviewImages = getPreviewImages(project.previewMedia, Infinity); // mobile strip — ALL images
+          {isMobile ? (
+            // Mobile: rows wrapped in the shared InfiniteLoop component
+            <InfiniteLoop>
+              <div
+                ref={gridRef}
+                className="grid gap-y-4 items-center"
+              >
+                {filteredProjects.map((project, key) => {
+                  const href = resolveHref(project._type, project.slug);
+                  if (!href) return null;
 
-              return (
-                <Link
-                  key={key}
-                  href={href}
-                  data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
-                  className="project-item-animate contents"
-                  onMouseEnter={() => {
-                    if (!isMobile) setHoveredKey(key);
-                  }}
-                  onMouseLeave={() => {
-                    if (!isMobile) {
-                      setHoveredKey((current) => (current === key ? null : current));
+                  return (
+                    <ProjectRow
+                      key={key}
+                      project={project}
+                      href={href}
+                      encodedSlug={encodeDataAttribute?.(['projects', key, 'slug'])}
+                      isMobile={isMobile}
+                      onMouseEnter={() => {}}
+                      onMouseLeave={() => {}}
+                    />
+                  );
+                })}
+              </div>
+            </InfiniteLoop>
+          ) : (
+            // Desktop: unchanged vertical grid with hover-driven preview
+            <div
+              ref={gridRef}
+              className="grid gap-y-4 items-center"
+            >
+              {filteredProjects.map((project, key) => {
+                const href = resolveHref(project._type, project.slug);
+                if (!href) return null;
+
+                return (
+                  <ProjectRow
+                    key={key}
+                    project={project}
+                    href={href}
+                    encodedSlug={encodeDataAttribute?.(['projects', key, 'slug'])}
+                    isMobile={isMobile}
+                    onMouseEnter={() => setHoveredKey(key)}
+                    onMouseLeave={() =>
+                      setHoveredKey((current) => (current === key ? null : current))
                     }
-                  }}
-                >
-                  <span className="text-body-01 [grid-column:1/2]">
-                    {project.customIndex !== undefined && project.customIndex !== null
-                      ? String(project.customIndex).padStart(3, '0')
-                      : key}
-                  </span>
-
-                  <span className="text-body-01 [grid-column:2/8] min-[768px]:[grid-column:2/22]">
-                    {project.title}
-                  </span>
-
-                  <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
-                    {project.projectType?.map((t) => t.title).join(', ') || '—'}
-                  </span>
-
-                  <span className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]">
-                    {project.status?.replace('-', ' ') || '—'}
-                  </span>
-
-                  <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right">
-                    {project.year || '—'}
-                  </span>
-
-                  {/* Mobile-only horizontal preview strip, spans the full row width (8-col mobile grid) */}
-                  <div className="md:hidden [grid-column:1/9] pb-4 pt-1">
-                    <MobileImageScroller images={mobilePreviewImages} />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                  />
+                );
+              })}
+            </div>
+          )}
 
           {/* Desktop-only hover overlay — never mounted on mobile */}
           {!isMobile && (

@@ -12,8 +12,8 @@ export function InfiniteLoopHorizontal({ children }: PropsWithChildren) {
   });
 
   return (
-    <div className="overflow-hidden" ref={emblaRef}>
-      <div className="flex touch-pan-x">
+    <div className="overflow-hidden cursor-grab active:cursor-grabbing" ref={emblaRef}>
+      <div className="flex touch-pan-x ">
         {children}
       </div>
     </div>
