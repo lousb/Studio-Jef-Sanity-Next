@@ -37,6 +37,8 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
     const readyRef = useRef(false);
     const lastHeightRef = useRef(0);
     const suspendedRef = useRef(false);
+    const containerTopRef = useRef(0);
+    const isWrappingRef = useRef(false);
     const [copiesPerSide, setCopiesPerSide] = useState(1);
     const [viewportH, setViewportH] = useState(0);
     const [ready, setReady] = useState(false);
@@ -56,6 +58,17 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
       },
       [lenis]
     );
+
+    // Tracks where the loop container's top sits in absolute Lenis-scroll
+    // coordinates. The wrap-around scroll handler needs this to convert
+    // lenis.scroll (document-relative) into a position local to the loop,
+    // since the loop may not start at scroll = 0 (e.g. title/meta content
+    // above it).
+    const updateContainerTop = useCallback(() => {
+      if (!containerRef.current || !lenis) return;
+      containerTopRef.current =
+        containerRef.current.getBoundingClientRect().top + lenis.scroll;
+    }, [lenis]);
 
     const measure = useCallback(() => {
       if (suspendedRef.current) return;
@@ -92,6 +105,7 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
               const targetScroll = Math.round(currentScroll * ratio);
               lenis.scrollTo(targetScroll, { immediate: true, force: true });
               lenis.start();
+              updateContainerTop();
             });
           });
         });
@@ -116,10 +130,11 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
             lastHeightRef.current = h;
             readyRef.current = true;
             setReady(true);
+            updateContainerTop();
           });
         });
       });
-    }, [lenis, copiesPerSide, withJumpFlag]);
+    }, [lenis, copiesPerSide, withJumpFlag, updateContainerTop]);
 
     // --- suspend/resume: dedicated, no ratio-scroll math ---
 
@@ -158,9 +173,10 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
           // that's what was cutting the infinite-loop buffer short.
           lenis.scrollTo(lenis.scroll, { immediate: true, force: true });
           lenis.start();
+          updateContainerTop();
         });
       });
-    }, [lenis]);
+    }, [lenis, updateContainerTop]);
 
     useImperativeHandle(ref, () => ({ suspend, resume }), [suspend, resume]);
 
@@ -202,6 +218,71 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
       };
     }, [measure]);
 
+    // --- wrap-around: the actual "infinite" part ---
+    //
+    // The duplicated copies above/below the center item only give a FINITE
+    // buffer before hitting the real top/bottom of the document. Without
+    // this, fast scrolling (iOS momentum flicks especially, but also fast
+    // wheel/trackpad deltas on desktop) can outrun the buffer and hit the
+    // real scroll boundary — which reads as "it stops at the top/bottom."
+    //
+    // This watches Lenis's scroll position and, once you get within one
+    // viewport of either end, silently jumps forward/back by an exact
+    // multiple of the item height. Because every copy is identical content,
+    // a jump of copiesPerSide * itemHeight lands on pixel-identical content,
+    // so the jump is visually undetectable.
+    useEffect(() => {
+      if (!lenis || !ready) return;
+
+      const handleScroll = () => {
+        if (suspendedRef.current || isWrappingRef.current) return;
+
+        const h = lastHeightRef.current;
+        if (!h) return;
+
+        const vh = getViewportHeight();
+        const totalH = h * (copiesPerSide * 2 + 1);
+        const maxLocal = totalH - vh;
+        const localScroll = lenis.scroll - containerTopRef.current;
+
+        const jumpDistance = copiesPerSide * h; // multiple of item height = seamless
+        const threshold = Math.max(vh, h); // trigger a full viewport early
+
+        if (localScroll < threshold) {
+          isWrappingRef.current = true;
+          withJumpFlag(() => {
+            lenis.scrollTo(lenis.scroll + jumpDistance, {
+              immediate: true,
+              force: true,
+            });
+          });
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              isWrappingRef.current = false;
+            })
+          );
+        } else if (localScroll > maxLocal - threshold) {
+          isWrappingRef.current = true;
+          withJumpFlag(() => {
+            lenis.scrollTo(lenis.scroll - jumpDistance, {
+              immediate: true,
+              force: true,
+            });
+          });
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              isWrappingRef.current = false;
+            })
+          );
+        }
+      };
+
+      lenis.on("scroll", handleScroll);
+      return () => {
+        lenis.off("scroll", handleScroll);
+      };
+    }, [lenis, ready, copiesPerSide, withJumpFlag]);
+
     const totalCopies = copiesPerSide * 2 + 1;
     const centerIndex = copiesPerSide;
     const lastIndex = totalCopies - 1;
@@ -212,7 +293,6 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
       overflowAnchor: "none" as const,
     };
 
-
     const wrapSeamStyle = {
       height: "var(--loop-item-h)",
       maxHeight: viewportH ? `${viewportH}px` : "100dvh",
@@ -221,7 +301,10 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
     };
 
     return (
-      <div ref={containerRef} style={{ visibility: ready ? "visible" : "hidden", overflowAnchor: "none" }}>
+      <div
+        ref={containerRef}
+        style={{ visibility: ready ? "visible" : "hidden", overflowAnchor: "none" }}
+      >
         {Array.from({ length: totalCopies }, (_, i) => {
           if (i === centerIndex) {
             return (
