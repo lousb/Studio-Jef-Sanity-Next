@@ -103,7 +103,7 @@
 .projectPageDetails {
   position: fixed;
   bottom: 0;
-  height: calc(100% - 60px);
+  height: calc(100% - 2em - var(--overview-height));
   width: calc(100% - 20px);
   margin-inline: 10px;
   z-index: 99;

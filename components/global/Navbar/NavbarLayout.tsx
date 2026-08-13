@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Link } from 'next-view-transitions'
@@ -36,6 +36,33 @@ export default function Navbar(props: NavbarProps) {
 
   const [logoWidth, setLogoWidth] = useState('685px')
 
+  const overviewRef = useRef<HTMLHeadingElement | null>(null)
+
+  // publish the overview block's height as a global CSS var, kept in sync on resize/content change
+  useEffect(() => {
+    const el = overviewRef.current
+
+    if (!el) {
+      document.documentElement.style.setProperty('--overview-height', '0px')
+      return
+    }
+
+    const setHeight = (height: number) => {
+      document.documentElement.style.setProperty('--overview-height', `${height}px`)
+    }
+
+    setHeight(el.offsetHeight)
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) setHeight(entry.target.getBoundingClientRect().height)
+    })
+
+    observer.observe(el)
+
+    return () => observer.disconnect()
+  }, [data?.overview?.text])
+
   // close the mobile menu on route change
   useEffect(() => {
     setIsMenuOpen(false)
@@ -56,7 +83,6 @@ export default function Navbar(props: NavbarProps) {
     let lastScrollY: number | null = null
 
     const handleScroll = ({ scroll }: { scroll: number }) => {
-      // ignore programmatic jumps from InfiniteLoop's teleport — just resync silently
       if ((lenis as any).__isProgrammaticJump) {
         lastScrollY = scroll
         return
@@ -69,7 +95,6 @@ export default function Navbar(props: NavbarProps) {
 
       const delta = scroll - lastScrollY
 
-      // grace period: keep navbar visible, just track position
       if (!isScrollReady) {
         lastScrollY = scroll
         return
@@ -104,7 +129,6 @@ export default function Navbar(props: NavbarProps) {
         ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
     >
       <div className="flex absolute top-[10px] left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
-        {/* Mobile trigger */}
         <button
           type="button"
           onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -114,7 +138,6 @@ export default function Navbar(props: NavbarProps) {
           Menu
         </button>
 
-        {/* Link list: centered + collapsible on mobile, original inline layout on desktop */}
         <div
           className={`
             ${isMenuOpen ? 'flex' : 'hidden'}
@@ -145,7 +168,7 @@ export default function Navbar(props: NavbarProps) {
       </div>
 
       {data?.overview?.text && (
-        <h2 className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
+        <h2 ref={overviewRef} className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
           <PortableText value={data.overview.text} />
         </h2>
       )}

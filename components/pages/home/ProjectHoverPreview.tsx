@@ -7,7 +7,7 @@ import ImageBox from '@/components/shared/ImageBox';
 import { colsToWidth } from '@/lib/gridWidth';
 import type { PreviewMediaBlock, PreviewMediaAsset } from '@/types';
 
-interface FlatPreviewImage {
+export interface FlatPreviewImage {
   asset: PreviewMediaAsset;
   caption?: string;
   title?: string;

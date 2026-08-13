@@ -12,8 +12,44 @@ import RevealDiv from '@/components/global/revealDiv';
 import Reveal from '@/components/global/Reveal';
 import type { ProjectsPagePayload } from '@/types';
 import { ProjectHoverPreview, getPreviewImages } from '@/components/pages/home/ProjectHoverPreview';
+import type { FlatPreviewImage } from '@/components/pages/home/ProjectHoverPreview';
+import { InfiniteLoopHorizontal } from '@/components/global/InfiniteLoopHorizontal';
+import { useIsMobile } from '@/components/global/useIsMobile';
+import ImageBox from '@/components/shared/ImageBox';
 
 const COLUMN_STORAGE_KEY = 'projectGridColumns';
+
+function MobileImageScroller({
+  images,
+}: {
+  images: FlatPreviewImage[];
+}) {
+  const isMobile = useIsMobile();
+  if (images.length === 0 || !isMobile) return null;
+
+  return (
+    <InfiniteLoopHorizontal>
+      {images.map((img, i) => {
+        const dimensions = img.asset.metadata?.dimensions;
+        const aspectRatio = dimensions ? `${dimensions.width} / ${dimensions.height}` : undefined;
+
+        return (
+          <div
+            key={i}
+            className="relative w-[70vw] shrink-0 mr-2 overflow-hidden mobile-image-scroller-item"
+            style={{ aspectRatio }}
+          >
+            <ImageBox
+              image={{ asset: img.asset, lqip: img.asset.metadata?.lqip }}
+              alt={img.title || img.caption || 'Project preview image'}
+              caption={img.caption}
+            />
+          </div>
+        );
+      })}
+    </InfiniteLoopHorizontal>
+  );
+}
 
 export function AllProjectsPage({
   data,
@@ -24,6 +60,8 @@ export function AllProjectsPage({
   };
   encodeDataAttribute?: EncodeDataAttributeCallback;
 }) {
+  const isMobile = useIsMobile();
+
   const [columns, setColumns] = useState<'1' | '2' | '4'>(() => {
     const saved = localStorage.getItem(COLUMN_STORAGE_KEY);
     return saved === '1' || saved === '2' || saved === '4' ? saved : '1';
@@ -44,6 +82,7 @@ export function AllProjectsPage({
   const gridRef = useRef<HTMLDivElement>(null);
 
   // which project row (by index into filteredProjects) is currently hovered
+  // — desktop only; on mobile this stays null so ProjectHoverPreview never renders
   const [hoveredKey, setHoveredKey] = useState<number | null>(null);
 
   useEffect(() => {
@@ -180,12 +219,14 @@ export function AllProjectsPage({
         <div className="flex flex-col justify-center min-h-[100vh] mt-0">
           <div
             ref={gridRef}
-            className="grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)] gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)] gap-y-4 items-center"
+            className="grid gap-y-4 items-center"
           >
             {filteredProjects.map((project, key) => {
               const href = resolveHref(project._type, project.slug);
               if (!href) return null;
               const delay = (key / filteredProjects.length) * 0.5;
+              const previewImages = getPreviewImages(project.previewMedia); // desktop hover — capped at 3
+              const mobilePreviewImages = getPreviewImages(project.previewMedia, Infinity); // mobile strip — ALL images
 
               return (
                 <Link
@@ -193,41 +234,57 @@ export function AllProjectsPage({
                   href={href}
                   data-sanity={encodeDataAttribute?.(['projects', key, 'slug'])}
                   className="project-item-animate contents"
-                  onMouseEnter={() => setHoveredKey(key)}
-                  onMouseLeave={() =>
-                    setHoveredKey((current) => (current === key ? null : current))
-                  }
+                  onMouseEnter={() => {
+                    if (!isMobile) setHoveredKey(key);
+                  }}
+                  onMouseLeave={() => {
+                    if (!isMobile) {
+                      setHoveredKey((current) => (current === key ? null : current));
+                    }
+                  }}
                 >
                   <span className="text-body-01 [grid-column:1/2]">
                     {project.customIndex !== undefined && project.customIndex !== null
                       ? String(project.customIndex).padStart(3, '0')
                       : key}
                   </span>
-                  <span className="text-body-01 [grid-column:2/5]">
+
+                  <span className="text-body-01 [grid-column:2/8] min-[768px]:[grid-column:2/22]">
                     {project.title}
                   </span>
-                  <span className="text-body-01 [grid-column:7/9]">
+
+                  <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
                     {project.projectType?.map((t) => t.title).join(', ') || '—'}
                   </span>
-                  <span className="text-body-01 capitalize [grid-column:19/21]">
+
+                  <span className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]">
                     {project.status?.replace('-', ' ') || '—'}
                   </span>
-                  <span className="text-body-01 [grid-column:23/25] text-right">
+
+                  <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right">
                     {project.year || '—'}
                   </span>
+
+                  {/* Mobile-only horizontal preview strip, spans the full row width (8-col mobile grid) */}
+                  <div className="md:hidden [grid-column:1/9] pb-4 pt-1">
+                    <MobileImageScroller images={mobilePreviewImages} />
+                  </div>
                 </Link>
               );
             })}
           </div>
 
-          <ProjectHoverPreview
-            images={
-              hoveredKey !== null
-                ? getPreviewImages(filteredProjects[hoveredKey]?.previewMedia)
-                : []
-            }
-            active={hoveredKey !== null}
-          />
+          {/* Desktop-only hover overlay — never mounted on mobile */}
+          {!isMobile && (
+            <ProjectHoverPreview
+              images={
+                hoveredKey !== null
+                  ? getPreviewImages(filteredProjects[hoveredKey]?.previewMedia) // unchanged, still capped at 3
+                  : []
+              }
+              active={hoveredKey !== null}
+            />
+          )}
         </div>
       ) : (
         <div className="text-center text-gray-500">No published projects found.</div>

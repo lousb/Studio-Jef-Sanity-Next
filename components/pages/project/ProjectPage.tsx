@@ -285,8 +285,10 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
             {overview && (
               <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details`}>
                 <div className="w-full">
-                  
+                  <Reveal>
                     <CustomPortableText value={overview} />
+                  </Reveal>
+                    
                   
 
                   {site && (
@@ -333,48 +335,65 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
               ))}
 
               <div>
-                Status
+                <Reveal>
+                  Status
                 {status && <div>{STATUS_LABELS[status] ?? status}</div>}
+                </Reveal>
+                
               </div>
 
               <div>
-                Size
+                <Reveal>
+                  Size
                 {size && <div>{size}</div>}
+                </Reveal>
+                
               </div>
 
               <div>
-                Year
+                <Reveal>
+                  Year
                 {year && <div>{year}</div>}
+                </Reveal>
+                
               </div>
 
               <div>
-                Location
-                {location && <div>{location}</div>}
+                <Reveal>
+                  Location
+                  {location && <div>{location}</div>}
+                </Reveal>
               </div>
 
               <div>
-                Type
+                <Reveal>Type</Reveal>
                 {projectType?.length ? (
                   <div>
                     {projectType.map((t, i) => (
-                      <span key={i}>
-                        {t.title}
-                        {i < projectType.length - 1 ? ', ' : ''}
-                      </span>
+                      <Reveal>
+                        <span key={i}>
+                          {t.title}
+                          {i < projectType.length - 1 ? ', ' : ''}
+                        </span>
+                      </Reveal>
+                      
                     ))}
                   </div>
                 ) : null}
               </div>
 
               <div>
-                Architect
+                <Reveal>Architect</Reveal>
                 {architects?.length ? (
                   <div>
                     {architects.map((a, i) => (
-                      <span key={i}>
-                        {a.title}
-                        {i < architects.length - 1 ? ', ' : ''}
-                      </span>
+                      <Reveal>
+                        <span key={i}>
+                          {a.title}
+                          {i < architects.length - 1 ? ', ' : ''}
+                        </span>
+                      </Reveal>
+                      
                     ))}
                   </div>
                 ) : null}
@@ -391,7 +410,10 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                     key={i}
                     className={`${fig.caption === hoveredCaption ? styles.figureActive : 'opacity-60'}`}
                   >
-                    Fig. {i + 1} - {fig.caption}
+                    <Reveal  staggerDelay={0.05}>
+                      Fig. {i + 1} - {fig.caption}
+                    </Reveal>
+                    
                   </div>
                 )
               })}

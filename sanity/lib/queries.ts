@@ -95,7 +95,7 @@ export const projectsPageQuery = groq`
       }
     }
   },
-  "previewMedia": content[_type in ["hybridMedia", "twoHybridMedia"]][0...4]{
+  "previewMedia": content[_type in ["hybridMedia", "twoHybridMedia"]]{
     _type,
     _key,
     media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
