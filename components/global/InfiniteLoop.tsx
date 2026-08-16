@@ -315,7 +315,7 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
           }
           const style = i === lastIndex ? wrapSeamStyle : naturalStyle;
           return (
-            <div aria-hidden="true" key={i} style={{ ...style }}>
+            <div aria-hidden="true" key={i} style={{ ...style, marginBottom: '10px' }}>
               {children}
             </div>
           );

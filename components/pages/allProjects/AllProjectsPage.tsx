@@ -54,6 +54,7 @@ function ProjectRow({
   isMobile,
   onMouseEnter,
   onMouseLeave,
+  opacity,
 }: {
   project: ProjectsPagePayload;
   href: string;
@@ -61,41 +62,57 @@ function ProjectRow({
   isMobile: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  opacity?: number;
 }) {
   const mobilePreviewImages = getPreviewImages(project.previewMedia, Infinity); // mobile strip — ALL images
+
+  // `contents` elements generate no box of their own, so opacity can't be set
+  // on the Link directly — it's ignored by the browser. Instead we pass the
+  // value down as a CSS var (custom properties inherit through `display:
+  // contents`) and apply it to each actual rendered child below.
+  const rowStyle =
+    opacity !== undefined ? ({ '--row-opacity': opacity } as React.CSSProperties) : undefined;
+  const childStyle: React.CSSProperties | undefined =
+    opacity !== undefined
+      ? { opacity: 'var(--row-opacity)', transitionDuration: '0s' }
+      : undefined;
 
   return (
     <Link
       href={href}
       data-sanity={encodedSlug}
-      className="project-item-animate contents"
+      className="project-item-animate contents text-list"
+      style={rowStyle}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <span className="text-body-01 [grid-column:1/2]">
+      <span className="text-body-01 [grid-column:1/2]" style={childStyle}>
         {project.customIndex !== undefined && project.customIndex !== null
           ? String(project.customIndex).padStart(3, '0')
           : ''}
       </span>
 
-      <span className="text-body-01 [grid-column:2/6] max-[768px]:[grid-column:2/6]">
+      <span className="text-body-01 [grid-column:2/6] max-[768px]:[grid-column:2/6]" style={childStyle}>
         {project.title}
       </span>
 
-      <span className="hidden max-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
+      <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]" style={childStyle}>
         {project.projectType?.map((t) => t.title).join(', ') || '—'}
       </span>
 
-      <span className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]">
+      <span
+        className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]"
+        style={childStyle}
+      >
         {project.status?.replace('-', ' ') || '—'}
       </span>
 
-      <span className="text-body-01 [grid-column:8/9] max-[768px]:[grid-column:23/25] text-right">
+      <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right" style={childStyle}>
         {project.year || '—'}
       </span>
 
       {/* Mobile-only horizontal preview strip, spans the full row width (8-col mobile grid) */}
-      <div className="md:hidden [grid-column:1/9] pb-4 pt-1">
+      <div className="md:hidden [grid-column:1/9] pb-4 pt-1" style={childStyle}>
         <MobileImageScroller images={mobilePreviewImages} />
       </div>
     </Link>
@@ -274,7 +291,7 @@ export function AllProjectsPage({
             // Mobile: rows wrapped in the shared InfiniteLoop component
               <div
                 ref={gridRef}
-                className="grid gap-y-4 items-center"
+                className="grid  items-center"
               >
                 {filteredProjects.map((project, key) => {
                   const href = resolveHref(project._type, project.slug);
@@ -298,7 +315,7 @@ export function AllProjectsPage({
             // Desktop: unchanged vertical grid with hover-driven preview
             <div
               ref={gridRef}
-              className="grid gap-y-4 items-center"
+              className="grid  items-center"
             >
               {filteredProjects.map((project, key) => {
                 const href = resolveHref(project._type, project.slug);
@@ -311,6 +328,7 @@ export function AllProjectsPage({
                     href={href}
                     encodedSlug={encodeDataAttribute?.(['projects', key, 'slug'])}
                     isMobile={isMobile}
+                    opacity={hoveredKey === null ? 1 : hoveredKey === key ? 1 : 0.3}
                     onMouseEnter={() => setHoveredKey(key)}
                     onMouseLeave={() =>
                       setHoveredKey((current) => (current === key ? null : current))

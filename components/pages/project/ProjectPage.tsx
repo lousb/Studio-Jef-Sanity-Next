@@ -110,9 +110,9 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
       if (cancelled) return
       if (lenis) {
         lenis.resize()
-        lenis.scrollTo(0, { immediate: true, force: true })
+        lenis.scrollTo(-80, { immediate: true, force: true })
       } else {
-        window.scrollTo(0, 0)
+        window.scrollTo(-80, 0)
       }
     }
 
@@ -326,7 +326,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
             </div>
 
             {/* Project meta: title, status, size, type, year, location, architect */}
-            <div className={`project-page-meta `} style={{ marginTop: '1rem', marginBottom: '1rem', opacity: 0.6 }}>
+            <div className={`project-page-meta `} style={{ marginTop: '1rem', marginBottom: '1rem' }}>
               {client?.map((client, i) => (
                 <span key={i}>
                   {client.title}
@@ -408,7 +408,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 return (
                   <div
                     key={i}
-                    className={`${fig.caption === hoveredCaption ? styles.figureActive : 'opacity-60'}`}
+                    className={`${fig.caption === hoveredCaption ? styles.figureActive : 'opacity-30'}`}
                   >
                     <Reveal  staggerDelay={0.05}>
                       Fig. {i + 1} - {fig.caption}

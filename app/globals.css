@@ -498,7 +498,6 @@ html:has( .header) #initial-loader{
 
 }
 .scroll-visible .fixed-logo {
-  margin-top: -20px ;
   opacity: 0%;
 }
 
@@ -585,6 +584,10 @@ html.resizing * {
 }
 
 
-.text-list{
-  line-height: 15px;
+.text-list, .text-list *{
+  line-height: 15px !important;
+}
+
+.grid:hover > .project-item-animate{
+  opacity: 30% !important;
 }

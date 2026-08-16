@@ -28,16 +28,16 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
       })
       
       // Initial state - mask cropped to compensate (7.5% on all sides for 1.15 scale)
-      gsap.set(imageMaskRef.current, { 
-        clipPath: 'inset(100% 10% 10% 10% round 20px)' 
-      })
+      // gsap.set(imageMaskRef.current, { 
+      //   clipPath: 'inset(100% 10% 10% 10% round 20px)' 
+      // })
       
       // Animate in - reveal from top to bottom while removing side crop
-      gsap.to(imageMaskRef.current, {
-        clipPath: 'inset(0% 0% 0% 0% round 20px)',
-        duration: 1.4,
-        ease: 'power3.out'
-      })
+      // gsap.to(imageMaskRef.current, {
+      //   clipPath: 'inset(0% 0% 0% 0% round 20px)',
+      //   duration: 1.4,
+      //   ease: 'power3.out'
+      // })
       
       // Animate image scale down
       gsap.to(imageRef.current, {

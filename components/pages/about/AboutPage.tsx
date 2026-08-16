@@ -132,7 +132,7 @@ function MobileAbout({ overview, aboutLinks, media, services, press, location }:
 
       <div
         className="project-page-meta px-6"
-        style={{ marginTop: '1rem', marginBottom: '1rem', opacity: 0.6 }}
+        style={{ marginTop: '1rem', marginBottom: '1rem' }}
       >
         <AboutMeta services={services} press={press} location={location} />
       </div>
@@ -190,7 +190,7 @@ function DesktopAbout({ overview, aboutLinks, media, services, press, location }
 
             <div
               className="project-page-meta"
-              style={{ marginTop: '1rem', marginBottom: '1rem', opacity: 0.6 }}
+              style={{ marginTop: '1rem', marginBottom: '1rem'}}
             >
               <AboutMeta services={services} press={press} location={location} />
             </div>
