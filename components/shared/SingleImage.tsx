@@ -3,44 +3,66 @@ import Image from 'next/image'
 import { urlForImage } from '@/sanity/lib/utils'
 
 interface ImageBoxProps {
-  image?: { asset?: any; lqip?: any }
+  image?: {
+    asset?: {
+      _ref?: string
+      _id?: string
+      url?: string
+      metadata?: {
+        dimensions?: { width: number; height: number }
+        lqip?: string
+        palette?: { dominant?: { background?: string } }
+      }
+    }
+    lqip?: any
+  }
   alt?: string
-  width?: number
-  height?: number
   size?: string
   classesWrapper?: string
   caption?: string
   previewImageUrl?: any
+  previewColor?: string
+  fallbackAspectRatio?: string
 }
 
-export default function ImageBox({
+const FALLBACK_COLOR = '#e7e5e2'
+
+export default function SingleImage({
   image,
   alt = 'Cover image',
-  width = 3500,
-  height = 2000,
   size = '(min-width: 940px) 60vw, 100vw',
   classesWrapper,
   caption,
-  previewImageUrl = image?.lqip,
+  previewImageUrl = image?.lqip ?? image?.asset?.metadata?.lqip,
+  previewColor = image?.asset?.metadata?.palette?.dominant?.background,
+  fallbackAspectRatio = '3 / 2',
 }: ImageBoxProps) {
-  const imageUrl = image && urlForImage(image)?.url()
+  const imageUrl = image?.asset?.url || (image && urlForImage(image as any)?.fit('max').auto('format').url())
+
+  const dimensions = image?.asset?.metadata?.dimensions
+  const aspectRatio = dimensions ? `${dimensions.width} / ${dimensions.height}` : fallbackAspectRatio
 
   return (
-    <div >
-      <div className={`w-full overflow-hidden  ${classesWrapper}`}>
+    <div>
+      <div
+        className={`w-full overflow-hidden relative ${classesWrapper || ''}`}
+        style={{
+          aspectRatio,
+          backgroundColor: previewColor || FALLBACK_COLOR,
+          backgroundImage: previewImageUrl ? `url(${previewImageUrl})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
         {imageUrl && (
           <Image
             alt={alt}
+            fill
             sizes={size}
-            style={{
-              width: '100%',
-              height: 'auto',
-              cursor: 'pointer',
-            }}
-            width={width}
-            height={height}
+            className="object-cover"
+            style={{ cursor: 'pointer' }}
             src={imageUrl}
-            placeholder="blur"
+            placeholder={previewImageUrl ? 'blur' : 'empty'}
             blurDataURL={previewImageUrl}
           />
         )}

@@ -9,8 +9,14 @@ const imageBuilder = createImageUrlBuilder({
 })
 
 export const urlForImage = (source: Image | undefined) => {
-  // Ensure that source image contains a valid reference
-  if (!source?.asset?._ref) {
+  // Accept a raw reference (asset._ref), an already-dereferenced asset
+  // (asset._id, from an `asset->{ ... }` GROQ projection), or an asset
+  // that only carries a `url` (image-url derives the ref from the URL
+  // itself in that case). Callers increasingly pass the dereferenced
+  // shape so they get metadata (real dimensions, lqip, palette) in the
+  // same query round trip.
+  const anyAsset = source?.asset as { _ref?: string; _id?: string; url?: string } | undefined
+  if (!anyAsset?._ref && !anyAsset?._id && !anyAsset?.url) {
     return undefined
   }
 

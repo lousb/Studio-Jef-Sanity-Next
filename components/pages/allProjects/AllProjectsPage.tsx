@@ -30,24 +30,18 @@ function MobileImageScroller({
 
   return (
     <InfiniteLoopHorizontal>
-      {images.map((img, i) => {
-        const dimensions = img.asset.metadata?.dimensions;
-        const aspectRatio = dimensions ? `${dimensions.width} / ${dimensions.height}` : undefined;
-
-        return (
-          <div
-            key={i}
-            className="relative w-[70vw] shrink-0 mr-2 overflow-hidden mobile-image-scroller-item"
-            style={{ aspectRatio }}
-          >
-            <ImageBox
-              image={{ asset: img.asset, lqip: img.asset.metadata?.lqip }}
-              alt={img.title || img.caption || 'Project preview image'}
-              caption={img.caption}
-            />
-          </div>
-        );
-      })}
+      {images.map((img, i) => (
+        <div
+          key={i}
+          className="relative w-[70vw] shrink-0 mr-2 overflow-hidden mobile-image-scroller-item"
+        >
+          <ImageBox
+            image={{ asset: img.asset, lqip: img.asset.metadata?.lqip }}
+            alt={img.title || img.caption || 'Project preview image'}
+            caption={img.caption}
+          />
+        </div>
+      ))}
     </InfiniteLoopHorizontal>
   );
 }
@@ -84,11 +78,11 @@ function ProjectRow({
           : ''}
       </span>
 
-      <span className="text-body-01 [grid-column:2/8] min-[768px]:[grid-column:2/22]">
+      <span className="text-body-01 [grid-column:2/6] max-[768px]:[grid-column:2/6]">
         {project.title}
       </span>
 
-      <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
+      <span className="hidden max-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]">
         {project.projectType?.map((t) => t.title).join(', ') || '—'}
       </span>
 
@@ -96,7 +90,7 @@ function ProjectRow({
         {project.status?.replace('-', ' ') || '—'}
       </span>
 
-      <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right">
+      <span className="text-body-01 [grid-column:8/9] max-[768px]:[grid-column:23/25] text-right">
         {project.year || '—'}
       </span>
 
@@ -278,7 +272,6 @@ export function AllProjectsPage({
         <div className="flex flex-col justify-center min-h-[100vh] mt-0">
           {isMobile ? (
             // Mobile: rows wrapped in the shared InfiniteLoop component
-            <InfiniteLoop>
               <div
                 ref={gridRef}
                 className="grid gap-y-4 items-center"
@@ -300,7 +293,7 @@ export function AllProjectsPage({
                   );
                 })}
               </div>
-            </InfiniteLoop>
+
           ) : (
             // Desktop: unchanged vertical grid with hover-driven preview
             <div

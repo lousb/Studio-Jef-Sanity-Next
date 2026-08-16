@@ -312,7 +312,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
               </div>
             )}
 
-            <div ref={titleHeadingRef}>
+            <div ref={titleHeadingRef} className='text-list'>
               {customIndex !== undefined && customIndex !== null && (
                 <Reveal element="div" elementClass="opacity-60">
                   {String(customIndex).padStart(3, '0')}
@@ -334,7 +334,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 </span>
               ))}
 
-              <div>
+              <div className='text-list'>
                 <Reveal>
                   Status
                 {status && <div>{STATUS_LABELS[status] ?? status}</div>}
@@ -342,7 +342,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 
               </div>
 
-              <div>
+              <div className='text-list'>
                 <Reveal>
                   Size
                 {size && <div>{size}</div>}
@@ -350,7 +350,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 
               </div>
 
-              <div>
+              <div className='text-list'>
                 <Reveal>
                   Year
                 {year && <div>{year}</div>}
@@ -358,14 +358,14 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 
               </div>
 
-              <div>
+              <div className='text-list'>
                 <Reveal>
                   Location
                   {location && <div>{location}</div>}
                 </Reveal>
               </div>
 
-              <div>
+              <div className='text-list'>
                 <Reveal>Type</Reveal>
                 {projectType?.length ? (
                   <div>
@@ -382,7 +382,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 ) : null}
               </div>
 
-              <div>
+              <div className='text-list'>
                 <Reveal>Architect</Reveal>
                 {architects?.length ? (
                   <div>
@@ -403,7 +403,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
 
           {/* Figure list: every image caption, prefixed Fig 1, Fig 2, etc */}
           {figures.length > 0 && (
-            <div className="project-page-figures mt-4">
+            <div className="project-page-figures mt-4 text-list">
               {figures.map((fig, i) => {
                 return (
                   <div

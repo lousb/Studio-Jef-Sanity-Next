@@ -1,6 +1,22 @@
 import type { PortableTextBlock } from '@portabletext/types'
 import type { Image } from 'sanity'
 
+// Shared shape for the metadata every image query now pulls: real
+// dimensions (for a zero-CLS aspect-ratio box), an inlined blurred
+// preview (lqip), and a dominant colour to paint before either is ready.
+export interface SanityAssetMetadata {
+  dimensions?: {
+    width: number
+    height: number
+  }
+  lqip?: string
+  palette?: {
+    dominant?: {
+      background?: string
+    }
+  }
+}
+
 export interface MenuItem {
   page?: {
     _type: string
@@ -46,13 +62,7 @@ export interface ShowcaseProject {
       asset: {
         _ref?: string
         _type?: string
-        metadata?: {
-          dimensions?: {
-            width: number
-            height: number
-          }
-          lqip?: string
-        }
+        metadata?: SanityAssetMetadata
         url?: string
       }
       lqip?: string
@@ -82,10 +92,7 @@ export interface FeaturedMediaItem {
       asset?: {
         _id: string
         url: string
-        metadata?: {
-          dimensions?: { width: number; height: number; aspectRatio?: number }
-          lqip?: string
-        }
+        metadata?: SanityAssetMetadata
       }
     }
     caption?: string
@@ -127,10 +134,7 @@ export interface PreviewMediaBlock {
 export interface PreviewMediaAsset {
   _id: string
   url: string
-  metadata?: {
-    dimensions?: { width: number; height: number }
-    lqip?: string
-  }
+  metadata?: SanityAssetMetadata
 }
 
 export interface ProjectsPagePayload {
@@ -141,13 +145,7 @@ export interface ProjectsPagePayload {
       asset?: {
         _ref?: string
         _type?: string
-        metadata?: {
-          dimensions?: {
-            width: number
-            height: number
-          }
-          lqip?: string
-        }
+        metadata?: SanityAssetMetadata
       }
     }
     video?: {
@@ -203,6 +201,7 @@ export interface Content {
   photo?: {
     asset?: {
       url?: string
+      metadata?: SanityAssetMetadata
     }
   }
   caption?: string
@@ -211,11 +210,13 @@ export interface Content {
   photoOne?: {
     asset?: {
       url?: string
+      metadata?: SanityAssetMetadata
     }
   }
   photoTwo?: {
     asset?: {
       url?: string
+      metadata?: SanityAssetMetadata
     }
   }
   textBlock?: object[]

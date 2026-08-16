@@ -182,7 +182,7 @@ body, .project-page-media {
 }
 
 
-
+/* 
 @keyframes fade-out {
   from {
     opacity: 1;
@@ -212,7 +212,7 @@ body, .project-page-media {
     pointer-events: all !important;
     opacity: 0.5;
   }
-}
+} */
 
 /* .mask-out-page-transition{
     view-transition-name: mask-out-page-transition;
@@ -259,7 +259,7 @@ body, .project-page-media {
   cursor: wait !important;
 }
 
-@keyframes slide-out {
+/* @keyframes slide-out {
   from {
     background: white;
     -webkit-clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
@@ -280,7 +280,7 @@ body, .project-page-media {
     background: white;
     clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
   }
-}
+} */
 
 ::view-transition-old(overlay) {
   animation: slide-out 0.6s ease-in-out;
@@ -582,4 +582,9 @@ html.resizing * {
   .project-page-figures{
     left:20px !important;
   }
+}
+
+
+.text-list{
+  line-height: 15px;
 }

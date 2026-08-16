@@ -1,5 +1,19 @@
 import { groq } from 'next-sanity'
 
+// Shared fragment: every image asset projection pulls the same three
+// things needed to render with zero layout shift —
+//  - dimensions: real aspect ratio, known before a single image byte loads
+//  - lqip: tiny blurred base64 preview, inlined in the payload (no extra request)
+//  - palette.dominant.background: a solid fallback colour, paints instantly
+// Keep this in sync everywhere an image asset is dereferenced below.
+const ASSET_META = groq`
+  metadata {
+    dimensions,
+    lqip,
+    palette { dominant { background } }
+  }
+`
+
 export const homePageQuery = groq`
   *[_type == "home"][0]{
     _id,
@@ -20,9 +34,7 @@ export const homePageQuery = groq`
             asset->{
               _id,
               url,
-              metadata {
-                lqip
-              }
+              ${ASSET_META}
             }
           },
           video {
@@ -60,7 +72,7 @@ export const homePageQuery = groq`
     },
     "block": project->content[_key == ^.mediaKey][0]{
       _key,
-      "image": media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      "image": media{ asset->{ _id, url, ${ASSET_META} } },
       caption,
       title,
       width
@@ -82,9 +94,7 @@ export const projectsPageQuery = groq`
       asset->{
         _id,
         url,
-        metadata {
-          lqip
-        }
+        ${ASSET_META}
       }
     },
     video {
@@ -98,16 +108,16 @@ export const projectsPageQuery = groq`
   "previewMedia": content[_type in ["hybridMedia", "twoHybridMedia"]]{
     _type,
     _key,
-    media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+    media{ asset->{ _id, url, ${ASSET_META} } },
     caption,
     title,
     mediaOne{
-      media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      media{ asset->{ _id, url, ${ASSET_META} } },
       caption,
       title
     },
     mediaTwo{
-      media{ asset->{ _id, url, metadata{ dimensions, lqip } } },
+      media{ asset->{ _id, url, ${ASSET_META} } },
       caption,
       title
     }
@@ -147,9 +157,7 @@ export const moreProjectsQuery = groq`
         asset->{
           _id,
           url,
-          metadata {
-            lqip
-          }
+          ${ASSET_META}
         }
       },
       video {
@@ -185,9 +193,7 @@ export const aboutPageQuery = groq`
         asset->{
           _id,
           url,
-          metadata {
-            lqip
-          }
+          ${ASSET_META}
         }
       }
     },
@@ -229,9 +235,7 @@ export const projectBySlugQuery = groq`
         asset->{
           _id,
           url,
-          metadata {
-            lqip
-          }
+          ${ASSET_META}
         }
       },
       video {
@@ -254,8 +258,7 @@ export const projectBySlugQuery = groq`
         _key,
         photo{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         caption,
       },
@@ -264,13 +267,11 @@ export const projectBySlugQuery = groq`
         _key,
         photoOne{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         photoTwo{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         caption,
       },
@@ -313,8 +314,7 @@ export const projectBySlugQuery = groq`
         width,
         media{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         video{
           asset->{
@@ -333,8 +333,7 @@ export const projectBySlugQuery = groq`
         featured,
         leftImage{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         leftVideo{
           asset->{
@@ -347,8 +346,7 @@ export const projectBySlugQuery = groq`
         },
         rightImage{
           _type,
-          asset,
-          "lqip": asset->metadata.lqip,
+          "asset": asset->{ _id, url, ${ASSET_META} },
         },
         rightVideo{
           asset->{

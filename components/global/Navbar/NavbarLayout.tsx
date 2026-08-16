@@ -143,7 +143,7 @@ export default function Navbar(props: NavbarProps) {
             ${isMenuOpen ? 'flex' : 'hidden'}
             md:flex
             flex-col items-center text-center gap-2 mt-3
-            md:flex-col md:items-start md:text-left md:gap-0 md:mt-0
+            md:flex-col md:items-start md:text-left md:gap-0 md:mt-0 text-list
           `}
         >
           <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">

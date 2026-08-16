@@ -36,10 +36,6 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                 if (!block?.image?.asset) return null
 
                 const cols = block.width ? COLUMN_NUM_MAP[block.width] ?? 24 : 24
-                const dimensions = block.image.asset.metadata?.dimensions
-                const aspectRatio = dimensions
-                  ? `${dimensions.width} / ${dimensions.height}`
-                  : undefined
 
                 const href = item?.project?.slug?.current
                   ? `/projects/${item.project.slug.current}`
@@ -52,16 +48,14 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                     onMouseEnter={() => setHoveredIndex(i)}
                     onMouseLeave={() => setHoveredIndex(null)}
                   >
-                    <div style={{ width: '100%', height: 'auto', aspectRatio }}>
-                      <ImageBox
-                        image={{
-                          asset: block.image.asset,
-                          lqip: block.image.asset.metadata?.lqip,
-                        }}
-                        alt={block.title || block.caption || 'Featured project image'}
-                        caption={block.caption}
-                      />
-                    </div>
+                    <ImageBox
+                      image={{
+                        asset: block.image.asset,
+                        lqip: block.image.asset.metadata?.lqip,
+                      }}
+                      alt={block.title || block.caption || 'Featured project image'}
+                      caption={block.caption}
+                    />
                     {block.title && (
                       <div className="hybrid-media-title text-sm opacity-60 mt-2">
                         {block.title}

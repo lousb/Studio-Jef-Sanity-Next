@@ -71,8 +71,6 @@ const TwoHybridMedia = ({ data }) => {
           lqip: image.asset.metadata?.lqip,
         }}
         alt={alt}
-        width={1600}
-        height={900}
       />
     )
   }

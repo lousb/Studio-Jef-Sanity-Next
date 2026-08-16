@@ -93,22 +93,15 @@ export function ProjectHoverPreview({ images, active }: ProjectHoverPreviewProps
       }}
       className="space-y-[10px]"
     >
-      {images.map((img, i) => {
-        const dimensions = img.asset.metadata?.dimensions;
-        const aspectRatio = dimensions ? `${dimensions.width} / ${dimensions.height}` : undefined;
-
-        return (
-          <div key={i} data-preview-item style={{ opacity: 0, width: '100%' }}>
-            <div style={{ width: '100%', height: 'auto', aspectRatio }}>
-              <ImageBox
-                image={{ asset: img.asset, lqip: img.asset.metadata?.lqip }}
-                alt={img.title || img.caption || 'Project preview image'}
-                caption={img.caption}
-              />
-            </div>
-          </div>
-        );
-      })}
+      {images.map((img, i) => (
+        <div key={i} data-preview-item style={{ opacity: 0, width: '100%' }}>
+          <ImageBox
+            image={{ asset: img.asset, lqip: img.asset.metadata?.lqip }}
+            alt={img.title || img.caption || 'Project preview image'}
+            caption={img.caption}
+          />
+        </div>
+      ))}
     </div>
   );
 }
