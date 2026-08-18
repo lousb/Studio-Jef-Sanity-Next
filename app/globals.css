@@ -646,12 +646,16 @@ html.resizing * {
   }
   body:has(.project-page-overlay) .title-heading > div{
     min-width: calc(10vw + 10px);
+    max-width: calc(30vw + 20px);
   }
   body:has(.mobile-menu-overlay) .project-page-title-info, body:has(.mobile-menu-overlay) .mobile-info-toggle{
     display:none;
   }
   .all-projects-page{
     padding-top: 60px;
+  }
+  .title-heading > div{
+    width: max-content;
   }
 }
 

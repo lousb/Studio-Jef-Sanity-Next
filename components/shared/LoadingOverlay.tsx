@@ -108,7 +108,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
       
       if (counterRef.current) {
         gsap.to(counterRef.current, {
-          y: '-100%',
+         
           delay: 1,
           duration: 0.8,
           ease: 'power2.inOut',
@@ -189,50 +189,18 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center px-4 py-4 md:px-5 md:py-4 lg:px-5 text-4xl font-sans text-black bg-white"
+      className="fixed inset-0 z-[9999] flex items-center justify-center text-black bg-white"
       style={{ opacity: 1, transform: 'translateY(0)' }}
     >
-      {imageUrl && (
-        <div
-          ref={imageMaskRef}
-          className="absolute inset-0 flex items-center loading-image-mask"
-          style={{ 
-            zIndex: 0, 
-            pointerEvents: 'none',
-            clipPath: 'inset(50% 50% 50% 50% round 20px)'
-          }}
-        >
-          <div
-            ref={imageRef}
-            className="relative ml-4 md:ml-5 lg:ml-5"
-            style={{
-              paddingLeft: '100px',
-              maxWidth: '40vw',
-              maxHeight: '80vh',
-              zIndex: 9999
-            }}
-          >
-            <img
-              src={imageUrl}
-              alt="Loading Background"
-              className="h-full w-auto object-contain rounded-2xl"
-              style={{ 
-                pointerEvents: 'none',
-                maxHeight: '80vh',
-                
-              }}
-              onLoad={() => setImageLoaded(true)}
-            />
-          </div>
-        </div>
-      )}
+      
       <div
         style={{
           zIndex: 1,
           width: '100%',
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           alignItems: 'center',
+          
         }}
       >
         
