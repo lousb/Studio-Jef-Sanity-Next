@@ -3,8 +3,6 @@ import ImageBox from '../shared/ImageBox';
 import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth';
 import { useFigureHover } from '@/components/pages/project/FigureHoverContext'
 
-const EASE = 'cubic-bezier(0.32, 0, 0.15, 1)';
-
 const HybridMedia = ({ data, isInfoActive }) => {
   const { media, caption, title, width, featured } = data || {};
   const { setHoveredCaption } = useFigureHover();
@@ -14,21 +12,17 @@ const HybridMedia = ({ data, isInfoActive }) => {
   const cols = COLUMN_NUM_MAP[width] ?? 24;
   const mobileCols = Math.max(1, Math.round(cols / 3)); // 12→4, 18→6, 24→8
 
-  const EASE = 'cubic-bezier(0.32, 0, 0.15, 1)';
-
   const wrapperStyle = isInfoActive
   ? {
       width: colsToWidth(6),
       marginLeft: `calc((100% - ${colsToWidth(6)}) / 2)`,
       marginRight: `calc((100% - ${colsToWidth(6)}) / 2)`,
-      transition: `width 1s ${EASE}, margin 1s ${EASE}`,
       '--hm-mobile-cols': mobileCols,
     }
   : {
       width: colsToWidth(cols),
       marginLeft: 0,
       marginRight: 0,
-      transition: `width 1s ${EASE}, margin 1s ${EASE}`,
       '--hm-mobile-cols': mobileCols,
     };
 

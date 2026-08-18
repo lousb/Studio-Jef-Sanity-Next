@@ -47,6 +47,24 @@ function getFigures(content: any[] = []) {
   return figures
 }
 
+// Only animate blocks actually in or near the viewport — off-screen
+// clones in the infinite gallery don't need to fade, keeping the toggle
+// feeling instant regardless of how many blocks exist in total.
+const VIEWPORT_MARGIN = 150
+function getVisibleBlocks(blocks: HTMLElement[]) {
+  const vh = window.innerHeight
+  const vw = window.innerWidth
+  return blocks.filter((el) => {
+    const r = el.getBoundingClientRect()
+    return (
+      r.bottom > -VIEWPORT_MARGIN &&
+      r.top < vh + VIEWPORT_MARGIN &&
+      r.right > -VIEWPORT_MARGIN &&
+      r.left < vw + VIEWPORT_MARGIN
+    )
+  })
+}
+
 // Outer component: sets up the provider, then hands off to the inner
 // component so hooks like useFigureHover() have a provider above them.
 export function ProjectPage(props: ProjectPageProps) {
@@ -90,6 +108,7 @@ function ProjectPageInner({
   const titleRef = useRef<HTMLDivElement>(null)
   const titleHeadingRef = useRef<HTMLDivElement>(null)
   const infiniteLoopRef = useRef<InfiniteLoopHandle>(null)
+  const isToggling = useRef(false)
 
   const [isInfoActive, setIsInfoActive] = useState(true)
   const [hasScrolled, setHasScrolled] = useState(false)
@@ -198,42 +217,68 @@ function ProjectPageInner({
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
-  // View 1 / View 2 toggle: HybridMedia blocks resize via a 1s CSS
-  // transition (width/margin). That reflow is already smooth on its own
-  // — the only thing we need to do is stop InfiniteLoop from ALSO trying
-  // to compensate for the same resize (it has its own ResizeObserver on
-  // the same content), then let it do one clean re-sync once the CSS
-  // transition has actually finished.
-  useEffect(() => {
-    const blocks = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
-    if (!blocks.length) return
+  // View 1 / View 2 toggle, fully sequenced and scoped to what's on
+  // screen, with the width/margin change happening instantly (no CSS
+  // transition on HybridMedia) so hidden time is kept to a minimum:
+  // 1. Stagger-fade only the on-screen (or near-screen) gallery blocks
+  //    to opacity 0.
+  // 2. Once that fade finishes, flip isInfoActive — width/margin apply
+  //    instantly on HybridMedia while the blocks are invisible.
+  // 3. Wait one frame for that layout change to actually paint.
+  // 4. Stagger-fade the blocks back to opacity 1 in their new position.
+  const handleSetIsInfoActive = (next: boolean) => {
+    if (next === isInfoActive || isToggling.current) return
 
-    infiniteLoopRef.current?.suspend()
+    const allBlocks = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
 
-    let pending = blocks.length
-    const onEnd = (e: TransitionEvent) => {
-      if (!['width', 'margin-left', 'margin-right'].includes(e.propertyName)) return
-      pending -= 1
-      if (pending <= 0) finish()
-    }
-    blocks.forEach((el) => el.addEventListener('transitionend', onEnd as any))
-
-    // Safety net in case a transitionend never fires (interrupted
-    // transition, display swap, etc.) — matches the ~1s CSS duration
-    // plus buffer, so we don't leave InfiniteLoop suspended forever.
-    const safety = setTimeout(finish, 1400)
-
-    let finished = false
-    function finish() {
-      if (finished) return
-      finished = true
-      blocks.forEach((el) => el.removeEventListener('transitionend', onEnd as any))
-      clearTimeout(safety)
-      infiniteLoopRef.current?.resume()
+    if (!allBlocks.length) {
+      setIsInfoActive(next)
+      return
     }
 
-    return () => finish()
-  }, [isInfoActive])
+    const blocks = getVisibleBlocks(allBlocks)
+
+    if (!blocks.length) {
+      setIsInfoActive(next)
+      return
+    }
+
+    isToggling.current = true
+    gsap.killTweensOf(blocks)
+
+    gsap.to(blocks, {
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power1.in',
+      stagger: {
+        each: 0.05,
+        from: 'random',
+      },
+      onComplete: () => {
+        infiniteLoopRef.current?.suspend()
+        setIsInfoActive(next)
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            infiniteLoopRef.current?.resume()
+
+            gsap.to(blocks, {
+              opacity: 1,
+              duration: 0.8,
+              ease: 'power2.out',
+              stagger: {
+                each: 0.2,
+                from: 'random',
+              },
+              onComplete: () => {
+                isToggling.current = false
+              },
+            })
+          })
+        })
+      },
+    })
+  }
 
   // On page navigation: reset scroll once the new content's real height
   // is in place (Lenis caches the old page's scroll limits until resize()
@@ -430,10 +475,10 @@ function ProjectPageInner({
       </div>
 
       <div className={`mt-2 md:mt-4 flex gap-4  project-page-title-info ${styles.projectPageTitleInfo}`}>
-        <button onClick={() => setIsInfoActive(true)} style={{ opacity: isInfoActive ? 0.5 : 1 }}>
+        <button onClick={() => handleSetIsInfoActive(true)} style={{ opacity: isInfoActive ? 0.5 : 1 }}>
           <Reveal>View 1</Reveal>
         </button>
-        <button onClick={() => setIsInfoActive(false)} style={{ opacity: !isInfoActive ? 0.5 : 1 }}>
+        <button onClick={() => handleSetIsInfoActive(false)} style={{ opacity: !isInfoActive ? 0.5 : 1 }}>
           <Reveal>View 2</Reveal>
         </button>
       </div>
