@@ -650,6 +650,9 @@ html.resizing * {
   body:has(.mobile-menu-overlay) .project-page-title-info, body:has(.mobile-menu-overlay) .mobile-info-toggle{
     display:none;
   }
+  .all-projects-page{
+    padding-top: 60px;
+  }
 }
 
 
