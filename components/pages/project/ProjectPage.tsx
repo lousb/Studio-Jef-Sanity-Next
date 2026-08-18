@@ -357,7 +357,7 @@ function ProjectPageInner({
               </div>
             )}
 
-            <div ref={titleHeadingRef} className='text-list title-heading'>
+            <div ref={titleHeadingRef} className={`${styles.titleHeading} text-list title-heading`}>
               {customIndex !== undefined && customIndex !== null && (
                 <Reveal element="div" elementClass="opacity-60">
                   {String(customIndex).padStart(3, '0')}
