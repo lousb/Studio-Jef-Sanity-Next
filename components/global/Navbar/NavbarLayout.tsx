@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Link } from 'next-view-transitions'
@@ -32,11 +33,17 @@ export default function Navbar(props: NavbarProps) {
   const [isVisible, setIsVisible] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrollReady, setIsScrollReady] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const lenis = useLenis()
 
   const [logoWidth, setLogoWidth] = useState('685px')
 
   const overviewRef = useRef<HTMLHeadingElement | null>(null)
+
+  // needed so createPortal only runs client-side (document isn't available during SSR)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // publish the overview block's height as a global CSS var, kept in sync on resize/content change
   useEffect(() => {
@@ -120,68 +127,86 @@ export default function Navbar(props: NavbarProps) {
   }, [lenis, isScrollReady])
 
   return (
-    <div
-      className={`header top-layer w-full pointer-events-none transition-transform duration-300
-        grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)]
-        gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)]
-        px-[var(--grid-margin-mobile)] md:px-[var(--grid-margin-desktop)]
-        py-4 items-start
-        ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
-    >
-      <div className="flex absolute top-[10px] left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
-        <button
-          type="button"
-          onClick={() => setIsMenuOpen((prev) => !prev)}
-          className="md:hidden text-1xl hover:text-secondary"
-          aria-expanded={isMenuOpen}
-        >
-          Menu
-        </button>
+    <>
+      {/* Mobile menu overlay — portaled to <body> so it sits outside the
+          fixed/transformed header and can actually blur the page content
+          behind it (backdrop-filter only sees layers within the same
+          containing/stacking context). */}
+      {mounted &&
+        isMenuOpen &&
+        createPortal(
+          <div
+            className="mobile-menu-overlay fixed inset-0 md:hidden"
+            onClick={() => setIsMenuOpen(false)}
+            aria-hidden="true"
+          />,
+          document.body
+        )}
 
-        <div
-          className={`
-            ${isMenuOpen ? 'flex' : 'hidden'}
-            md:flex
-            flex-col items-center text-center gap-2 mt-3
-            md:flex-col md:items-start md:text-left md:gap-0 md:mt-0 text-list
-          `}
-        >
-          <Link href="/" className="h-full text-1xl hover:text-secondary md:text-1xl">
-            Home
-          </Link>
-          {isProjectsPage ? (
-            <span className="text-gray-400 cursor-default">Projects</span>
-          ) : (
-            <Link href="/projects" className="h-full text-1xl hover:text-secondary md:text-1xl">
-              Projects
-            </Link>
-          )}
+      <div
+        className={`header top-layer w-full pointer-events-none transition-transform duration-300
+          grid grid-cols-[repeat(var(--grid-columns-mobile),1fr)] md:grid-cols-[repeat(var(--grid-columns-desktop),1fr)]
+          gap-x-[var(--grid-gutter-mobile)] md:gap-x-[var(--grid-gutter-desktop)]
+          px-[var(--grid-margin-mobile)] md:px-[var(--grid-margin-desktop)]
+          py-4 items-start
+          ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
+      >
 
-          {isAboutPage ? (
-            <span className="text-gray-400 cursor-default">Studio</span>
-          ) : (
-            <Link href="/about" className="h-full text-1xl hover:text-secondary md:text-1xl">
-              Studio
+        <div className="flex absolute top-[10px] left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className="md:hidden text-1xl hover:text-secondary"
+            aria-expanded={isMenuOpen}
+          >
+            Menu
+          </button>
+
+          <div
+            className={`
+              ${isMenuOpen ? 'flex' : 'hidden'}
+              md:flex
+              flex-col items-center text-center gap-2 mt-3
+              md:flex-col md:items-start md:text-left md:gap-0 md:mt-0 text-list main-menu
+            `}
+          >
+            <Link href="/" className="h-full cursor-pointer text-1xl hover:text-secondary md:text-1xl">
+              Home
             </Link>
-          )}
+            {isProjectsPage ? (
+              <span className="text-gray-400 cursor-default">Projects</span>
+            ) : (
+              <Link href="/projects" className="cursor-pointer h-full text-1xl hover:text-secondary md:text-1xl">
+                Projects
+              </Link>
+            )}
+
+            {isAboutPage ? (
+              <span className="text-gray-400 cursor-default">Studio</span>
+            ) : (
+              <Link href="/about" className="cursor-pointer h-full text-1xl hover:text-secondary md:text-1xl">
+                Studio
+              </Link>
+            )}
+          </div>
         </div>
+
+        {data?.overview?.text && (
+          <h2 ref={overviewRef} className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
+            <PortableText value={data.overview.text} />
+          </h2>
+        )}
+
+        {customLogo ? (
+          <Image
+            src={logoImageUrl}
+            alt="Logo"
+            width={685}
+            height={274}
+            className="fixed-logo h-auto"
+          />
+        ) : null}
       </div>
-
-      {data?.overview?.text && (
-        <h2 ref={overviewRef} className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
-          <PortableText value={data.overview.text} />
-        </h2>
-      )}
-
-      {customLogo ? (
-        <Image
-          src={logoImageUrl}
-          alt="Logo"
-          width={685}
-          height={274}
-          className="fixed-logo h-auto"
-        />
-      ) : null}
-    </div>
+    </>
   )
 }

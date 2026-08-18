@@ -83,7 +83,7 @@ function ProjectPageInner({
 
   const prevProject = projects[currentProjectIndex - 1] || null
   const nextProject = projects[currentProjectIndex + 1] || null
-const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
+  const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
 
   const figures = getFigures(content)
 
@@ -283,7 +283,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
   data-mobile-open={isMobileDetailsOpen ? 'true' : 'false'}
 >          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
             {overview && (
-              <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details`}>
+              <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}` }>
                 <div className="w-full">
                   <Reveal>
                     <CustomPortableText value={overview} />
@@ -312,7 +312,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
               </div>
             )}
 
-            <div ref={titleHeadingRef} className='text-list'>
+            <div ref={titleHeadingRef} className='text-list title-heading'>
               {customIndex !== undefined && customIndex !== null && (
                 <Reveal element="div" elementClass="opacity-60">
                   {String(customIndex).padStart(3, '0')}
@@ -326,7 +326,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
             </div>
 
             {/* Project meta: title, status, size, type, year, location, architect */}
-            <div className={`project-page-meta `} style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+            <div className={`project-page-meta ${styles.projectPageMeta}`} style={{ marginTop: '1rem', marginBottom: '1rem' }}>
               {client?.map((client, i) => (
                 <span key={i}>
                   {client.title}
@@ -350,9 +350,12 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 
               </div>
 
-              <div className='text-list'>
+              <div className='text-list project-year'>
                 <Reveal>
+                  <span className='project-year-title'>
                   Year
+                  </span>
+                  
                 {year && <div>{year}</div>}
                 </Reveal>
                 
@@ -365,8 +368,12 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
                 </Reveal>
               </div>
 
-              <div className='text-list'>
-                <Reveal>Type</Reveal>
+              <div className='text-list project-type'>
+                <Reveal>
+                  <span className='project-type-title'>
+                    Type
+                  </span>
+                  </Reveal>
                 {projectType?.length ? (
                   <div>
                     {projectType.map((t, i) => (
@@ -403,7 +410,7 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
 
           {/* Figure list: every image caption, prefixed Fig 1, Fig 2, etc */}
           {figures.length > 0 && (
-            <div className="project-page-figures mt-4 text-list">
+            <div className={`project-page-figures mt-4 text-list ${styles.projectPageFigures}`}>
               {figures.map((fig, i) => {
                 return (
                   <div
@@ -431,13 +438,30 @@ const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
         </button>
       </div>
 
+      {/* Fullscreen black overlay, shown while the mobile details panel is open */}
+      {isMobileDetailsOpen && (
+        <div
+        className='project-page-overlay'
+          onClick={() => setIsMobileDetailsOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            width: '100vw',
+            height: '100vh',
+           
+            zIndex: 40,
+          }}
+        />
+      )}
+
       <button
-  type="button"
-  onClick={() => setIsMobileDetailsOpen((v) => !v)}
-  className={styles.mobileInfoToggle}
->
-  Information
-</button>
+        type="button"
+        onClick={() => setIsMobileDetailsOpen((v) => !v)}
+        className={`${styles.mobileInfoToggle} mobile-info-toggle`}
+        
+      >
+        {isMobileDetailsOpen ? 'Close' : 'Information'}
+      </button>
     </div>
   )
 }

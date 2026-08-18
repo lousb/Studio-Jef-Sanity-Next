@@ -27,6 +27,7 @@
 
 .mobileInfoToggle {
   display: none;
+  z-index: 9999;
 }
 
 @media (max-width: 767px) {
@@ -36,16 +37,22 @@
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 50;
+    z-index: 9999;
     background: none;
     border: none;
     padding: 0;
     font: inherit;
     cursor: pointer;
   }
-
-  .detailsPanel[data-mobile-open='false'] {
+  .projectPageFigures {
     display: none;
+  }
+
+  .detailsPanel[data-mobile-open='false'] .projectPageMeta, .detailsPanel[data-mobile-open='false'] .projectPageDesc {
+    display: none !important;
+  }
+  .projectPageDetails{
+    width: calc(100% - 40px) !important;
   }
 }
 
@@ -85,7 +92,7 @@
   bottom: 10px;
   left: 10px;
   cursor: pointer;
-  z-index: 9999;
+  z-index: 9900;
   mix-blend-mode: difference;
   color: white
 }
@@ -139,7 +146,7 @@
   transition: none !important;
 }
 
-@media only screen and (max-width: 908px) {
+@media only screen and (max-width: 767px) {
   .projectPage {
     width: 100% !important;
     margin-top: 0 !important;
@@ -172,3 +179,4 @@
 }
 
 }
+

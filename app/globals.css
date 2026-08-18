@@ -537,7 +537,12 @@ html:has( .header) #initial-loader{
     width: 88vw !important;
   }
   .main-desc{
-    display: none !important;
+    display:none !important;
+  }
+  body:has(.mobile-menu-overlay) .main-desc{
+    display: block !important;
+    bottom:20px !important;
+    position: fixed !important;
   }
 }
 
@@ -581,6 +586,70 @@ html.resizing * {
   .project-page-figures{
     left:20px !important;
   }
+
+  .mobile-menu-overlay, .project-page-overlay{
+    background-color: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+
+
+  }
+  body:has(.mobile-menu-overlay) .fixed-logo{
+    opacity: 100% !important;
+  }
+  body:has(.mobile-menu-overlay) .project-page-overlay{
+    opacity: 0;
+  }
+  body:has(.mobile-menu-overlay)   .title-heading{
+    opacity: 0;
+  }
+  body:has(.project-page-overlay) .fixed-logo{
+    opacity: 1;
+  }
+  .project-page-details{
+    margin-bottom: 20px;
+  }
+  body:has(.project-page-overlay) .title-heading{
+    left: 20px;
+    transform: translateX(0);
+  }
+  .project-page-meta *{
+    opacity: 0;
+    pointer-events: none;
+    display:none;
+  }
+  .project-type-title, .project-year-title{
+    display: none !important;
+  }
+  .project-type, .project-year, .project-type *, .project-year *{
+    opacity: 1;
+    pointer-events: all;
+    display: block;
+  }
+  .project-page-details{
+    mix-blend-mode: difference;
+  }
+  .project-page-details *{
+    color: white !important;
+  }
+  .project-type{
+    position: fixed;
+    top:40px;
+    left: calc(50% + 5px);
+
+  }
+  .project-year{
+    position: fixed;
+    top:40px;
+    right: 20px;
+
+  }
+  body:has(.project-page-overlay) .title-heading > div{
+    min-width: calc(10vw + 10px);
+  }
+  body:has(.mobile-menu-overlay) .project-page-title-info, body:has(.mobile-menu-overlay) .mobile-info-toggle{
+    display:none;
+  }
 }
 
 
@@ -590,4 +659,10 @@ html.resizing * {
 
 .grid:hover > .project-item-animate{
   opacity: 30% !important;
+}
+.main-menu .cursor-pointer{
+  cursor: pointer !important;
+}
+.mobile-menu-overlay{
+  z-index: 99;
 }

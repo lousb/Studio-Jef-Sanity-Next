@@ -315,7 +315,7 @@ export function AllProjectsPage({
             // Desktop: unchanged vertical grid with hover-driven preview
             <div
               ref={gridRef}
-              className="grid  items-center"
+              className="grid"
             >
               {filteredProjects.map((project, key) => {
                 const href = resolveHref(project._type, project.slug);

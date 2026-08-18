@@ -150,6 +150,15 @@ body:has(.scroll-visible) .about-link{
 
 
 @media only screen and (max-width: 768px) {
+  .title-heading{
+    position: fixed;
+    top: 40px;
+    left:50%;
+    transform: translateX(calc(-50% + 10px));
+    display: flex;
+
+
+  }
   .loading-image-mask{
     display: flex;
     justify-content: center;
