@@ -134,10 +134,14 @@ html {
   z-index: 999;
 }
 
-::view-transition-new(root) {
+/* ::view-transition-new(root) {
   animation: fade-in 0.6s linear;
   cursor: wait !important;
 }
+::view-transition-old(root) {
+  animation: fade-out 0.6s linear;
+  cursor: wait !important;
+} */
 .hybrid-media{
   position:relative;
   transform:translateX(0px);
@@ -180,9 +184,15 @@ body, .project-page-media {
   margin-inline: 10px !important;
   padding-block: 10px;
 }
+.home-featured-media > div{
+  margin-top: 0px !important;
+  margin-bottom:10px !important;
+}
+.project-page-media > div > div{
+  margin-bottom: 10px;
+}
 
 
-/* 
 @keyframes fade-out {
   from {
     opacity: 1;
@@ -201,18 +211,6 @@ body, .project-page-media {
   }
 }
 
-@keyframes opacity-in {
-  from {
-    background: black;
-    pointer-events: all !important;
-    opacity: 0;
-  }
-  to {
-    background: black;
-    pointer-events: all !important;
-    opacity: 0.5;
-  }
-} */
 
 /* .mask-out-page-transition{
     view-transition-name: mask-out-page-transition;

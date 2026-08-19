@@ -14,6 +14,8 @@ import { useLenis } from "./LenisProvider";
 
 const SETTLE_MS = 120;
 const HEIGHT_TOLERANCE_PX = 0.5;
+const ITEM_GAP_PX = 10; // structural gap between clones — keep in sync with marginBottom below
+const START_OFFSET_PX = 0; // manual fine-tune knob — nudge until scroll lands exactly at visual top
 
 function getViewportHeight() {
   return window.visualViewport?.height ?? window.innerHeight;
@@ -27,6 +29,7 @@ function computeCopiesPerSide(itemHeight: number, viewportHeight: number) {
 export interface InfiniteLoopHandle {
   suspend: () => void;
   resume: () => void;
+  scrollToStart: () => boolean;
 }
 
 export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
@@ -126,7 +129,7 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
             lenis.resize();
-            lenis.scrollTo(needed * h, { immediate: true, force: true });
+            lenis.scrollTo(needed * (h + ITEM_GAP_PX) + START_OFFSET_PX, { immediate: true, force: true });
             lastHeightRef.current = h;
             readyRef.current = true;
             setReady(true);
@@ -178,7 +181,24 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
       });
     }, [lenis, updateContainerTop]);
 
-    useImperativeHandle(ref, () => ({ suspend, resume }), [suspend, resume]);
+    // Returns true once it actually moved scroll to the real start position;
+    // false if InfiniteLoop isn't ready/measured yet, so callers know to retry.
+    const scrollToStart = useCallback((): boolean => {
+      if (!lenis || !readyRef.current) return false;
+      const h = lastHeightRef.current;
+      if (!h) return false;
+
+      withJumpFlag(() => {
+        lenis.scrollTo(copiesPerSide * (h + ITEM_GAP_PX) + START_OFFSET_PX, { immediate: true, force: true });
+      });
+      return true;
+    }, [lenis, copiesPerSide, withJumpFlag]);
+
+    useImperativeHandle(
+      ref,
+      () => ({ suspend, resume, scrollToStart }),
+      [suspend, resume, scrollToStart]
+    );
 
     useLayoutEffect(() => {
       const container = containerRef.current;
@@ -228,9 +248,12 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
     //
     // This watches Lenis's scroll position and, once you get within one
     // viewport of either end, silently jumps forward/back by an exact
-    // multiple of the item height. Because every copy is identical content,
-    // a jump of copiesPerSide * itemHeight lands on pixel-identical content,
-    // so the jump is visually undetectable.
+    // multiple of the item spacing (item height + gap). Because every copy
+    // is identical content, a jump of copiesPerSide * (itemHeight + gap)
+    // lands on pixel-identical content, so the jump is visually undetectable.
+    // NOTE: intentionally does NOT use START_OFFSET_PX — that offset only
+    // applies to the initial/reset position, adding it here would break the
+    // exact-multiple math and cause a visible snap on wrap.
     useEffect(() => {
       if (!lenis || !ready) return;
 
@@ -241,11 +264,11 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
         if (!h) return;
 
         const vh = getViewportHeight();
-        const totalH = h * (copiesPerSide * 2 + 1);
+        const totalH = (h + ITEM_GAP_PX) * (copiesPerSide * 2 + 1) - ITEM_GAP_PX;
         const maxLocal = totalH - vh;
         const localScroll = lenis.scroll - containerTopRef.current;
 
-        const jumpDistance = copiesPerSide * h; // multiple of item height = seamless
+        const jumpDistance = copiesPerSide * (h + ITEM_GAP_PX); // multiple of item spacing = seamless
         const threshold = Math.max(vh, h); // trigger a full viewport early
 
         if (localScroll < threshold) {
@@ -315,7 +338,7 @@ export const InfiniteLoop = forwardRef<InfiniteLoopHandle, PropsWithChildren>(
           }
           const style = i === lastIndex ? wrapSeamStyle : naturalStyle;
           return (
-            <div aria-hidden="true" key={i} style={{ ...style, marginBottom: '10px' }}>
+            <div aria-hidden="true" key={i} style={{ ...style, marginBottom: `${ITEM_GAP_PX}px` }}>
               {children}
             </div>
           );

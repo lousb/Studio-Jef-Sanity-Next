@@ -127,11 +127,9 @@ function ProjectPageInner({
 
     const forceTop = () => {
       if (cancelled) return
-      if (lenis) {
-        lenis.resize()
-        lenis.scrollTo(-80, { immediate: true, force: true })
-      } else {
-        window.scrollTo(-80, 0)
+      const succeeded = infiniteLoopRef.current?.scrollToStart()
+      if (!succeeded) {
+        requestAnimationFrame(forceTop) // InfiniteLoop not ready yet — try again next frame
       }
     }
 
