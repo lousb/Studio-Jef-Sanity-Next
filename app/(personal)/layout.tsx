@@ -8,7 +8,7 @@ import { Suspense } from 'react'
 
 import { Footer } from '@/components/global/Footer'
 import { Navbar } from '@/components/global/Navbar'
-import { urlForImage, urlForOpenGraphImage } from '@/sanity/lib/utils'
+import { urlForOpenGraphImage } from '@/sanity/lib/utils'
 import { loadHomePage, loadSettings } from '@/sanity/loader/loadQuery'
 
 const LiveVisualEditing = dynamic(
@@ -22,16 +22,10 @@ export async function generateMetadata(): Promise<Metadata> {
   ])
 
   const ogImage = urlForOpenGraphImage(settings?.ogImage)
-  const favIcon = urlForImage(settings?.favIcon)
-    ?.height(512)
-    .width(512)
-    .fit('crop')
-    .url()
-  const appleIcon = urlForImage(settings?.favIcon)
-    ?.height(180)
-    .width(180)
-    .fit('crop')
-    .url()
+
+  // Favicon / apple-touch-icon come from app/icon.tsx + app/apple-icon.tsx
+  // (a flat #F47723 circle) via Next's file-convention metadata — nothing
+  // to wire up here.
   return {
     title: homePage?.title
       ? {
@@ -45,21 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: ogImage ? [ogImage] : [],
     },
-    icons: {
-      icon: favIcon ? [favIcon] : [],
-      apple: appleIcon ? [appleIcon] : [],
-    },
   }
 }
 
-export async function viewport(): Promise<Viewport> {
-  const [{ data: settings }] = await Promise.all([loadSettings()])
-  const rgbaBgColor = `${settings?.bgColor?.r || 255}, ${settings?.bgColor?.g || 255}, ${settings?.bgColor?.b || 255}`
-
-  return {
-    themeColor: `rgb(` + rgbaBgColor + `)`,
-  }
-}
 
 export default async function IndexRoute({
   children,
@@ -71,8 +53,6 @@ export default async function IndexRoute({
     loadHomePage(),
   ])
 
-  const showcaseProjects = homePage?.showcaseProjects || []
-  const projectCount = showcaseProjects.length
 
   
 

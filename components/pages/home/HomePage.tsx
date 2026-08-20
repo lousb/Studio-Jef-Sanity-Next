@@ -8,7 +8,7 @@ import { Header } from '@/components/shared/Header'
 import type { HomePagePayload } from '@/types'
 import RevealDiv from '@/components/global/revealDiv'
 import ImageBox from '@/components/shared/ImageBox'
-import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth'
+import { colsToWidth, colsToWidthMobile, COLUMN_NUM_MAP, MOBILE_COLUMN_NUM_MAP } from '@/lib/gridWidth'
 import { InfiniteLoop } from '@/components/global/InfiniteLoop'
 import { CursorLabel } from '@/components/global/CursorLabel'
 
@@ -36,13 +36,17 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                 if (!block?.image?.asset) return null
 
                 const cols = block.width ? COLUMN_NUM_MAP[block.width] ?? 24 : 24
+                // Mobile grid is 8 columns, not 24 — map straight from the
+                // width option so items land on 4/6/8.
+                const mobileCols = block.width ? MOBILE_COLUMN_NUM_MAP[block.width] ?? 8 : 8
 
                 // Tell next/image the REAL rendered width so it fetches a
                 // source large enough for this box — without this, ImageBox
                 // falls back to a 33vw assumption and full-width featured
                 // media ends up visibly soft/pixelated.
                 const desktopVw = Math.min(100, Math.round((cols / 24) * 100))
-                const imageSizes = `(min-width: 768px) ${desktopVw}vw, 100vw`
+                const mobileVw = Math.min(100, Math.round((mobileCols / 8) * 100))
+                const imageSizes = `(min-width: 768px) ${desktopVw}vw, ${mobileVw}vw`
 
                 const href = item?.project?.slug?.current
                   ? `/projects/${item.project.slug.current}`
@@ -51,7 +55,12 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                 const mediaContent = (
                   <div
                     className="hybrid-media"
-                    style={{ width: colsToWidth(cols), marginLeft: 0, marginRight: 'auto' }}
+                    style={{
+                      width: colsToWidth(cols),
+                      marginLeft: 0,
+                      marginRight: 'auto',
+                      '--home-mobile-width': colsToWidthMobile(mobileCols),
+                    } as React.CSSProperties}
                     onMouseEnter={() => setHoveredIndex(i)}
                     onMouseLeave={() => setHoveredIndex(null)}
                   >

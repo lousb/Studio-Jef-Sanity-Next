@@ -444,9 +444,7 @@ margin-bottom: -0.3rem;
 .home-page .scale-down a > div {
   scale: 0.8;
 }
-.home-featured-media .hybrid-media{
-  max-width: calc(100vw - 30px) !important;
-}
+
 .header-wrap .flex{
   margin-top:0 !important;
 }
@@ -544,8 +542,19 @@ html:has( .header) #initial-loader{
     display: block;
   }
   
+  
 }
 @media only screen and (max-width: 768px) {
+  .home-featured-media{
+    width: calc(100% - 40px);
+    margin-inline: 20px !important;
+  }
+  .home-featured-media .hybrid-media{
+    width: var(--home-mobile-width) !important;
+    max-width: calc(100vw - 40px) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
   .fixed-logo{
     width: 88vw !important;
   }
@@ -607,17 +616,25 @@ body:has(.all-projects-page) .fixed-logo{
   .project-page-figures{
     left:20px !important;
   }
+  .home-featured-media{
+    width: calc(100% - 40px);
+    margin-inline: 20px !important;
+  }
+  
 
- 
-
-  @media (max-width: 767px) {
-    .mobile-menu-overlay.is-visible,
+   .mobile-menu-overlay.is-visible,
     .project-page-overlay.is-visible {
       background-color: rgba(255, 255, 255, 0.01);
       backdrop-filter: blur(40px);
       -webkit-backdrop-filter: blur(40px);
     }
-  }
+
+    .project-page-media > div > div > div{
+      margin-bottom: 20px !important;
+    }
+
+  
+
   body:has(.mobile-menu-overlay) .fixed-logo{
     opacity: 100% !important;
   }
