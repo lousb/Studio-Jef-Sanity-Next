@@ -154,9 +154,16 @@ body:has(.scroll-visible) .about-link{
     position: fixed;
     top: 40px;
     left:50%;
-    transform: translateX(calc(-50% + 10px));
+    transform: translateX(-50%);
     display: flex;
+    transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) all ;
 
+  }
+  .title-heading > div{
+
+    min-width:0%;
+    max-width:100%;
+    transition: 800ms cubic-bezier(0.69, 0.01, 0.73, 1) all ;
 
   }
   .loading-image-mask{
@@ -215,6 +222,7 @@ body:has(.scroll-visible) .about-link{
   }
   .header > .flex:last-of-type{
     justify-content: end;
+    width: calc(100% - 20px);
   }
   .div-reveal-element > div{
     opacity: 1 !important;

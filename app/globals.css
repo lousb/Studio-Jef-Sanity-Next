@@ -569,6 +569,9 @@ html.resizing * {
 .project-page-overlay {
   transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, background-color 0.4s ease, opacity 0.4s ease;
 }
+body:has(.all-projects-page) .fixed-logo{
+  opacity: 0;
+}
 
 @media (max-width: 767px) {
   .hybrid-media {
@@ -646,11 +649,18 @@ html.resizing * {
   .project-page-details *{
     color: white !important;
   }
+  .hybrid-media{
+    margin-bottom: 20px !important;
+  }
   .project-type{
     position: fixed;
     top:40px;
     left: calc(50% + 5px);
-
+    transition: 500ms opacity ease-in 500ms !important;
+    opacity: 0 !important;
+  }
+  body:has(.project-page-overlay.is-visible)  .project-type{
+    opacity: 1 !important;
   }
   .project-year{
     position: fixed;

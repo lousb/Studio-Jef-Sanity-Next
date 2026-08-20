@@ -108,11 +108,11 @@ function ProjectRow({
       </span>
 
       <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right" style={childStyle}>
-        {project.year || '—'}
+        {project.year || ''}
       </span>
 
       {/* Mobile-only horizontal preview strip, spans the full row width (8-col mobile grid) */}
-      <div className="md:hidden [grid-column:1/9] pb-4 pt-1" style={childStyle}>
+      <div className="md:hidden [grid-column:1/9] pb-4 pt-2" style={childStyle}>
         <MobileImageScroller images={mobilePreviewImages} />
       </div>
     </Link>
