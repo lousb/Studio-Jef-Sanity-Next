@@ -156,6 +156,11 @@ html.is-navigating.is-navigating.is-navigating * {
   cursor: wait !important;
 }
 
+
+html.is-navigating.is-navigating.is-navigating .fixed-logo.fixed-logo.fixed-logo {
+  opacity: 1 !important;
+}
+
 html:has(::view-transition) {
   cursor: wait !important;
 }
@@ -439,7 +444,9 @@ margin-bottom: -0.3rem;
 .home-page .scale-down a > div {
   scale: 0.8;
 }
-
+.home-featured-media .hybrid-media{
+  max-width: calc(100vw - 30px) !important;
+}
 .header-wrap .flex{
   margin-top:0 !important;
 }

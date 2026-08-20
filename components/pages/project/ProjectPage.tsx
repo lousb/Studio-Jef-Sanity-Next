@@ -37,7 +37,7 @@ function MobileDetailsOverlay({ onClick }: { onClick: () => void }) {
 
 interface ProjectPageProps {
   data: ProjectPayload | null
-
+  moreProjects: ProjectPayload[]
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
@@ -125,6 +125,7 @@ function ProjectPageInner({
 
   const titleRef = useRef<HTMLDivElement>(null)
   const titleHeadingRef = useRef<HTMLDivElement>(null)
+  const figuresRef = useRef<HTMLDivElement>(null)
   const infiniteLoopRef = useRef<InfiniteLoopHandle>(null)
   const isToggling = useRef(false)
 
@@ -233,6 +234,23 @@ function ProjectPageInner({
     localStorage.setItem('infoActive', isInfoActive.toString())
   }, [isInfoActive])
 
+  // Figures list: coordinated stagger across the whole list — 0.03s between
+  // items, no per-item fade duration and no upfront delay, so it reads as a
+  // quick cascading step-reveal rather than a slow fade. clearProps hands
+  // opacity back to CSS afterward so the existing hover-dim (opacity-30 /
+  // figureActive) classes keep working once the reveal is done.
+  useEffect(() => {
+    if (!figuresRef.current) return
+    const items = figuresRef.current.querySelectorAll('[data-figure-item]')
+    if (!items.length) return
+
+    gsap.fromTo(
+      items,
+      { opacity: 0 },
+      { opacity: 1, duration: 0, delay: 0, stagger: 0.03, clearProps: 'opacity' }
+    )
+  }, [slug])
+
   // View 1 / View 2 toggle, fully sequenced and scoped to what's on
   // screen, with the width/margin change happening instantly (no CSS
   // transition on HybridMedia) so hidden time is kept to a minimum:
@@ -337,34 +355,29 @@ function ProjectPageInner({
       </div>
 
       <div ref={titleRef} className={`w-full lg:w-2/4 flex ${styles.projectPageTitle} project-page-title flex-col`}>
-<div
-  className={`project-page-details ${styles.projectPageDetails} ${styles.detailsPanel}`}
-  data-mobile-open={isMobileDetailsOpen ? 'true' : 'false'}
->          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
+        <div
+          className={`project-page-details ${styles.projectPageDetails} ${styles.detailsPanel}`}
+          data-mobile-open={isMobileDetailsOpen ? 'true' : 'false'}
+        >
+          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
             {overview && (
-              <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}` }>
+              <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}>
                 <div className="w-full">
                   <Reveal>
                     <CustomPortableText value={overview} />
                   </Reveal>
-                    
-                  
 
                   {site && (
                     <div className="mt-3">
-                      
-                      {site && (
-                        
-                        <Link
-                          target="_blank"
-                          className=" break-words  underline"
-                          href={site.url}
-                        >
-                          <Reveal element={'div'} elementClass={' break-words  underline'}>
-                            {site.urltitle}
-                          </Reveal>
-                        </Link>
-                      )}
+                      <Link
+                        target="_blank"
+                        className=" break-words  underline"
+                        href={site.url}
+                      >
+                        <Reveal element={'div'} elementClass={' break-words  underline'}>
+                          {site.urltitle}
+                        </Reveal>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -393,96 +406,91 @@ function ProjectPageInner({
                 </span>
               ))}
 
-              <div className='text-list'>
-                <Reveal>
-                  Status
-                {status && <div>{STATUS_LABELS[status] ?? status}</div>}
-                </Reveal>
-                
-              </div>
-
-              <div className='text-list'>
-                <Reveal>
-                  Size
-                {size && <div>{size}</div>}
-                </Reveal>
-                
-              </div>
-
-              <div className='text-list project-year'>
-                <Reveal>
-                  <span className='project-year-title'>
-                  Year
-                  </span>
-                  
-                {year && <div>{year}</div>}
-                </Reveal>
-                
-              </div>
-
-              <div className='text-list'>
-                <Reveal>
-                  Location
-                  {location && <div>{location}</div>}
-                </Reveal>
-              </div>
-
-              <div className='text-list project-type'>
-                <Reveal>
-                  <span className='project-type-title'>
-                    Type
-                  </span>
+              {status && (
+                <div className='text-list'>
+                  <Reveal>
+                    Status
+                    <div>{STATUS_LABELS[status] ?? status}</div>
                   </Reveal>
-                {projectType?.length ? (
+                </div>
+              )}
+
+              {size && (
+                <div className='text-list'>
+                  <Reveal>
+                    Size
+                    <div>{size}</div>
+                  </Reveal>
+                </div>
+              )}
+
+              {year && (
+                <div className='text-list project-year'>
+                  <Reveal>
+                    <span className='project-year-title'>Year</span>
+                    <div>{year}</div>
+                  </Reveal>
+                </div>
+              )}
+
+              {location && (
+                <div className='text-list'>
+                  <Reveal>
+                    Location
+                    <div>{location}</div>
+                  </Reveal>
+                </div>
+              )}
+
+              {projectType?.length ? (
+                <div className='text-list project-type'>
+                  <Reveal>
+                    <span className='project-type-title'>Type</span>
+                  </Reveal>
                   <div>
                     {projectType.map((t, i) => (
-                      <Reveal>
-                        <span key={i}>
+                      <Reveal key={i}>
+                        <span>
                           {t.title}
                           {i < projectType.length - 1 ? ', ' : ''}
                         </span>
                       </Reveal>
-                      
                     ))}
                   </div>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
 
-              <div className='text-list'>
-                <Reveal>Architect</Reveal>
-                {architects?.length ? (
+              {architects?.length ? (
+                <div className='text-list'>
+                  <Reveal>Architect</Reveal>
                   <div>
                     {architects.map((a, i) => (
-                      <Reveal>
-                        <span key={i}>
+                      <Reveal key={i}>
+                        <span>
                           {a.title}
                           {i < architects.length - 1 ? ', ' : ''}
                         </span>
                       </Reveal>
-                      
                     ))}
                   </div>
-                ) : null}
-              </div>
+                </div>
+              ) : null}
             </div>
           </div>
 
           {/* Figure list: every image caption, prefixed Fig 1, Fig 2, etc */}
           {figures.length > 0 && (
-            <div className={`project-page-figures mt-4 text-list ${styles.projectPageFigures}`}>
-              {figures.map((fig, i) => {
-                return (
-                  <div
-                    key={i}
-                    className={`${fig.caption === hoveredCaption ? styles.figureActive : 'opacity-30'}`}
-                  >
-                    <Reveal  staggerDelay={0.05}>
-                      Fig. {i + 1} - {fig.caption}
-                    </Reveal>
-                    
-                  </div>
-                )
-              })}
+            <div ref={figuresRef} className={`project-page-figures mt-4 text-list ${styles.projectPageFigures}`}>
+              {figures.map((fig, i) => (
+                <div
+                  key={i}
+                  data-figure-item
+                  className={`${fig.caption === hoveredCaption ? styles.figureActive : 'opacity-30'}`}
+                  style={{ opacity: 0 }}
+                >
+                  Fig. {i + 1} - {fig.caption}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -498,7 +506,6 @@ function ProjectPageInner({
       </div>
 
       {/* Fullscreen black overlay, shown while the mobile details panel is open */}
-
       {isMobileDetailsOpen && (
         <MobileDetailsOverlay onClick={() => setIsMobileDetailsOpen(false)} />
       )}
@@ -507,7 +514,6 @@ function ProjectPageInner({
         type="button"
         onClick={() => setIsMobileDetailsOpen((v) => !v)}
         className={`${styles.mobileInfoToggle} mobile-info-toggle`}
-        
       >
         {isMobileDetailsOpen ? 'Close' : 'Information'}
       </button>

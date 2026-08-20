@@ -12,6 +12,14 @@ const HybridMedia = ({ data, isInfoActive }) => {
   const cols = COLUMN_NUM_MAP[width] ?? 24;
   const mobileCols = Math.max(1, Math.round(cols / 3)); // 12→4, 18→6, 24→8
 
+  // Tell next/image the REAL rendered width so it fetches a source large
+  // enough for this box — without this, ImageBox falls back to a 33vw
+  // assumption and full-width blocks end up visibly soft/pixelated.
+  const effectiveCols = isInfoActive ? 6 : cols;
+  const desktopVw = Math.min(100, Math.round((effectiveCols / 24) * 100));
+  const mobileVw = Math.min(100, Math.round((mobileCols / 8) * 100));
+  const imageSizes = `(min-width: 768px) ${desktopVw}vw, ${mobileVw}vw`;
+
   const wrapperStyle = isInfoActive
   ? {
       width: colsToWidth(6),
@@ -43,6 +51,7 @@ const HybridMedia = ({ data, isInfoActive }) => {
         }}
         alt={title || caption || 'Project image'}
         caption={caption}
+        size={imageSizes}
       />
       {title && (
         <div className="hybrid-media-title text-sm opacity-60 mt-2">
@@ -53,4 +62,4 @@ const HybridMedia = ({ data, isInfoActive }) => {
   );
 };
 
-export default HybridMedia;
+export default HybridMedia;0

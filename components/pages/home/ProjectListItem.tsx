@@ -277,6 +277,7 @@ else {
             image={project.coverImage.media}
             alt={`Cover image from ${project.title}`}
             classesWrapper="relative"
+            size="100vw"
           />
           </div>
        

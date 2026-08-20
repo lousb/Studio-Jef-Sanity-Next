@@ -37,6 +37,13 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
 
                 const cols = block.width ? COLUMN_NUM_MAP[block.width] ?? 24 : 24
 
+                // Tell next/image the REAL rendered width so it fetches a
+                // source large enough for this box — without this, ImageBox
+                // falls back to a 33vw assumption and full-width featured
+                // media ends up visibly soft/pixelated.
+                const desktopVw = Math.min(100, Math.round((cols / 24) * 100))
+                const imageSizes = `(min-width: 768px) ${desktopVw}vw, 100vw`
+
                 const href = item?.project?.slug?.current
                   ? `/projects/${item.project.slug.current}`
                   : null
@@ -55,6 +62,7 @@ export function HomePage({ data, encodeDataAttribute }: HomePageProps) {
                       }}
                       alt={block.title || block.caption || 'Featured project image'}
                       caption={block.caption}
+                      size={imageSizes}
                     />
                     {block.title && (
                       <div className="hybrid-media-title text-sm opacity-60 mt-2">

@@ -97,14 +97,14 @@ function ProjectRow({
       </span>
 
       <span className="hidden min-[768px]:inline text-body-01 min-[768px]:[grid-column:7/9]" style={childStyle}>
-        {project.projectType?.map((t) => t.title).join(', ') || '—'}
+        {project.projectType?.map((t) => t.title).join(', ') || ''}
       </span>
 
       <span
         className="hidden min-[768px]:inline text-body-01 capitalize min-[768px]:[grid-column:19/21]"
         style={childStyle}
       >
-        {project.status?.replace('-', ' ') || '—'}
+        {project.status?.replace('', ' ') || ''}
       </span>
 
       <span className="text-body-01 [grid-column:8/9] min-[768px]:[grid-column:23/25] text-right" style={childStyle}>
