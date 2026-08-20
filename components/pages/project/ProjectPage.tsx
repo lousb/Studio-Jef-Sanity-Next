@@ -282,10 +282,10 @@ function ProjectPageInner({
 
     gsap.to(blocks, {
       opacity: 0,
-      duration: 0.4,
+      duration: 0.6,
       ease: 'power1.in',
       stagger: {
-        each: 0.05,
+        each: 0.1,
         from: 'random',
       },
       onComplete: () => {
@@ -296,14 +296,21 @@ function ProjectPageInner({
           requestAnimationFrame(() => {
             infiniteLoopRef.current?.resume()
 
-            gsap.to(blocks, {
+            // Re-query instead of reusing `blocks`: suspend()/resume() on
+            // InfiniteLoop can clone/regenerate the block nodes, so the
+            // references captured before the toggle may now be detached
+            // from the document — animating them would be a silent no-op.
+            const freshBlocks = getVisibleBlocks(
+              Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
+            )
+            gsap.killTweensOf(freshBlocks)
+            gsap.set(freshBlocks, { opacity: 0 })
+
+            gsap.to(freshBlocks, {
               opacity: 1,
               duration: 0.8,
               ease: 'power2.out',
-              stagger: {
-                each: 0.2,
-                from: 'random',
-              },
+              stagger: { each: 0.2, from: 'random' },
               onComplete: () => {
                 isToggling.current = false
               },
