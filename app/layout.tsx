@@ -6,6 +6,7 @@ import { Suspense } from 'react'
 import LoadingOverlay from '@/components/shared/LoadingOverlay'
 import { urlForImage } from '@/sanity/lib/utils'
 import GridOverlay from '@/components/global/GridOverlay'
+import NavigationCursor from '@/components/global/NavigationCursor'
 import { InfiniteLoop } from '@/components/global/InfiniteLoop'
 
 export default async function RootLayout({
@@ -89,6 +90,7 @@ export default async function RootLayout({
           {/* 🟢 React-based loader takes over - now with dynamic image */}
           <LoadingOverlay imageUrl={loadingImageUrl} />
           <GridOverlay />
+          <NavigationCursor />
           <Suspense fallback={null}>
 
             <LenisProvider>

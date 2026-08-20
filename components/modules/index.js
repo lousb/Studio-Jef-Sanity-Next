@@ -9,12 +9,12 @@ const TwoVideos = dynamic(() => import('./two-videos'))
 const HybridMedia = dynamic(() => import('./hybrid-media'))
 const TwoHybridMedia = dynamic(() => import('./two-hybrid-media'))
 
-export const Module = ({ content, isInfoActive }) => {
+export const Module = ({ content, isInfoActive, isHero }) => {
   const type = content._type
 
   switch (type) {
     case 'singleImage':
-      return <SingleImage data={content} />
+      return <SingleImage data={content} isHero={isHero} />
     case 'twoImages':
       return <TwoImages data={content} />
     case 'textBlock':
@@ -26,7 +26,7 @@ export const Module = ({ content, isInfoActive }) => {
     case 'twoVideos':
       return <TwoVideos data={content} />
     case 'hybridMedia':
-      return <HybridMedia data={content} isInfoActive={isInfoActive} />
+      return <HybridMedia data={content} isInfoActive={isInfoActive} isHero={isHero} />
     case 'twoHybridMedia':
       return <TwoHybridMedia data={content} isInfoActive={isInfoActive} />
     default:

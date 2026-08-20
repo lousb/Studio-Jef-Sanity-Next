@@ -67,10 +67,10 @@ export function ProjectHoverPreview({ images, active }: ProjectHoverPreviewProps
       gsap.fromTo(
         items,
         { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.4, stagger: 0.12, ease: 'power3.out', overwrite: true }
+        { opacity: 1, y: 0, duration: 0, stagger: 0, ease: 'power3.out', overwrite: true }
       );
     } else {
-      gsap.to(items, { opacity: 0, y: 12, duration: 0.25, ease: 'power3.in', stagger: 0.05, overwrite: true });
+      gsap.to(items, { opacity: 0, duration: 0, ease: 'power3.in', stagger: 0, overwrite: true });
     }
   }, [active, images]);
 

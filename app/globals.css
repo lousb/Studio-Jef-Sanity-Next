@@ -151,6 +151,14 @@ html {
 html:has(::view-transition) {
   cursor: wait !important;
 }
+html.is-navigating,
+html.is-navigating.is-navigating.is-navigating * {
+  cursor: wait !important;
+}
+
+html:has(::view-transition) {
+  cursor: wait !important;
+}
 
 .project-page-meta{
   display: flex;
@@ -557,6 +565,11 @@ html.resizing * {
   pointer-events: all;
 }
 
+.mobile-menu-overlay,
+.project-page-overlay {
+  transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, background-color 0.4s ease, opacity 0.4s ease;
+}
+
 @media (max-width: 767px) {
   .hybrid-media {
     --hm-mobile-col-w: calc(
@@ -585,12 +598,15 @@ html.resizing * {
     left:20px !important;
   }
 
-  .mobile-menu-overlay, .project-page-overlay{
-    background-color: rgba(255, 255, 255, 0.01);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+ 
 
-
+  @media (max-width: 767px) {
+    .mobile-menu-overlay.is-visible,
+    .project-page-overlay.is-visible {
+      background-color: rgba(255, 255, 255, 0.01);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+    }
   }
   body:has(.mobile-menu-overlay) .fixed-logo{
     opacity: 100% !important;

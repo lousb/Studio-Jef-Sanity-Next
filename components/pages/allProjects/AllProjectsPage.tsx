@@ -131,6 +131,7 @@ export function AllProjectsPage({
   const isMobile = useIsMobile();
 
   const [columns, setColumns] = useState<'1' | '2' | '4'>(() => {
+    if (typeof window === 'undefined') return '1'; // SSR has no localStorage — this initializer runs during server render too
     const saved = localStorage.getItem(COLUMN_STORAGE_KEY);
     return saved === '1' || saved === '2' || saved === '4' ? saved : '1';
   });
@@ -164,9 +165,8 @@ export function AllProjectsPage({
         { opacity: 0 },
         {
           opacity: 1,
-          duration: 0.0000001,
-          stagger: 0.08,
-          ease: 'power2.out',
+          duration: 0,
+          stagger: 0.0,
           clearProps: 'all',
         }
       );

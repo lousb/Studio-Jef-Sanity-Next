@@ -19,6 +19,23 @@ interface NavbarProps {
   projectCount?: number
 }
 
+function MobileMenuOverlay({ onClick }: { onClick: () => void }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  return (
+    <div
+      className={`mobile-menu-overlay fixed inset-0 md:hidden${visible ? ' is-visible' : ''}`}
+      onClick={onClick}
+      aria-hidden="true"
+    />
+  )
+}
+
 export default function Navbar(props: NavbarProps) {
   const { data, projectCount } = props
   const title = props.title ?? ''
@@ -126,6 +143,8 @@ export default function Navbar(props: NavbarProps) {
     }
   }, [lenis, isScrollReady])
 
+  
+
   return (
     <>
       {/* Mobile menu overlay — portaled to <body> so it sits outside the
@@ -133,15 +152,11 @@ export default function Navbar(props: NavbarProps) {
           behind it (backdrop-filter only sees layers within the same
           containing/stacking context). */}
       {mounted &&
-        isMenuOpen &&
-        createPortal(
-          <div
-            className="mobile-menu-overlay fixed inset-0 md:hidden"
-            onClick={() => setIsMenuOpen(false)}
-            aria-hidden="true"
-          />,
-          document.body
-        )}
+      isMenuOpen &&
+      createPortal(
+        <MobileMenuOverlay onClick={() => setIsMenuOpen(false)} />,
+        document.body
+      )}
 
       <div
         className={`header top-layer w-full pointer-events-none transition-transform duration-300
@@ -169,6 +184,7 @@ export default function Navbar(props: NavbarProps) {
               flex-col items-center text-center gap-2 mt-3
               md:flex-col md:items-start md:text-left md:gap-0 md:mt-0 text-list main-menu
             `}
+            
           >
             <Link href="/" className="h-full cursor-pointer text-1xl hover:text-secondary md:text-1xl">
               Home

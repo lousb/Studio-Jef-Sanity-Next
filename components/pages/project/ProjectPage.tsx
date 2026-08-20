@@ -17,9 +17,27 @@ import { FigureHoverProvider, useFigureHover } from './FigureHoverContext'
 import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
 import { useLenis } from '@/components/global/LenisProvider'
 
+function MobileDetailsOverlay({ onClick }: { onClick: () => void }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  return (
+    <div
+      className={`project-page-overlay${visible ? ' is-visible' : ''}`}
+      onClick={onClick}
+      style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', zIndex: 40 }}
+      aria-hidden="true"
+    />
+  )
+}
+
 interface ProjectPageProps {
   data: ProjectPayload | null
-  moreProjects: ProjectPayload[]
+
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
@@ -311,10 +329,8 @@ function ProjectPageInner({
       <div className={` space-y-6 project-page-media ${styles.projectPage}`}>
         <div className='relative z-10 bg-white'>
           <InfiniteLoop ref={infiniteLoopRef}>
-            {content?.map((content, key) => (
-
-                <Module content={content} isInfoActive={isInfoActive} />
-
+            {content?.map((block, i) => (
+              <Module isHero={false} key={block._key ?? i} content={block} isInfoActive={isInfoActive} />
             ))}
           </InfiniteLoop>
         </div>
@@ -482,19 +498,9 @@ function ProjectPageInner({
       </div>
 
       {/* Fullscreen black overlay, shown while the mobile details panel is open */}
+
       {isMobileDetailsOpen && (
-        <div
-        className='project-page-overlay'
-          onClick={() => setIsMobileDetailsOpen(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            width: '100vw',
-            height: '100vh',
-           
-            zIndex: 40,
-          }}
-        />
+        <MobileDetailsOverlay onClick={() => setIsMobileDetailsOpen(false)} />
       )}
 
       <button

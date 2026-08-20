@@ -40,8 +40,10 @@ export function generateStaticParams() {
 }
 
 export default async function ProjectSlugRoute({ params }: Props) {
-  const initial = await loadProject(params.slug)
-  const moreProjects = await loadMoreProjects()
+  const [initial, moreProjects] = await Promise.all([
+    loadProject(params.slug),
+    loadMoreProjects(),
+  ])
 
   if (!initial || !initial.data) {
     console.error('Project not found:', params.slug) // Debugging
@@ -52,5 +54,5 @@ export default async function ProjectSlugRoute({ params }: Props) {
     return <ProjectPreview params={params} initial={initial} />
   }
 
-  return <ProjectPage data={initial.data} moreProjects={moreProjects.data} />
+  return <ProjectPage data={initial.data}  />
 }

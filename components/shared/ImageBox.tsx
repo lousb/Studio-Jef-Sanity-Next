@@ -37,9 +37,71 @@ interface ImageBoxProps {
 }
 
 // Neutral placeholder paint — only shows if this particular asset has no
-// palette yet (e.g. metadata genuinely still processing). Real projects
-// almost always have palette.dominant.background from Sanity instantly.
-const FALLBACK_COLOR = '#e7e5e2'
+// palette yet (e.g. metadata genuinely still processing). Dark enough on
+// its own to never read as a blank/white flash.
+const FALLBACK_COLOR = '#3f3d38'
+
+// Sanity's palette.dominant.background can legitimately be very pale (a
+// bright sky, a white studio backdrop) — fine as the actual photo, but as
+// a solid loading-state fill it reads as "blank" rather than "loading".
+// Clamp its lightness so the paint is always visibly a colour.
+const MAX_LIGHTNESS = 55 // 0–100, HSL lightness ceiling
+
+function clampLightness(hex?: string, maxLightness = MAX_LIGHTNESS): string | undefined {
+  if (!hex) return hex
+  const match = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!match) return hex
+
+  const r = parseInt(match[1], 16) / 255
+  const g = parseInt(match[2], 16) / 255
+  const b = parseInt(match[3], 16) / 255
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const l = (max + min) / 2
+
+  if (l * 100 <= maxLightness) return hex // already dark enough, leave it untouched
+
+  let h = 0
+  let s = 0
+  const d = max - min
+  if (d !== 0) {
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break
+      case g: h = (b - r) / d + 2; break
+      default: h = (r - g) / d + 4
+    }
+    h /= 6
+  }
+
+  return hslToHex(h, s, maxLightness / 100)
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const hue2rgb = (p: number, q: number, t: number) => {
+    if (t < 0) t += 1
+    if (t > 1) t -= 1
+    if (t < 1 / 6) return p + (q - p) * 6 * t
+    if (t < 1 / 2) return q
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6
+    return p
+  }
+
+  let r: number, g: number, b: number
+  if (s === 0) {
+    r = g = b = l
+  } else {
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    const p = 2 * l - q
+    r = hue2rgb(p, q, h + 1 / 3)
+    g = hue2rgb(p, q, h)
+    b = hue2rgb(p, q, h - 1 / 3)
+  }
+
+  const toHex = (x: number) => Math.round(x * 255).toString(16).padStart(2, '0')
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
 
 export default function ImageBox({
   image,
@@ -63,6 +125,7 @@ export default function ImageBox({
   // fallback when we don't, so this box never collapses to 0px and nothing
   // jumps once the image (or its metadata) actually arrives.
   const aspectRatio = dimensions ? `${dimensions.width} / ${dimensions.height}` : fallbackAspectRatio
+  const resolvedPreviewColor = clampLightness(previewColor) || FALLBACK_COLOR
 
   return (
     <div
@@ -71,10 +134,11 @@ export default function ImageBox({
       style={{
         aspectRatio,
         // Three-stage progressive load, all painted before any image byte
-        // arrives: 1) dominant colour (instant, no network) → 2) blurred
-        // LQIP (inlined in the page payload) → 3) crossfade to the sharp
-        // image via next/image's built-in blur placeholder below.
-        backgroundColor: previewColor || FALLBACK_COLOR,
+        // arrives: 1) dominant colour, lightness-clamped so it's never a
+        // near-white flash (instant, no network) → 2) blurred LQIP (inlined
+        // in the page payload) → 3) crossfade to the sharp image via
+        // next/image's built-in blur placeholder below.
+        backgroundColor: resolvedPreviewColor,
         backgroundImage: previewImageUrl ? `url(${previewImageUrl})` : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
