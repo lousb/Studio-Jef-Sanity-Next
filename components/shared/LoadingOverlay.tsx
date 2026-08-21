@@ -7,6 +7,9 @@ interface LoadingOverlayProps {
   imageUrl?: string | null
 }
 
+// Flip this to true to force the loader to run on every refresh, regardless of route or cache state.
+const TEST_MODE = true
+
 export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   const [done, setDone] = useState(false)
   const [shouldShow, setShouldShow] = useState(false)
@@ -18,28 +21,52 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   const counterRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLDivElement>(null)
   const imageMaskRef = useRef<HTMLDivElement>(null)
+  const hasFadedRef = useRef(false)
+
+  // Smooth mouse-follow for the counter
+  const quickX = useRef<gsap.QuickToFunc | null>(null)
+  const quickY = useRef<gsap.QuickToFunc | null>(null)
+
+  useEffect(() => {
+    if (!shouldShow || !counterRef.current) return
+
+    // Start centered on screen until the mouse actually moves
+    gsap.set(counterRef.current, {
+      xPercent: -50,
+      yPercent: -50,
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      opacity: 1,
+    })
+
+    quickX.current = gsap.quickTo(counterRef.current, 'x', {
+      duration: 1,
+      ease: 'power3.out',
+    })
+    quickY.current = gsap.quickTo(counterRef.current, 'y', {
+      duration: 1,
+      ease: 'power3.out',
+    })
+
+    const handleMouseMove = (e: MouseEvent) => {
+      quickX.current?.(e.clientX)
+      quickY.current?.(e.clientY)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [shouldShow])
+
+  // Fade the counter out once progress hits 100
+  
 
   // Vertical mask animation in - only after image is loaded
   useEffect(() => {
     if (shouldShow && imageLoaded && imageMaskRef.current && imageRef.current) {
-      // Initial state - image scaled up
       gsap.set(imageRef.current, {
         scale: 1.15
       })
-      
-      // Initial state - mask cropped to compensate (7.5% on all sides for 1.15 scale)
-      // gsap.set(imageMaskRef.current, { 
-      //   clipPath: 'inset(100% 10% 10% 10% round 20px)' 
-      // })
-      
-      // Animate in - reveal from top to bottom while removing side crop
-      // gsap.to(imageMaskRef.current, {
-      //   clipPath: 'inset(0% 0% 0% 0% round 20px)',
-      //   duration: 1.4,
-      //   ease: 'power3.out'
-      // })
-      
-      // Animate image scale down
+
       gsap.to(imageRef.current, {
         scale: 1,
         duration: 1.4,
@@ -84,20 +111,32 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
 
     const animateHide = () => {
       if (!containerRef.current) return
-      
-      // First, mask out the image vertically
+
       if (imageMaskRef.current) {
         gsap.to(imageMaskRef.current, {
           clipPath: 'inset(0% 0% 100% 0% round 20px)',
-          y:-200,
+          y: -200,
           duration: 2,
           ease: 'power3.inOut'
         })
       }
-      
-      // Then animate the container height after a delay
+
+      gsap.to(counterRef.current, {
+        opacity: 0,
+        duration: 1,
+        ease: 'power2.out',
+      })
+
+      gsap.fromTo('.fixed-logo', {
+        opacity:0
+      },{
+        opacity:1,
+        duration: 1.2,
+        ease: 'power2.in',
+      })
+
       gsap.to(containerRef.current, {
-        height: 'calc(24px + 2rem)',
+        height: '0',
         duration: 1.2,
         delay: 0.6,
         ease: 'power2.inOut',
@@ -105,10 +144,9 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
           setDone(true)
         },
       })
-      
+
       if (counterRef.current) {
         gsap.to(counterRef.current, {
-         
           delay: 1,
           duration: 0.8,
           ease: 'power2.inOut',
@@ -121,10 +159,10 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
       if (intervalRef.current) clearInterval(intervalRef.current)
       setProgress(100)
 
-      // ✅ Hold 0.8s before exit animation
       doneTimeoutRef.current = setTimeout(() => {
-        // Run the exit animation
         animateHide()
+
+       
 
         if (header) {
           gsap.to(header, {
@@ -151,7 +189,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
     }
 
     showTimeout = setTimeout(() => {
-      if (document.readyState !== 'complete') {
+      if (TEST_MODE || document.readyState !== 'complete') {
         setShouldShow(true)
         if (header) header.style.height = 'auto'
 
@@ -168,10 +206,14 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
       }
     }, 150)
 
-    if (document.readyState === 'complete') {
+    if (!TEST_MODE && document.readyState === 'complete') {
       setDone(true)
       setShouldShow(false)
       if (showTimeout) clearTimeout(showTimeout)
+    } else if (TEST_MODE) {
+      doneTimeoutRef.current = setTimeout(() => {
+        animateHide()
+      }, 2000)
     } else {
       window.addEventListener('load', onFullLoad)
     }
@@ -189,24 +231,20 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center text-black bg-white"
+      className="fixed inset-0 z-[9999] text-black bg-white"
       style={{ opacity: 1, transform: 'translateY(0)' }}
     >
-      
       <div
+        ref={counterRef}
+        className="loading-counter-init overflow-hidden pointer-events-none"
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
           zIndex: 1,
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          
         }}
       >
-        
-        <div className="loading-counter-init overflow-hidden">
-          <div ref={counterRef}>{Math.min(100, Math.round(progress))}%</div>
-        </div>
+        {Math.min(100, Math.round(progress))}%
       </div>
     </div>
   )

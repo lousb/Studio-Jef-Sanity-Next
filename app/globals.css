@@ -504,7 +504,7 @@ html:has( .header) #initial-loader{
   transition: 500ms ease-in-out opacity, 500ms ease-in-out margin !important;
   mix-blend-mode: difference;
   filter: invert(1);
-
+  z-index: 99999999999;
 
 
 }

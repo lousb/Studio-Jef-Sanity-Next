@@ -503,11 +503,27 @@ function ProjectPageInner({
         </div>
       </div>
 
-      <div className={`mt-2 md:mt-4 flex gap-4  project-page-title-info ${styles.projectPageTitleInfo}`}>
-        <button onClick={() => handleSetIsInfoActive(true)} style={{ opacity: isInfoActive ? 0.5 : 1 }}>
+      <div className={`mt-2 md:mt-4 flex gap-4 project-page-title-info ${styles.projectPageTitleInfo}`}>
+        <button
+          onClick={() => handleSetIsInfoActive(true)}
+          disabled={isInfoActive}
+          style={{
+            opacity: isInfoActive ? 0.5 : 1,
+            cursor: isInfoActive ? 'default' : 'pointer',
+            pointerEvents: isInfoActive ? 'none' : 'auto',
+          }}
+        >
           <Reveal>View 1</Reveal>
         </button>
-        <button onClick={() => handleSetIsInfoActive(false)} style={{ opacity: !isInfoActive ? 0.5 : 1 }}>
+        <button
+          onClick={() => handleSetIsInfoActive(false)}
+          disabled={!isInfoActive}
+          style={{
+            opacity: !isInfoActive ? 0.5 : 1,
+            cursor: !isInfoActive ? 'default' : 'pointer',
+            pointerEvents: !isInfoActive ? 'none' : 'auto',
+          }}
+        >
           <Reveal>View 2</Reveal>
         </button>
       </div>

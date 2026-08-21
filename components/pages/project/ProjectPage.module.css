@@ -93,7 +93,7 @@
   position: fixed;
   bottom: 10px;
   left: 10px;
-  cursor: pointer;
+
   z-index: 9900;
   mix-blend-mode: difference;
   color: white
