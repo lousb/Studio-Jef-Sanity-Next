@@ -8,7 +8,7 @@ interface LoadingOverlayProps {
 }
 
 // Flip this to true to force the loader to run on every refresh, regardless of route or cache state.
-const TEST_MODE = true
+const TEST_MODE = false
 
 export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   const [done, setDone] = useState(false)
