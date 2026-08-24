@@ -72,6 +72,7 @@
   }
   .projectPageTitleInfo{
     left:20px !important;
+    bottom: 20px;
     width:calc(100% - 40px);
     justify-content: space-between;
   }

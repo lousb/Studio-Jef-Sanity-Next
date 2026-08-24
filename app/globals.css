@@ -558,14 +558,15 @@ html:has( .header) #initial-loader{
   .fixed-logo{
     width: 88vw !important;
   }
-  .main-desc{
-    display:none !important;
-  }
+  
   body:has(.mobile-menu-overlay) .main-desc{
-    display: block !important;
-    bottom:20px !important;
-    position: fixed !important;
+    opacity: 1;
+    transition: 200ms linear all 200ms;
   }
+}
+
+.about-page-mobile .project-page-media > div > div > div, .about-page-mobile .project-page-media > div > div{
+  margin-bottom: 0px !important;
 }
 
 html.resizing,
@@ -581,15 +582,24 @@ html.resizing * {
   pointer-events: all;
 }
 
-.mobile-menu-overlay,
+
+/* .mobile-menu-overlay,
 .project-page-overlay {
-  transition: backdrop-filter 0.4s ease, -webkit-backdrop-filter 0.4s ease, background-color 0.4s ease, opacity 0.4s ease;
-}
+  transition: backdrop-filter 0.4s linear, -webkit-backdrop-filter 0.4s linear, background-color 0.4s linear, opacity 0.4s linear;
+} */
 body:has(.all-projects-page) .fixed-logo{
   opacity: 0;
 }
 
 @media (max-width: 767px) {
+  .main-desc {
+      display: block !important;
+      opacity: 0;
+      width: calc(100% - 40px);
+      transition: 0ms linear all 0s;
+      bottom:20px !important;
+      position: fixed !important;
+  }
   .hybrid-media {
     --hm-mobile-col-w: calc(
       (100% - 2 * var(--grid-margin-mobile) - 7 * var(--grid-gutter-mobile)) / 8
@@ -603,6 +613,17 @@ body:has(.all-projects-page) .fixed-logo{
     margin-left: calc(((100% - var(--hm-mobile-w4)) / 2) - 20px) !important;
     margin-right: calc((100% - var(--hm-mobile-w4)) / 2) !important;
   }
+  
+  
+  .mobile-menu-overlay,
+.project-page-overlay{
+  background-color: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+
+
+
+}
 
   /* View 2 — variable width per image: 4, 6, or 8 of 8, left-aligned */
   .hybrid-media[data-info-active='false'] {

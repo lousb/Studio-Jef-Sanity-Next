@@ -17,17 +17,52 @@ import { FigureHoverProvider, useFigureHover } from './FigureHoverContext'
 import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
 import { useLenis } from '@/components/global/LenisProvider'
 
-function MobileDetailsOverlay({ onClick }: { onClick: () => void }) {
-  const [visible, setVisible] = useState(false)
+function MobileDetailsOverlay({ open, onClick }: { open: boolean; onClick: () => void }) {
+  const [shouldRender, setShouldRender] = useState(open)
+  const elRef = useRef<HTMLDivElement | null>(null)
+  const tweenRef = useRef<gsap.core.Tween | null>(null)
+  const stateRef = useRef({ blur: 0, alpha: 0 })
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setVisible(true))
-    return () => cancelAnimationFrame(raf)
-  }, [])
+    if (open) setShouldRender(true)
+  }, [open])
+
+  useEffect(() => {
+    if (!shouldRender) return
+    const el = elRef.current
+    if (!el) return
+
+    const state = stateRef.current
+    const applyState = () => {
+      el.style.setProperty('backdrop-filter', `blur(${state.blur}px)`)
+      el.style.setProperty('-webkit-backdrop-filter', `blur(${state.blur}px)`)
+      el.style.setProperty('background-color', `rgba(255, 255, 255, ${state.alpha})`)
+    }
+
+    tweenRef.current?.kill()
+
+    tweenRef.current = open
+      ? gsap.to(state, { blur: 40, alpha: 0.01, duration: 0.45, ease: 'linear', onUpdate: applyState })
+      : gsap.to(state, {
+          blur: 0,
+          alpha: 0,
+          duration: 0.4,
+          ease: 'linear',
+          onUpdate: applyState,
+          onComplete: () => setShouldRender(false),
+        })
+
+    return () => {
+      tweenRef.current?.kill()
+    }
+  }, [open, shouldRender])
+
+  if (!shouldRender) return null
 
   return (
     <div
-      className={`project-page-overlay${visible ? ' is-visible' : ''}`}
+      ref={elRef}
+      className="project-page-overlay is-visible"
       onClick={onClick}
       style={{ position: 'fixed', inset: 0, width: '100vw', height: '100vh', zIndex: 40 }}
       aria-hidden="true"
@@ -529,9 +564,8 @@ function ProjectPageInner({
       </div>
 
       {/* Fullscreen black overlay, shown while the mobile details panel is open */}
-      {isMobileDetailsOpen && (
-        <MobileDetailsOverlay onClick={() => setIsMobileDetailsOpen(false)} />
-      )}
+      {/* Fullscreen blur overlay, shown while the mobile details panel is open */}
+      <MobileDetailsOverlay open={isMobileDetailsOpen} onClick={() => setIsMobileDetailsOpen(false)} />
 
       <button
         type="button"

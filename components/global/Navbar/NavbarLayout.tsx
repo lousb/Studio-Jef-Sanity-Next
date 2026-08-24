@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { Link } from 'next-view-transitions'
 import { PortableText } from '@portabletext/react'
+import { gsap } from 'gsap'
 
 import { urlForLogo } from '@/sanity/lib/utils'
 import type { LinkItem, PageItem, SettingsPayload } from '@/types'
@@ -19,17 +20,52 @@ interface NavbarProps {
   projectCount?: number
 }
 
-function MobileMenuOverlay({ onClick }: { onClick: () => void }) {
-  const [visible, setVisible] = useState(false)
+function MobileMenuOverlay({ open, onClick }: { open: boolean; onClick: () => void }) {
+  const [shouldRender, setShouldRender] = useState(open)
+  const elRef = useRef<HTMLDivElement | null>(null)
+  const tweenRef = useRef<gsap.core.Tween | null>(null)
+  const stateRef = useRef({ blur: 0, alpha: 0 })
 
   useEffect(() => {
-    const raf = requestAnimationFrame(() => setVisible(true))
-    return () => cancelAnimationFrame(raf)
-  }, [])
+    if (open) setShouldRender(true)
+  }, [open])
+
+  useEffect(() => {
+    if (!shouldRender) return
+    const el = elRef.current
+    if (!el) return
+
+    const state = stateRef.current
+    const applyState = () => {
+      el.style.setProperty('backdrop-filter', `blur(${state.blur}px)`)
+      el.style.setProperty('-webkit-backdrop-filter', `blur(${state.blur}px)`)
+      el.style.setProperty('background-color', `rgba(255, 255, 255, ${state.alpha})`)
+    }
+
+    tweenRef.current?.kill()
+
+    tweenRef.current = open
+      ? gsap.to(state, { blur: 40, alpha: 0.01, duration: 0.45, ease: 'power2.out', onUpdate: applyState })
+      : gsap.to(state, {
+          blur: 0,
+          alpha: 0,
+          duration: 0.4,
+          ease: 'power2.in',
+          onUpdate: applyState,
+          onComplete: () => setShouldRender(false),
+        })
+
+    return () => {
+      tweenRef.current?.kill()
+    }
+  }, [open, shouldRender])
+
+  if (!shouldRender) return null
 
   return (
     <div
-      className={`mobile-menu-overlay fixed inset-0 md:hidden${visible ? ' is-visible' : ''}`}
+      ref={elRef}
+      className="mobile-menu-overlay fixed inset-0 md:hidden is-visible"
       onClick={onClick}
       aria-hidden="true"
     />
@@ -152,9 +188,8 @@ export default function Navbar(props: NavbarProps) {
           behind it (backdrop-filter only sees layers within the same
           containing/stacking context). */}
       {mounted &&
-      isMenuOpen &&
       createPortal(
-        <MobileMenuOverlay onClick={() => setIsMenuOpen(false)} />,
+        <MobileMenuOverlay open={isMenuOpen} onClick={() => setIsMenuOpen(false)} />,
         document.body
       )}
 

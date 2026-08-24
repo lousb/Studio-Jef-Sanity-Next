@@ -93,9 +93,9 @@ function AboutMeta({ services, press, location }: Pick<SectionProps, 'services' 
 
 function MobileAbout({ overview, aboutLinks, media, services, press, location }: SectionProps) {
   return (
-    <div>
+    <div className='about-page-mobile'>
       {/* Section 1: 90vh hero — links stacked, centered */}
-      <div className="flex mobile-media flex-col gap-4 text-center px-6" style={{ minHeight: '90vh' }}>
+      <div className="flex mobile-media flex-col gap-4 text-center px-6 " style={{ minHeight: '90vh' }}>
         {aboutLinks?.map((link, key) => (
           <Reveal key={key} element="div" elementClass="break-words hyphens-auto">
             <Link target="_blank" className="break-words" href={link.url!}>
@@ -142,7 +142,7 @@ function MobileAbout({ overview, aboutLinks, media, services, press, location }:
 
 function DesktopAbout({ overview, aboutLinks, media, services, press, location }: SectionProps) {
   return (
-    <div className={`${styles.infoActive} info-active`}>
+    <div className={`${styles.infoActive} info-active about-page`}>
       <div className="space-y-6 project-page-media">
         <div className="relative z-10 gap-[10px] bg-white flex justify-center w-full">
           <InfiniteLoop>
