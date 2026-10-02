@@ -45,7 +45,7 @@ export function resolveHref(
     case 'home':
       return '/';
     case 'about':
-      return '/about';
+      return '/studio';
     case 'project':
       return slugValue ? `/projects/${slugValue}` : undefined;
     default:

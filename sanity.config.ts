@@ -1,6 +1,6 @@
 'use client'
 /**
- * This config is used to set up Sanity Studio that's mounted on the `app/studio/[[...index]]/page.tsx` route
+ * This config is used to set up Sanity Studio that's mounted on the `app/admin/[[...index]]/page.tsx` route
  */
 
 import { colorInput } from '@sanity/color-input'

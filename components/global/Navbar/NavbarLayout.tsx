@@ -79,7 +79,7 @@ export default function Navbar(props: NavbarProps) {
   const pathname = usePathname()
 
   const isProjectsPage = pathname === '/projects'
-  const isAboutPage = pathname === '/about'
+  const isAboutPage = pathname === '/studio'
 
   const customLogo = props?.logo
   const logoImageUrl = customLogo && urlForLogo(customLogo)?.url()
@@ -236,7 +236,7 @@ export default function Navbar(props: NavbarProps) {
             {isAboutPage ? (
               <span className="text-gray-400 cursor-default">Studio</span>
             ) : (
-              <Link href="/about" className="cursor-pointer h-full text-1xl hover:text-secondary md:text-1xl">
+              <Link href="/studio" className="cursor-pointer h-full text-1xl hover:text-secondary md:text-1xl">
                 Studio
               </Link>
             )}

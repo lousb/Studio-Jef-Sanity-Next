@@ -78,7 +78,7 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
   useEffect(() => {
     const currentPath = window.location.pathname
     const isStudioRoute =
-      currentPath === '/studio' || currentPath.startsWith('/studio/')
+      currentPath === '/admin' || currentPath.startsWith('/admin/')
 
     if (isStudioRoute) {
       setShouldShow(true)

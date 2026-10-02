@@ -14,10 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = data?.overview?.length ? toPlainText(data.overview) : undefined
 
   return {
-    title: data?.title || 'About',
+    title: data?.title || 'Studio',
     ...(description ? { description } : {}),
-    alternates: { canonical: '/about' },
-    openGraph: { url: '/about', ...(description ? { description } : {}) },
+    alternates: { canonical: '/studio' },
+    openGraph: { url: '/studio', ...(description ? { description } : {}) },
   }
 }
 
@@ -34,7 +34,7 @@ export default async function AboutRoute() {
 
   return (
     <>
-      <h1 className="sr-only">{initial.data.title || 'About'}</h1>
+      <h1 className="sr-only">{initial.data.title || 'Studio'}</h1>
       <AboutPage data={initial.data} />
     </>
   )

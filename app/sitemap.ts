@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...(data?.about
       ? [
           {
-            url: absoluteUrl('/about'),
+            url: absoluteUrl('/studio'),
             lastModified: data.about,
             changeFrequency: 'monthly' as const,
             priority: 0.7,

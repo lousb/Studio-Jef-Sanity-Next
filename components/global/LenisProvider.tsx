@@ -30,7 +30,7 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
   const prevPathname = useRef(pathname);
   const [lenisInstance, setLenisInstance] = useState<LenisWithJumpFlag | null>(null);
 
-  const isStudio = pathname.startsWith("/studio");
+  const isStudio = pathname.startsWith("/admin");
 
   useEffect(() => {
     if (typeof window !== "undefined" && "scrollRestoration" in window.history) {

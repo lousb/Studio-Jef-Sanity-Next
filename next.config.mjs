@@ -23,10 +23,16 @@ const config = {
   experimental: {
     taint: true,
   },
+  async redirects() {
+    return [
+      // The studio (about) page used to live at /about; Sanity Studio used to be /studio
+      { source: '/about', destination: '/studio', permanent: true },
+    ]
+  },
   async headers() {
     return [
       {
-        source: '/studio/:path*',
+        source: '/admin/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
     ]
