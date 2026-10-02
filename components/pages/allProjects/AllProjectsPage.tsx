@@ -291,7 +291,7 @@ export function AllProjectsPage({
             // Mobile: rows wrapped in the shared InfiniteLoop component
               <div
                 ref={gridRef}
-                className="grid  items-center"
+                className="grid"
               >
                 {filteredProjects.map((project, key) => {
                   const href = resolveHref(project._type, project.slug);
