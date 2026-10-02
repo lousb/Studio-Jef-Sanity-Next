@@ -1,4 +1,4 @@
-import './globals.css'
+import '../globals.css'
 
 import type { Viewport } from 'next'
 import { ViewTransitions } from 'next-view-transitions'
