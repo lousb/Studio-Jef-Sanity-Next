@@ -1,5 +1,18 @@
-/* Bump Studio UI text 20% larger — Studio-only, doesn't touch the live site */
-html,
-body {
-  zoom: 1.1;
+/* Bump Studio UI ~20% larger. Studio-only, doesn't touch the live site. */
+:root {
+  --studio-zoom: 1.21;
+}
+
+html {
+  zoom: var(--studio-zoom);
+}
+
+/*
+ * NextStudio sizes itself to 100vh with an inline style. Zoom scales that up
+ * too, so the bottom of the Studio (the Publish bar) ended up below the window.
+ * Shrink the container by the same factor so it fits the viewport exactly.
+ */
+#sanity[data-ui='NextStudioLayout'] {
+  height: calc(100vh / var(--studio-zoom)) !important;
+  max-height: calc(100dvh / var(--studio-zoom)) !important;
 }
