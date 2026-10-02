@@ -57,9 +57,9 @@
     width: calc(100% - 40px) !important;
   }
 
-  /* Open info panel: the description sits in its own box between the logo
-     and the View 1 / Close / View 2 row (positions set in ProjectPage.tsx).
-     20px padding keeps short text 20px clear of both edges. */
+  /* Open info panel: the description sits in its own box from the bottom of
+     the index/title row to the View 1 / Close / View 2 row (positions set in
+     ProjectPage.tsx). 20px top padding = text starts 20px under the title. */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc {
     position: fixed;
     left: 20px;
@@ -72,21 +72,18 @@
     padding-block: 20px;
     overflow: hidden;
   }
-  /* Short text sits at the bottom, just above the buttons */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc > * {
-    margin-top: auto;
     flex-shrink: 0;
   }
-  /* Text taller than the box: moves with the page scroll, clamped to its
-     first/last line (ProjectPage.tsx), with a 60px fade top and bottom.
-     Padding matches the fade so both ends finish fully clear of it. */
+  /* Text taller than the box (rare): moves with the page scroll, clamped to
+     its first/last line (ProjectPage.tsx). 60px fade at the bottom; the top
+     fades only within the 20px gap under the title, so text at rest is crisp. */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] {
-    padding-block: 60px;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+    padding-bottom: 60px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 60px), transparent 100%);
   }
   .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] > * {
-    margin-top: 0;
     will-change: transform;
   }
 }

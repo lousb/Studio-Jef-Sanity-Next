@@ -152,9 +152,9 @@ function ProjectPageInner({
   const descCopyRef = useRef<HTMLDivElement>(null)
   const [descOverflows, setDescOverflows] = useState(false)
 
-  // Mobile info panel: the description scrolls in its own box that sits
-  // between the logo and the View 1 / Close / View 2 row. Measure both so it
-  // never overlaps the logo, whatever the screen size.
+  // Mobile info panel: the description sits in its own box from just under
+  // the index / title / type / year row down to the View 1 / Close / View 2
+  // row (the logo is hidden while it's open). Measured, so it fits any screen.
   useEffect(() => {
     if (!isMobileDetailsOpen) return
     const el = descRef.current
@@ -162,26 +162,26 @@ function ProjectPageInner({
 
     const update = () => {
       const vh = window.visualViewport?.height ?? window.innerHeight
-      const logo = document.querySelector('.fixed-logo')
-      const rows = Array.from(
-        document.querySelectorAll('.project-page-title-info, .mobile-info-toggle'),
-      )
-      const logoBottom = logo ? logo.getBoundingClientRect().bottom : vh * 0.6
-      const rowTop = rows.length
-        ? Math.min(...rows.map((r) => r.getBoundingClientRect().top))
-        : vh - 60
-      el.style.setProperty('--desc-top', `${Math.round(logoBottom)}px`)
+      const visibleRects = (selector: string) =>
+        Array.from(document.querySelectorAll(selector))
+          .map((n) => n.getBoundingClientRect())
+          .filter((r) => r.height > 0 && r.width > 0)
+      const header = visibleRects('.title-heading, .project-type, .project-year')
+      const rows = visibleRects('.project-page-title-info, .mobile-info-toggle')
+      const headerBottom = header.length ? Math.max(...header.map((r) => r.bottom)) : 60
+      const rowTop = rows.length ? Math.min(...rows.map((r) => r.top)) : vh - 60
+      el.style.setProperty('--desc-top', `${Math.round(headerBottom)}px`)
       el.style.setProperty('--desc-bottom', `${Math.round(vh - rowTop)}px`)
       measureOverflow()
     }
 
-    // Does the text fit? If not it gets the fade mask + scroll-linked loop.
+    // Does the text fit? If not it gets the bottom fade + page-linked scroll.
     const measureOverflow = () => {
       const copy = descCopyRef.current
       if (!copy) return
-      // Box height is fixed by top/bottom, so compare against its resting
-      // (20px top + bottom padding) space regardless of current padding;
-      // this can't flip back and forth when the padding is removed.
+      // Box height is fixed by top/bottom; compare against the resting space
+      // (20px top + 20px bottom padding) so the extra bottom padding added
+      // when overflowing can't flip the result back.
       setDescOverflows(copy.offsetHeight > el.clientHeight - 40 + 1)
     }
 

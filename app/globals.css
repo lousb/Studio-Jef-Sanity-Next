@@ -660,8 +660,10 @@ body:has(.all-projects-page) .fixed-logo{
   body:has(.mobile-menu-overlay)   .title-heading{
     opacity: 0;
   }
+  /* Hide the logo while the mobile project info panel is open */
   body:has(.project-page-overlay) .fixed-logo{
-    opacity: 1;
+    opacity: 0 !important;
+    pointer-events: none;
   }
   .project-page-details{
     margin-bottom: 20px;
