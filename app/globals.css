@@ -12,7 +12,7 @@
   --font-body: var(--font-diatype), sans-serif;
   --text-body-01-size: 13px;
   --text-body-01-weight: 700;
-  --text-body-01-letter-spacing: 0.02em;
+  --text-body-01-letter-spacing: 0.0em;
   --text-body-01-line-height: normal;
 
   /* Grid — desktop */
