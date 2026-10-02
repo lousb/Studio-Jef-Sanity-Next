@@ -219,6 +219,50 @@ function ProjectPageInner({
   const { hoveredCaption } = useFigureHover()
   const lenis = useLenis()
 
+  // Mobile info panel, text taller than its box: move it with the page
+  // scroll (scroll down = text moves up), stopping at the first and last
+  // line rather than looping.
+  useEffect(() => {
+    if (!isMobileDetailsOpen || !descOverflows) return
+    const box = descRef.current
+    const text = descCopyRef.current
+    if (!box || !text) return
+
+    let offset = 0
+    let last = lenis ? lenis.scroll : window.scrollY
+    const maxOffset = () => {
+      const cs = getComputedStyle(box)
+      const space = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+      return Math.max(0, text.offsetHeight - space)
+    }
+    const apply = () => {
+      text.style.transform = `translate3d(0, ${-offset}px, 0)`
+    }
+
+    const onScroll = (y: number) => {
+      const delta = y - last
+      last = y
+      // InfiniteLoop teleports the page when it wraps; ignore those jumps
+      if (Math.abs(delta) > window.innerHeight * 0.5) return
+      offset = Math.min(maxOffset(), Math.max(0, offset + delta))
+      apply()
+    }
+
+    apply()
+    let cleanupScroll: () => void
+    if (lenis) {
+      cleanupScroll = lenis.on('scroll', (l: { scroll: number }) => onScroll(l.scroll))
+    } else {
+      const onWindowScroll = () => onScroll(window.scrollY)
+      window.addEventListener('scroll', onWindowScroll, { passive: true })
+      cleanupScroll = () => window.removeEventListener('scroll', onWindowScroll)
+    }
+    return () => {
+      cleanupScroll()
+      text.style.transform = ''
+    }
+  }, [isMobileDetailsOpen, descOverflows, lenis])
+
   // On page mount / navigation: pin scroll to top, re-pinning if content
   // height keeps changing (InfiniteLoop cloning in, images loading).
   useEffect(() => {
@@ -464,7 +508,6 @@ function ProjectPageInner({
               <div
                 ref={descRef}
                 data-overflow={descOverflows ? 'true' : 'false'}
-                data-lenis-prevent
                 className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}
               >
                 <div ref={descCopyRef} className="w-full">
