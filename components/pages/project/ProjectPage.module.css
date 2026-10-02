@@ -76,12 +76,17 @@
     flex-shrink: 0;
   }
   /* Text taller than the box (rare): moves with the page scroll, clamped to
-     its first/last line (ProjectPage.tsx). 60px fade at the bottom; the top
-     fades only within the 20px gap under the title, so text at rest is crisp. */
+     its first/last line (ProjectPage.tsx). 60px fade at the bottom. */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] {
     padding-bottom: 60px;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 60px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 60px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 60px), transparent 100%);
+  }
+  /* Once scrolled: text is hidden in the 20px gap under the title, then
+     fades in over the next 20px. */
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'][data-scrolled='true'] {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent 20px, #000 40px, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, transparent 20px, #000 40px, #000 calc(100% - 60px), transparent 100%);
   }
   .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] > * {
     will-change: transform;

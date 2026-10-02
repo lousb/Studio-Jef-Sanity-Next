@@ -239,6 +239,8 @@ function ProjectPageInner({
     }
     const apply = () => {
       text.style.transform = `translate3d(0, ${-offset}px, 0)`
+      // Top fade only once the text has moved, so the first line is crisp at rest
+      box.dataset.scrolled = offset > 0 ? 'true' : 'false'
     }
 
     const onScroll = (y: number) => {
@@ -262,6 +264,7 @@ function ProjectPageInner({
     return () => {
       cleanupScroll()
       text.style.transform = ''
+      delete box.dataset.scrolled
     }
   }, [isMobileDetailsOpen, descOverflows, lenis])
 
