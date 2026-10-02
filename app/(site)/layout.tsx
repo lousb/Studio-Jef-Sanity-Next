@@ -1,6 +1,7 @@
 import '../globals.css'
 
 import type { Viewport } from 'next'
+import localFont from 'next/font/local'
 import { ViewTransitions } from 'next-view-transitions'
 import { Suspense } from 'react'
 
@@ -11,6 +12,16 @@ import NavigationCursor from '@/components/global/NavigationCursor'
 import LoadingOverlay from '@/components/shared/LoadingOverlay'
 import { urlForImage } from '@/sanity/lib/utils'
 import { loadSettings } from '@/sanity/loader/loadQuery'
+
+// Self-hosted via next/font: preloaded, hashed + cached, no flash of fallback text
+const diatype = localFont({
+  src: '../fonts/ABCDiatype-Bold.otf',
+  weight: '700',
+  style: 'normal',
+  display: 'swap',
+  variable: '--font-diatype',
+  fallback: ['Helvetica Neue', 'Arial', 'sans-serif'],
+})
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -37,7 +48,7 @@ export default async function RootLayout({
     <ViewTransitions>
       <html
         lang="en-AU"
-        className="bg-primary"
+        className={`bg-primary ${diatype.variable}`}
       >
         <head>
           {/* Critical CSS to prioritize initial loader rendering */}

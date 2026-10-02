@@ -1,14 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@font-face {
-
-  font-family: 'ABC Diatype';
-  src: url('/fonts/ABCDiatype-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* ABC Diatype is loaded with next/font in app/(site)/layout.tsx (--font-diatype) */
 
 
 
@@ -16,7 +9,7 @@
   view-transition-name: root;
 
   /* Typography — Body-01 / Desktop B1 */
-  --font-body: 'ABC Diatype', sans-serif;
+  --font-body: var(--font-diatype), sans-serif;
   --text-body-01-size: 12px;
   --text-body-01-weight: 700;
   --text-body-01-letter-spacing: 0em;
