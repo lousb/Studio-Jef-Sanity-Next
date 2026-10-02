@@ -3,8 +3,6 @@
  * This config is used to set up Sanity Studio that's mounted on the `app/studio/[[...index]]/page.tsx` route
  */
 
-import './sanity/studio.css'
-
 import { colorInput } from '@sanity/color-input'
 import { visionTool } from '@sanity/vision'
 import { defineConfig, NavbarProps, useWorkspace } from 'sanity'
