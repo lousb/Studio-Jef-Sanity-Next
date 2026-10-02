@@ -57,10 +57,9 @@
     width: calc(100% - 40px) !important;
   }
 
-  /* Open info panel: description scrolls in its own box between the logo
+  /* Open info panel: the description sits in its own box between the logo
      and the View 1 / Close / View 2 row (positions set in ProjectPage.tsx).
-     20px padding keeps the text 20px clear of both at rest; the 20px mask
-     fades it out as it scrolls past either edge. */
+     20px padding keeps short text 20px clear of both edges. */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc {
     position: fixed;
     left: 20px;
@@ -71,24 +70,22 @@
     flex-direction: column;
     flex-wrap: nowrap;
     padding-block: 20px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+    overflow: hidden;
   }
-  /* Short text sits at the bottom (just above the buttons); long text still
-     scrolls normally. margin-top:auto (not justify-content:flex-end) keeps
-     the top of overflowing text reachable. */
+  /* Short text sits at the bottom, just above the buttons */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc > * {
     margin-top: auto;
     flex-shrink: 0;
   }
-  .detailsPanel[data-mobile-open='true'] .projectPageDesc::-webkit-scrollbar {
-    display: none;
+  /* Text taller than the box: 60px fade top and bottom, and the text moves
+     with the page scroll, looping like the gallery (see ProjectPage.tsx). */
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] {
+    padding-block: 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
+  }
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] > * {
+    margin-top: 0;
   }
 }
 
@@ -229,3 +226,6 @@
 
 }
 
+.descTrack {
+  will-change: transform;
+}
