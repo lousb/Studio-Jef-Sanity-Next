@@ -75,9 +75,6 @@ interface ProjectPageProps {
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
-// Space between the end of the description and its looped copy (mobile info panel)
-const DESC_LOOP_GAP = 40
-
 const STATUS_LABELS: Record<string, string> = {
   'completed': 'Completed',
   'in-progress': 'In Progress',
@@ -152,7 +149,6 @@ function ProjectPageInner({
 
   const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
   const descRef = useRef<HTMLDivElement>(null)
-  const descTrackRef = useRef<HTMLDivElement>(null)
   const descCopyRef = useRef<HTMLDivElement>(null)
   const [descOverflows, setDescOverflows] = useState(false)
 
@@ -222,48 +218,6 @@ function ProjectPageInner({
 
   const { hoveredCaption } = useFigureHover()
   const lenis = useLenis()
-
-  // Mobile info panel, overflowing text: scroll it with the page instead of
-  // independently, looping seamlessly like the infinite image gallery
-  // (a second copy follows the first, offset wraps at one copy + gap).
-  useEffect(() => {
-    if (!isMobileDetailsOpen || !descOverflows) return
-    const track = descTrackRef.current
-    const copy = descCopyRef.current
-    if (!track || !copy) return
-
-    let offset = 0
-    let last = lenis ? lenis.scroll : window.scrollY
-    const apply = () => {
-      track.style.transform = `translate3d(0, ${-offset}px, 0)`
-    }
-
-    const onScroll = (y: number) => {
-      const delta = y - last
-      last = y
-      // InfiniteLoop teleports the page when it wraps; ignore those jumps
-      if (Math.abs(delta) > window.innerHeight * 0.5) return
-      const loop = copy.offsetHeight + DESC_LOOP_GAP
-      if (!loop) return
-      offset = (((offset + delta) % loop) + loop) % loop
-      apply()
-    }
-
-    apply()
-    if (lenis) {
-      const unsubscribe = lenis.on('scroll', (l: { scroll: number }) => onScroll(l.scroll))
-      return () => {
-        unsubscribe()
-        track.style.transform = ''
-      }
-    }
-    const onWindowScroll = () => onScroll(window.scrollY)
-    window.addEventListener('scroll', onWindowScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', onWindowScroll)
-      track.style.transform = ''
-    }
-  }, [isMobileDetailsOpen, descOverflows, lenis])
 
   // On page mount / navigation: pin scroll to top, re-pinning if content
   // height keeps changing (InfiniteLoop cloning in, images loading).
@@ -510,9 +464,9 @@ function ProjectPageInner({
               <div
                 ref={descRef}
                 data-overflow={descOverflows ? 'true' : 'false'}
+                data-lenis-prevent
                 className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}
               >
-                <div ref={descTrackRef} className={`w-full ${styles.descTrack}`}>
                 <div ref={descCopyRef} className="w-full">
                   <Reveal>
                     <CustomPortableText value={overview} />
@@ -532,14 +486,6 @@ function ProjectPageInner({
                       </Link>
                     </div>
                   )}
-                </div>
-                {/* Looped copy for the mobile scroll-linked panel (only when overflowing) */}
-                {isMobileDetailsOpen && descOverflows && (
-                  <div aria-hidden="true" className="w-full" style={{ marginTop: DESC_LOOP_GAP }}>
-                    <CustomPortableText value={overview} />
-                    {site && <div className="mt-3 break-words underline">{site.urltitle}</div>}
-                  </div>
-                )}
                 </div>
               </div>
             )}

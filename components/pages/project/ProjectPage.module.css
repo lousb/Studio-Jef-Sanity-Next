@@ -70,17 +70,26 @@
     flex-direction: column;
     flex-wrap: nowrap;
     padding-block: 20px;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: none;
+  }
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc::-webkit-scrollbar {
+    display: none;
   }
   /* Short text sits at the bottom, just above the buttons */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc > * {
     margin-top: auto;
     flex-shrink: 0;
   }
-  /* Text taller than the box: 60px fade top and bottom, and the text moves
-     with the page scroll, looping like the gallery (see ProjectPage.tsx). */
+  /* Text taller than the box: scrolls inside it (not the page) with a 60px
+     fade top and bottom. Padding matches the fade so the first and last
+     lines can be scrolled fully clear of it. */
   .detailsPanel[data-mobile-open='true'] .projectPageDesc[data-overflow='true'] {
-    padding-block: 0;
+    padding-block: 60px;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%);
   }
@@ -224,8 +233,4 @@
   font-size: 1.4rem;
 }
 
-}
-
-.descTrack {
-  will-change: transform;
 }
