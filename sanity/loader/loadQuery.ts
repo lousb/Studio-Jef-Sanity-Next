@@ -9,7 +9,6 @@ import {
   homePageQuery,
   homePageTitleQuery,
   projectsPageQuery,
-  moreProjectsQuery,
   projectBySlugQuery,
   settingsQuery,
 } from '@/sanity/lib/queries'
@@ -82,24 +81,12 @@ export function loadHomePage() {
   )
 }
 
-export async function loadProjectsPage(): Promise<{ data: ProjectsPagePayload[] }> {
-  const queryResponse = await loadQuery<ProjectsPagePayload[] | null>(
+export function loadProjectsPage() {
+  // Tag must match the document _type ('project') or the revalidate webhook never refreshes this page
+  return loadQuery<ProjectsPagePayload[] | null>(
     projectsPageQuery,
     {},
-    { next: { tags: ['projects', 'genre', 'technique', 'client', 'credits'] } },
-  );
-
-
-  const data = queryResponse?.data || [];
-
-  return { data };
-}
-
-export function loadMoreProjects() {
-  return loadQuery<HomePagePayload | null>(
-    moreProjectsQuery,
-    { },
-    { next: { tags: ['home', 'project'] } },
+    { next: { tags: ['project', 'genre', 'technique', 'client', 'credits', 'architect', 'projectType'] } },
   )
 }
 
@@ -123,14 +110,7 @@ export function loadProject(slug: string) {
   return loadQuery<ProjectPayload | null>(
     projectBySlugQuery,
     { slug },
-    { next: { tags: [`project:${slug}`] } },
+    { next: { tags: ['project', `project:${slug}`] } },
   )
 }
 
-// export function loadMoreProjects() {
-//   return loadQuery<ProjectPayload | null>(
-//     moreProjectsQuery,
-//     {},
-//     { next: { tags: [`project`] } },
-//   )
-// }

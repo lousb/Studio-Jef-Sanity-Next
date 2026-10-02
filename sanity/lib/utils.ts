@@ -20,11 +20,11 @@ export const urlForImage = (source: Image | undefined) => {
     return undefined
   }
 
-  return imageBuilder?.image(source).auto('format').fit('max')
+  return imageBuilder.image(source as Image).auto('format').fit('max')
 }
 
-export function urlForOpenGraphImage(image: Image | undefined) {
-  return urlForImage(image)?.width(1200).height(627).fit('crop').url()
+export function urlForOpenGraphImage(image: Image | { asset?: unknown } | null | undefined) {
+  return urlForImage((image ?? undefined) as Image | undefined)?.width(1200).height(630).fit('crop').url()
 }
 
 export const urlForLogo = (source: Image | undefined) => {

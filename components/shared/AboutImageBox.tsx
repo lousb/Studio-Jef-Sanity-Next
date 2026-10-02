@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import Image from 'next/image'
+import { useState } from 'react'
+
 import { urlForImage } from '@/sanity/lib/utils'
 
 interface ImageBoxProps {
@@ -71,6 +72,8 @@ export default function AboutImageBox({
     >
       {imageUrl && (
         isGif || isAnimatedWebP ? (
+          // next/image would flatten animated GIF/WebP to a still frame
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageUrl}
             alt={alt}

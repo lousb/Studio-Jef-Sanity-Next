@@ -1,7 +1,7 @@
 // FigureHoverContext.tsx
 "use client";
 
-import { createContext, useContext, useState, PropsWithChildren } from 'react'
+import { createContext, PropsWithChildren,useContext, useState } from 'react'
 
 const FigureHoverContext = createContext<{
   hoveredCaption: string | null

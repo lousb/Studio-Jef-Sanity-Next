@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import React, { useEffect, useRef } from 'react'
 
 const Reveal = ({ children, element = 'div', elementClass = '', staggerDelay = 0.05 }) => {
   const containerRef = useRef(null)

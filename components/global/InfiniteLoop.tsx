@@ -2,14 +2,15 @@
 
 import {
   forwardRef,
+  PropsWithChildren,
+  useCallback,
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
   useState,
-  useCallback,
-  PropsWithChildren,
 } from "react";
+
 import { useLenis } from "./LenisProvider";
 
 const SETTLE_MS = 120;

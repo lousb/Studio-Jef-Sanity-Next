@@ -1,6 +1,12 @@
 import { ImageIcon, PlayIcon, StarIcon, TextIcon } from '@sanity/icons'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
+// Counts the visible characters in a portable-text field (what ends up in <meta description>)
+const plainTextLength = (blocks: any[] | undefined) =>
+  (blocks || [])
+    .map((b) => (b?.children || []).map((c: any) => c?.text || '').join(''))
+    .join(' ').length
+
 export default defineType({
   name: 'project',
   title: 'Projects',
@@ -70,7 +76,16 @@ export default defineType({
           type: 'block',
         }),
       ],
-      validation: (rule) => rule.max(155).required(),
+      validation: (rule) => [
+        rule.required(),
+        rule
+          .custom((blocks: any[] | undefined) =>
+            plainTextLength(blocks) > 160
+              ? `Google shows ~160 characters in search results (currently ${plainTextLength(blocks)})`
+              : true,
+          )
+          .warning(),
+      ],
     }),
     defineField({
       name: 'year',

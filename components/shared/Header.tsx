@@ -1,4 +1,5 @@
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
+
 import Reveal from '../global/Reveal'
 
 interface HeaderProps {

@@ -1,8 +1,8 @@
 // CursorLabel.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { useEffect, useRef, useState } from "react";
 
 interface CursorLabelProps {
   text: string;

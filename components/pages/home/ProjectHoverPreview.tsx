@@ -1,11 +1,12 @@
 // components/pages/home/ProjectHoverPreview.tsx
 "use client";
 
-import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { useEffect, useRef } from 'react';
+
 import ImageBox from '@/components/shared/ImageBox';
 import { colsToWidth } from '@/lib/gridWidth';
-import type { PreviewMediaBlock, PreviewMediaAsset } from '@/types';
+import type { PreviewMediaAsset,PreviewMediaBlock } from '@/types';
 
 export interface FlatPreviewImage {
   asset: PreviewMediaAsset;

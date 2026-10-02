@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import MuxPlayer from '@mux/mux-player-react'
+import { useEffect, useState } from 'react'
 
 interface MuxVideoBoxProps {
   playbackId?: string

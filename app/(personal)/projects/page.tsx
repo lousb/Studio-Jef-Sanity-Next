@@ -1,27 +1,35 @@
-import dynamic from 'next/dynamic';
-import { draftMode } from 'next/headers';
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next'
+import dynamic from 'next/dynamic'
+import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
 
-import { AllProjectsPage } from '@/components/pages/allProjects/AllProjectsPage';
-import { loadProjectsPage } from '@/sanity/loader/loadQuery';
-import { ProjectsPagePayload } from '@/types';
+import { AllProjectsPage } from '@/components/pages/allProjects/AllProjectsPage'
+import { loadProjectsPage } from '@/sanity/loader/loadQuery'
 
-const AllProjectPreview = dynamic(
-  () => import('@/components/pages/allProjects/ProjectPagePreview'),
-);
+const AllProjectPreview = dynamic(() => import('@/components/pages/allProjects/ProjectPagePreview'))
 
-export default async function IndexRoute() {
+export const metadata: Metadata = {
+  title: 'Projects',
+  alternates: { canonical: '/projects' },
+  openGraph: { url: '/projects' },
+}
 
-  const { data }: { data: ProjectsPagePayload[] } = await loadProjectsPage();
-
+export default async function ProjectsRoute() {
+  const initial = await loadProjectsPage()
 
   if (draftMode().isEnabled) {
-    return <AllProjectPreview initial={{ data }} />;
+    return <AllProjectPreview initial={initial} />
   }
 
-  if (!data || data.length === 0) {
-    return redirect('/');
+  const data = initial.data ?? []
+  if (data.length === 0) {
+    return redirect('/')
   }
 
-  return <AllProjectsPage data={{ allProjects: data }} />;
+  return (
+    <>
+      <h1 className="sr-only">Projects</h1>
+      <AllProjectsPage data={{ allProjects: data }} />
+    </>
+  )
 }

@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
-import { usePathname } from 'next/navigation'
-import Image from 'next/image'
-import { Link } from 'next-view-transitions'
 import { PortableText } from '@portabletext/react'
 import { gsap } from 'gsap'
+import Image from 'next/image'
+import { usePathname } from 'next/navigation'
+import { Link } from 'next-view-transitions'
+import { useEffect, useRef,useState } from 'react'
+import { createPortal } from 'react-dom'
 
 import { urlForLogo } from '@/sanity/lib/utils'
 import type { LinkItem, PageItem, SettingsPayload } from '@/types'
-import Reveal from '../Reveal'
+
 import { useLenis } from '../LenisProvider'
+import Reveal from '../Reveal'
 
 interface NavbarProps {
   data: SettingsPayload
@@ -91,7 +92,7 @@ export default function Navbar(props: NavbarProps) {
 
   const [logoWidth, setLogoWidth] = useState('685px')
 
-  const overviewRef = useRef<HTMLHeadingElement | null>(null)
+  const overviewRef = useRef<HTMLDivElement | null>(null)
 
   // needed so createPortal only runs client-side (document isn't available during SSR)
   useEffect(() => {
@@ -243,15 +244,15 @@ export default function Navbar(props: NavbarProps) {
         </div>
 
         {data?.overview?.text && (
-          <h2 ref={overviewRef} className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
+          <div ref={overviewRef} className="main-desc text-body-01 [grid-column:1/9] md:[grid-column:19/25] z-[9999]">
             <PortableText value={data.overview.text} />
-          </h2>
+          </div>
         )}
 
         {customLogo ? (
           <Image
             src={logoImageUrl}
-            alt="Logo"
+            alt={title || 'Studio Jef'}
             width={685}
             height={274}
             className="fixed-logo h-auto"

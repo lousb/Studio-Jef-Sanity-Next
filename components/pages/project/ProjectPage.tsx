@@ -1,21 +1,21 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
-import styles from './ProjectPage.module.css'
+import { gsap } from 'gsap'
 import { Link } from 'next-view-transitions'
-import Reveal from '../../global/Reveal'
+import { useEffect, useRef,useState } from 'react'
 
+import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
+import { useLenis } from '@/components/global/LenisProvider'
+import RevealDiv from '@/components/global/revealDiv'
 import { Module } from '@/components/modules'
-import { MoreProjects } from '@/components/pages/project/MoreProjects'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import type { ProjectPayload } from '@/types'
 import type { HomePagePayload } from '@/types'
-import RevealDiv from '@/components/global/revealDiv'
+
+import Reveal from '../../global/Reveal'
 import { FigureHoverProvider, useFigureHover } from './FigureHoverContext'
-import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
-import { useLenis } from '@/components/global/LenisProvider'
+import styles from './ProjectPage.module.css'
 
 function MobileDetailsOverlay({ open, onClick }: { open: boolean; onClick: () => void }) {
   const [shouldRender, setShouldRender] = useState(open)
@@ -72,7 +72,6 @@ function MobileDetailsOverlay({ open, onClick }: { open: boolean; onClick: () =>
 
 interface ProjectPageProps {
   data: ProjectPayload | null
-  moreProjects: ProjectPayload[]
   encodeDataAttribute?: EncodeDataAttributeCallback
 }
 
@@ -130,7 +129,6 @@ export function ProjectPage(props: ProjectPageProps) {
 
 function ProjectPageInner({
   data,
-  moreProjects,
   encodeDataAttribute,
 }: ProjectPageProps) {
   const {
@@ -149,11 +147,6 @@ function ProjectPageInner({
     architects,
   } = data ?? {}
 
-  const projects = moreProjects || []
-  const currentProjectIndex = projects.findIndex((project) => project.slug === slug)
-
-  const prevProject = projects[currentProjectIndex - 1] || null
-  const nextProject = projects[currentProjectIndex + 1] || null
   const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
 
   const figures = getFigures(content)
@@ -258,7 +251,7 @@ function ProjectPageInner({
         })
       }
     }
-  }, [isInfoActive, hasScrolled, shouldShowTitleBlock])
+  }, [isInfoActive, hasScrolled, shouldShowTitleBlock, isAnimating])
 
   useEffect(() => {
     const storedInfoState = localStorage.getItem('infoActive')
@@ -413,6 +406,7 @@ function ProjectPageInner({
                     <div className="mt-3">
                       <Link
                         target="_blank"
+                        rel="noopener noreferrer"
                         className=" break-words  underline"
                         href={site.url}
                       >
@@ -433,7 +427,7 @@ function ProjectPageInner({
                 </Reveal>
               )}
               {title && (
-                <Reveal element={'div'} elementClass={' break-words hyphens-auto'}>
+                <Reveal element={'h1'} elementClass={' break-words hyphens-auto'}>
                   {title}
                 </Reveal>
               )}

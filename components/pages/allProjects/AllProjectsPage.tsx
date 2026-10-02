@@ -1,22 +1,22 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { gsap } from 'gsap';
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader';
+import { gsap } from 'gsap';
 import Link from 'next/link';
+import { useEffect, useLayoutEffect, useRef,useState } from 'react';
 
+import { InfiniteLoop } from '@/components/global/InfiniteLoop';
+import { InfiniteLoopHorizontal } from '@/components/global/InfiniteLoopHorizontal';
+import Reveal from '@/components/global/Reveal';
+import RevealDiv from '@/components/global/revealDiv';
+import { useIsMobile } from '@/components/global/useIsMobile';
+import type { FlatPreviewImage } from '@/components/pages/home/ProjectHoverPreview';
+import { getPreviewImages,ProjectHoverPreview } from '@/components/pages/home/ProjectHoverPreview';
 import { ProjectListItem } from '@/components/pages/home/ProjectListItem';
 import { Header } from '@/components/shared/Header';
-import { resolveHref } from '@/sanity/lib/utils';
-import RevealDiv from '@/components/global/revealDiv';
-import Reveal from '@/components/global/Reveal';
-import type { ProjectsPagePayload } from '@/types';
-import { ProjectHoverPreview, getPreviewImages } from '@/components/pages/home/ProjectHoverPreview';
-import type { FlatPreviewImage } from '@/components/pages/home/ProjectHoverPreview';
-import { InfiniteLoopHorizontal } from '@/components/global/InfiniteLoopHorizontal';
-import { InfiniteLoop } from '@/components/global/InfiniteLoop';
-import { useIsMobile } from '@/components/global/useIsMobile';
 import ImageBox from '@/components/shared/ImageBox';
+import { resolveHref } from '@/sanity/lib/utils';
+import type { ProjectsPagePayload } from '@/types';
 
 const COLUMN_STORAGE_KEY = 'projectGridColumns';
 

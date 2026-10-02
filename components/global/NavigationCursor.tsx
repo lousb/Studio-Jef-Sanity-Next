@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 const NAV_CLASS = 'is-navigating'
 const SAFETY_TIMEOUT = 8000          // clears if nav never resolves (fetch error, cancelled, etc.)

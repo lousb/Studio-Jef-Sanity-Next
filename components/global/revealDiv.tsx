@@ -1,13 +1,13 @@
 'use client'
 
+import { motion, Variants } from 'framer-motion'
 import React, {
-  useRef,
-  useEffect,
-  useState,
   ElementType,
   ReactNode,
+  useEffect,
+  useRef,
+  useState,
 } from 'react'
-import { motion, Variants } from 'framer-motion'
 
 export interface RevealDivProps {
   children: ReactNode

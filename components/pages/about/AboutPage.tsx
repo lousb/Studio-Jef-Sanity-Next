@@ -1,16 +1,16 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
 import { Link } from 'next-view-transitions'
+import React, { useEffect, useState } from 'react'
 
-import AboutImageBox from '@/components/shared/AboutImageBox'
-import Reveal from '@/components/global/Reveal'
-import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import { InfiniteLoop } from '@/components/global/InfiniteLoop'
+import Reveal from '@/components/global/Reveal'
+import styles from '@/components/pages/project/ProjectPage.module.css'
+import AboutImageBox from '@/components/shared/AboutImageBox'
+import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import { colsToWidth } from '@/lib/gridWidth'
 import type { AboutPayload } from '@/types'
-import styles from '@/components/pages/project/ProjectPage.module.css'
 
 export interface AboutPageProps {
   data: AboutPayload | null
@@ -98,7 +98,7 @@ function MobileAbout({ overview, aboutLinks, media, services, press, location }:
       <div className="flex mobile-media flex-col gap-4 text-center px-6 " style={{ minHeight: '90vh' }}>
         {aboutLinks?.map((link, key) => (
           <Reveal key={key} element="div" elementClass="break-words hyphens-auto">
-            <Link target="_blank" className="break-words" href={link.url!}>
+            <Link target="_blank" rel="noopener noreferrer" className="break-words" href={link.url!}>
               {link.title}
             </Link>
           </Reveal>
@@ -181,7 +181,7 @@ function DesktopAbout({ overview, aboutLinks, media, services, press, location }
             <div>
               {aboutLinks?.map((link, key) => (
                 <Reveal key={key} element="div" elementClass="break-words hyphens-auto">
-                  <Link target="_blank" className="break-words" href={link.url!}>
+                  <Link target="_blank" rel="noopener noreferrer" className="break-words" href={link.url!}>
                     {link.title}
                   </Link>
                 </Reveal>

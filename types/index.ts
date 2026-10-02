@@ -17,6 +17,27 @@ export interface SanityAssetMetadata {
   }
 }
 
+// Normalised cover shape returned by COVER_IMAGE in queries.ts — works for
+// both the current schema (plain image) and older docs ({ media, video }).
+export interface CoverImage {
+  media?: {
+    _type?: 'image'
+    asset?: {
+      _id?: string
+      url?: string
+      metadata?: SanityAssetMetadata
+    }
+  } | null
+  video?: {
+    asset?: {
+      playbackId?: string
+      status?: string
+      aspect_ratio?: string
+      url?: string
+    }
+  } | null
+}
+
 export interface MenuItem {
   page?: {
     _type: string
@@ -56,26 +77,7 @@ export interface ShowcaseProject {
   location?: string
   projectType?: { title: string }[]
   architects?: { title: string }[]
-  coverImage?: {
-    media?: {
-      _type: 'image'
-      asset: {
-        _ref?: string
-        _type?: string
-        metadata?: SanityAssetMetadata
-        url?: string
-      }
-      lqip?: string
-    }
-    video?: {
-      asset: {
-        playbackId?: string
-        status?: string
-        aspect_ratio?: string
-        url?: string
-      }
-    }
-  }
+  coverImage?: CoverImage
 }
 
 // Page payloads
@@ -140,21 +142,7 @@ export interface PreviewMediaAsset {
 export interface ProjectsPagePayload {
   _type: string
   customIndex?: number
-  coverImage?: {
-    image?: {
-      asset?: {
-        _ref?: string
-        _type?: string
-        metadata?: SanityAssetMetadata
-      }
-    }
-    video?: {
-      asset?: {
-        playbackId?: string
-        status?: string
-      }
-    }
-  }
+  coverImage?: CoverImage
   previewMedia?: PreviewMediaBlock[]
   overview?: PortableTextBlock[]
   slug?: string
@@ -181,7 +169,7 @@ export interface ProjectPayload {
   location?: string
   projectType?: { title: string }[]
   architects?: { title: string }[]
-  coverImage?: Image
+  coverImage?: CoverImage
   description?: PortableTextBlock[]
   overview?: PortableTextBlock[]
   client?: { title: string }[]

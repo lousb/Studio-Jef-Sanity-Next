@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { gsap } from 'gsap';
-import ImageBox from '@/components/shared/ImageBox';
 import MuxPlayer from '@mux/mux-player-react';
+import { gsap } from 'gsap';
+import React, { useEffect, useRef, useState } from 'react';
+
+import ImageBox from '@/components/shared/ImageBox';
 import type { ShowcaseProject } from '@/types';
 
 interface ProjectProps {
@@ -231,8 +232,10 @@ else {
   }, [isMobile]);
 
 
-  const hasVideo = !!project.coverImage?.video?.asset?.playbackId;
-  const hasImage = !!project.coverImage?.media?.asset;
+  const playbackId = project.coverImage?.video?.asset?.playbackId;
+  const coverMedia = project.coverImage?.media ?? undefined;
+  const hasVideo = !!playbackId;
+  const hasImage = !!coverMedia?.asset;
 
   const [videoAspectRatio, setVideoAspectRatio] = useState('16:9');
 
@@ -253,11 +256,12 @@ else {
         <div ref={mediaRef} className='will-change-transform' style={{ width: '100%', paddingBottom, position: 'relative', scale:1.1 }}>
           <div className="absolute inset-0" style={{pointerEvents: 'none'}}>
             <MuxPlayer
-            userInactiveTimeout={0}
-              playbackId={project.coverImage.video.asset.playbackId}
+            // not in MuxPlayer's typings but still forwarded to the element (hides controls instantly)
+            {...({ userInactiveTimeout: 0 } as Record<string, unknown>)}
+              playbackId={playbackId}
               streamType="on-demand"
               autoPlay="muted"
-              loop="true"
+              loop
               style={{
                 width: '100%',
                 height: '100%',
@@ -274,7 +278,7 @@ else {
         >
           <ImageBox
            
-            image={project.coverImage.media}
+            image={coverMedia}
             alt={`Cover image from ${project.title}`}
             classesWrapper="relative"
             size="100vw"

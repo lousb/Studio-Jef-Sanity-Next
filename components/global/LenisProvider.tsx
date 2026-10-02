@@ -1,15 +1,15 @@
 "use client";
 
 import Lenis from "lenis";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   createContext,
+  PropsWithChildren,
   useContext,
   useEffect,
   useRef,
   useState,
-  PropsWithChildren,
 } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
 
 type LenisWithJumpFlag = Lenis & { __isProgrammaticJump?: boolean };
 

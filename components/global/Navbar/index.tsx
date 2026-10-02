@@ -12,14 +12,14 @@ import NavbarLayout from './NavbarLayout'
 const NavbarPreview = dynamic(() => import('./NavbarPreview'))
 
 export async function Navbar() {
-  const initial = await loadSettings();
-  const title = await getHomePageTitle();
-  const customLogo = await loadHomePage();
-  const projects = await loadProjectsPage();
+  const [initial, title, customLogo, projects] = await Promise.all([
+    loadSettings(),
+    getHomePageTitle(),
+    loadHomePage(),
+    loadProjectsPage(),
+  ])
 
-  // Extract showcaseProjects and calculate projectCount
-  const showcaseProjects = customLogo.data?.showcaseProjects || []
-  const projectCount = projects.data?.length || 0;
+  const projectCount = projects.data?.length || 0
 
   if (draftMode().isEnabled) {
     return (

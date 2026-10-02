@@ -1,16 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
 import { Link } from 'next-view-transitions'
+import { useState } from 'react'
 
-import { Header } from '@/components/shared/Header'
-import type { HomePagePayload } from '@/types'
+import { CursorLabel } from '@/components/global/CursorLabel'
+import { InfiniteLoop } from '@/components/global/InfiniteLoop'
 import RevealDiv from '@/components/global/revealDiv'
+import { Header } from '@/components/shared/Header'
 import ImageBox from '@/components/shared/ImageBox'
 import { colsToWidth, colsToWidthMobile, COLUMN_NUM_MAP, MOBILE_COLUMN_NUM_MAP } from '@/lib/gridWidth'
-import { InfiniteLoop } from '@/components/global/InfiniteLoop'
-import { CursorLabel } from '@/components/global/CursorLabel'
+import type { HomePagePayload } from '@/types'
 
 export interface HomePageProps {
   data: HomePagePayload | null

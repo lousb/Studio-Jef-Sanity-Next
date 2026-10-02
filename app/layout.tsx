@@ -1,13 +1,22 @@
 import './globals.css'
-import { loadSettings } from '@/sanity/loader/loadQuery'
-import LenisProvider from '@/components/global/LenisProvider'
+
+import type { Viewport } from 'next'
 import { ViewTransitions } from 'next-view-transitions'
 import { Suspense } from 'react'
+
+import GridOverlay from '@/components/global/GridOverlay'
+import { InfiniteLoop } from '@/components/global/InfiniteLoop'
+import LenisProvider from '@/components/global/LenisProvider'
+import NavigationCursor from '@/components/global/NavigationCursor'
 import LoadingOverlay from '@/components/shared/LoadingOverlay'
 import { urlForImage } from '@/sanity/lib/utils'
-import GridOverlay from '@/components/global/GridOverlay'
-import NavigationCursor from '@/components/global/NavigationCursor'
-import { InfiniteLoop } from '@/components/global/InfiniteLoop'
+import { loadSettings } from '@/sanity/loader/loadQuery'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#ffffff',
+}
 
 export default async function RootLayout({
   children,
@@ -27,7 +36,7 @@ export default async function RootLayout({
   return (
     <ViewTransitions>
       <html
-        lang="en"
+        lang="en-AU"
         className="bg-primary"
       >
         <head>

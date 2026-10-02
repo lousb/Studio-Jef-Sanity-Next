@@ -1,7 +1,9 @@
 import React, { useMemo, useRef } from 'react';
-import ImageBox from '../shared/ImageBox';
-import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth';
+
 import { useFigureHover } from '@/components/pages/project/FigureHoverContext'
+import { colsToWidth, COLUMN_NUM_MAP } from '@/lib/gridWidth';
+
+import ImageBox from '../shared/ImageBox';
 
 // True only for the very first script evaluation of a hard page load.
 // Client-side (Next.js) navigations don't re-run this module, so the

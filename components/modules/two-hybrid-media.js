@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useEffect, useState, lazy, Suspense } from 'react'
+import React, { lazy, Suspense,useEffect, useState } from 'react'
+
 import ImageBox from '@/components/shared/ImageBox'
 
 const MuxPlayer = lazy(() => import('@mux/mux-player-react'))

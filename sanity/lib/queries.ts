@@ -14,6 +14,25 @@ const ASSET_META = groq`
   }
 `
 
+// Cover image, normalised. The schema stores a plain image now, but older
+// project docs used { media, video } — return { media, video } either way
+// so nothing downstream has to care which shape a given doc has.
+const COVER_IMAGE = groq`
+  coverImage {
+    "media": select(
+      defined(media.asset) => media{ _type, crop, hotspot, asset->{ _id, url, ${ASSET_META} } },
+      defined(asset) => { "_type": "image", crop, hotspot, "asset": asset->{ _id, url, ${ASSET_META} } }
+    ),
+    video {
+      asset->{
+        playbackId,
+        "aspect_ratio": data.aspect_ratio,
+        "url": "https://stream.mux.com/" + playbackId
+      }
+    }
+  }
+`
+
 export const homePageQuery = groq`
   *[_type == "home"][0]{
     _id,
@@ -23,46 +42,6 @@ export const homePageQuery = groq`
       displayText,
     },
     customLogo,
-    showcaseProjects[]{
-      scaleTile,
-      project->{
-        _type,
-        _id,
-        coverImage {
-          media {
-            _type,
-            asset->{
-              _id,
-              url,
-              ${ASSET_META}
-            }
-          },
-          video {
-            asset->{
-              playbackId,
-              "aspect_ratio": data.aspect_ratio,
-              "url": "https://stream.mux.com/" + playbackId
-            }
-          }
-        },
-        overview,
-        "slug": slug.current,
-        title,
-        year,
-        status,
-        size,
-        location,
-        projectType[]->{
-          title
-        },
-        architects[]->{
-          title
-        },
-        client[]->{
-          title
-        }
-      }
-    },
     title,
    // skip items whose project isn't published (weak refs)
    featuredMedia[defined(project->_id)]{
@@ -89,23 +68,7 @@ export const projectsPageQuery = groq`
   customIndex,
   title,
   slug,
-  coverImage {
-    media {
-      _type,
-      asset->{
-        _id,
-        url,
-        ${ASSET_META}
-      }
-    },
-    video {
-      asset->{
-        playbackId,
-        "aspect_ratio": data.aspect_ratio,
-        "url": "https://stream.mux.com/" + playbackId
-      }
-    }
-  },
+  ${COVER_IMAGE},
   "previewMedia": content[_type in ["hybridMedia", "twoHybridMedia"]]{
     _type,
     _key,
@@ -147,37 +110,6 @@ export const projectsPageQuery = groq`
     title
   }
 }
-`
-
-export const moreProjectsQuery = groq`
-  *[_type == "project"] | order(_updatedAt desc) {
-    _type,
-    coverImage {
-      media {
-        _type,
-        asset->{
-          _id,
-          url,
-          ${ASSET_META}
-        }
-      },
-      video {
-        asset->{
-          playbackId,
-          "aspect_ratio": data.aspect_ratio,
-          "url": "https://stream.mux.com/" + playbackId
-        }
-      }
-    },
-    overview,
-    "slug": slug.current,
-    title,
-    year,
-    status,
-    size,
-    location,
-    _updatedAt,
-  }
 `
 
 export const aboutPageQuery = groq`
@@ -230,23 +162,7 @@ export const projectBySlugQuery = groq`
     client[]->{
       title
     },
-    coverImage {
-      media {
-        _type,
-        asset->{
-          _id,
-          url,
-          ${ASSET_META}
-        }
-      },
-      video {
-        asset->{
-          playbackId,
-          aspect_ratio,
-          "url": "https://stream.mux.com/" + playbackId
-        }
-      }
-    },
+    ${COVER_IMAGE},
     description,
     overview,
     site,

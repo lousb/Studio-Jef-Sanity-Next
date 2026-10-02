@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@sanity/client'
 import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook'
+import { NextRequest, NextResponse } from 'next/server'
 
 import { syncFeaturedMedia } from '@/sanity/lib/syncFeaturedMedia'
 
