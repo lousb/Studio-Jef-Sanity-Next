@@ -253,13 +253,24 @@ function ProjectPageInner({
     }
   }, [isInfoActive, hasScrolled, shouldShowTitleBlock, isAnimating])
 
+  // Every visit starts on View 1. Once the visitor picks a view it carries
+  // across projects for the rest of their visit (sessionStorage), then resets.
   useEffect(() => {
-    const storedInfoState = localStorage.getItem('infoActive')
-    setIsInfoActive(storedInfoState ? storedInfoState === 'true' : true)
+    try {
+      localStorage.removeItem('infoActive') // clear the old forever-remembered choice
+      const stored = sessionStorage.getItem('infoActive')
+      setIsInfoActive(stored === null ? true : stored === 'true')
+    } catch {
+      setIsInfoActive(true)
+    }
   }, [slug])
 
   useEffect(() => {
-    localStorage.setItem('infoActive', isInfoActive.toString())
+    try {
+      sessionStorage.setItem('infoActive', isInfoActive.toString())
+    } catch {
+      // storage unavailable (private mode etc.) — view just won't carry over
+    }
   }, [isInfoActive])
 
   // Figures list: coordinated stagger across the whole list — 0.03s between
