@@ -64,7 +64,8 @@ export const homePageQuery = groq`
       }
     },
     title,
-   featuredMedia[]{
+   // skip items whose project isn't published (weak refs)
+   featuredMedia[defined(project->_id)]{
     mediaKey,
     "project": project->{
       title,

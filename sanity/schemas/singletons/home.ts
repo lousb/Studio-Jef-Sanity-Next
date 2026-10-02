@@ -41,7 +41,8 @@ export default defineType({
   type: 'object',
   name: 'featuredMediaItem',
   fields: [
-    { name: 'project', type: 'reference', to: [{ type: 'project' }], readOnly: true },
+    // weak: featured items can point at unpublished projects without blocking publish/unpublish
+    { name: 'project', type: 'reference', to: [{ type: 'project' }], weak: true, readOnly: true },
     { name: 'mediaKey', title: 'Media key', type: 'string', readOnly: true },
   ],
   preview: {
