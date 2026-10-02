@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useClient } from 'sanity'
 import type { DocumentActionComponent, DocumentActionProps } from 'sanity'
+import { useClient } from 'sanity'
 
 import { syncFeaturedMedia } from '@/sanity/lib/syncFeaturedMedia'
 
-export const syncFeaturedMediaAction: DocumentActionComponent = (
+export const SyncFeaturedMediaAction: DocumentActionComponent = (
   props: DocumentActionProps,
 ) => {
   const client = useClient({ apiVersion: '2024-01-01' })

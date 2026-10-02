@@ -28,7 +28,7 @@ export default defineType({
     defineField({
   name: 'featuredMedia',
   title: 'Featured media',
-  description: 'Auto-synced from project media marked "Featured". Drag to reorder.',
+  description: 'Updates automatically when a project with media marked "Featured" is published. Drag to reorder.',
   type: 'array',
   components: {
     input: (props) => props.renderDefault({

@@ -13,7 +13,6 @@ import { structureTool } from 'sanity/structure'
 import { media } from 'sanity-plugin-media'
 import { muxInput } from 'sanity-plugin-mux-input';
 
-
 import { apiVersion, dataset, projectId, studioUrl } from '@/sanity/lib/api'
 import { Logo } from '@/sanity/plugins/Logo'
 import * as resolve from '@/sanity/plugins/resolve'
@@ -22,15 +21,16 @@ import project from '@/sanity/schemas/documents/project'
 import about from '@/sanity/schemas/singletons/about'
 import home from '@/sanity/schemas/singletons/home'
 import settings from '@/sanity/schemas/singletons/settings'
-import genre from '@/sanity/schemas/tags/genre'
-import technique from '@/sanity/schemas/tags/technique'
+import architect from '@/sanity/schemas/tags/architect'
 import client from '@/sanity/schemas/tags/client'
 import credits from '@/sanity/schemas/tags/credits'
-import { structure } from './sanity/structure'
-
-import architect from '@/sanity/schemas/tags/architect'
+import genre from '@/sanity/schemas/tags/genre'
 import projectType from '@/sanity/schemas/tags/projectType'
-import { syncFeaturedMediaAction } from './sanity/actions/syncFeaturedMediaAction'
+import technique from '@/sanity/schemas/tags/technique'
+
+import { withFeaturedSync } from './sanity/actions/publishWithFeaturedSync'
+import { SyncFeaturedMediaAction } from './sanity/actions/syncFeaturedMediaAction'
+import { structure } from './sanity/structure'
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE ||
@@ -43,9 +43,14 @@ export default defineConfig({
   title,
   document: {
   actions: (prev, context) => {
-    console.log('document.actions called for:', context.schemaType, prev.length)
     if (context.schemaType === 'home') {
-      return [...prev, syncFeaturedMediaAction]
+      // Manual fallback; normally unnecessary since project publishes auto-sync
+      return [...prev, SyncFeaturedMediaAction]
+    }
+    if (context.schemaType === 'project') {
+      return prev.map((action) =>
+        action.action === 'publish' ? withFeaturedSync(action) : action,
+      )
     }
     return prev
   },
