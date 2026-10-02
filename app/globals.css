@@ -581,7 +581,9 @@ html.resizing * {
   position: relative;
   pointer-events: all;
 }
-
+.main-desc > p{
+  color:white !important;
+}
 
 /* .mobile-menu-overlay,
 .project-page-overlay {
