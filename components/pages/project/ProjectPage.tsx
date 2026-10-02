@@ -148,6 +148,42 @@ function ProjectPageInner({
   } = data ?? {}
 
   const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
+  const descRef = useRef<HTMLDivElement>(null)
+
+  // Mobile info panel: the description scrolls in its own box that sits
+  // between the logo and the View 1 / Close / View 2 row. Measure both so it
+  // never overlaps the logo, whatever the screen size.
+  useEffect(() => {
+    if (!isMobileDetailsOpen) return
+    const el = descRef.current
+    if (!el) return
+
+    const update = () => {
+      const vh = window.visualViewport?.height ?? window.innerHeight
+      const logo = document.querySelector('.fixed-logo')
+      const rows = Array.from(
+        document.querySelectorAll('.project-page-title-info, .mobile-info-toggle'),
+      )
+      const logoBottom = logo ? logo.getBoundingClientRect().bottom : vh * 0.6
+      const rowTop = rows.length
+        ? Math.min(...rows.map((r) => r.getBoundingClientRect().top))
+        : vh - 60
+      el.style.setProperty('--desc-top', `${Math.round(logoBottom)}px`)
+      el.style.setProperty('--desc-bottom', `${Math.round(vh - rowTop)}px`)
+    }
+
+    update()
+    const raf = requestAnimationFrame(update)
+    const settle = setTimeout(update, 550) // logo margin transition is 500ms
+    window.addEventListener('resize', update)
+    window.visualViewport?.addEventListener('resize', update)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(settle)
+      window.removeEventListener('resize', update)
+      window.visualViewport?.removeEventListener('resize', update)
+    }
+  }, [isMobileDetailsOpen])
 
   const figures = getFigures(content)
 
@@ -407,7 +443,11 @@ function ProjectPageInner({
         >
           <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
             {overview && (
-              <div className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}>
+              <div
+                ref={descRef}
+                data-lenis-prevent
+                className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}
+              >
                 <div className="w-full">
                   <Reveal>
                     <CustomPortableText value={overview} />

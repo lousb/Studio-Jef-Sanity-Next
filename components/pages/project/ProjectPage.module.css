@@ -56,6 +56,31 @@
   .projectPageDetails{
     width: calc(100% - 40px) !important;
   }
+
+  /* Open info panel: description scrolls in its own box between the logo
+     and the View 1 / Close / View 2 row (positions set in ProjectPage.tsx).
+     20px padding keeps the text 20px clear of both at rest; the 20px mask
+     fades it out as it scrolls past either edge. */
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc {
+    position: fixed;
+    left: 20px;
+    right: 20px;
+    top: var(--desc-top, 60vh);
+    bottom: var(--desc-bottom, 60px);
+    display: block;
+    padding-block: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  }
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 
