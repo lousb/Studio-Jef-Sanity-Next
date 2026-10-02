@@ -1,0 +1,5 @@
+/* Bump Studio UI text 20% larger — Studio-only, doesn't touch the live site */
+html,
+body {
+  zoom: 1.1;
+}
