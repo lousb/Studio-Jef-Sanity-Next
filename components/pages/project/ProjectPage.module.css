@@ -67,7 +67,9 @@
     right: 20px;
     top: var(--desc-top, 60vh);
     bottom: var(--desc-bottom, 60px);
-    display: block;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     padding-block: 20px;
     overflow-x: hidden;
     overflow-y: auto;
@@ -77,6 +79,13 @@
     scrollbar-width: none;
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  }
+  /* Short text sits at the bottom (just above the buttons); long text still
+     scrolls normally. margin-top:auto (not justify-content:flex-end) keeps
+     the top of overflowing text reachable. */
+  .detailsPanel[data-mobile-open='true'] .projectPageDesc > * {
+    margin-top: auto;
+    flex-shrink: 0;
   }
   .detailsPanel[data-mobile-open='true'] .projectPageDesc::-webkit-scrollbar {
     display: none;
