@@ -166,7 +166,9 @@ function ProjectPageInner({
         Array.from(document.querySelectorAll(selector))
           .map((n) => n.getBoundingClientRect())
           .filter((r) => r.height > 0 && r.width > 0)
-      const header = visibleRects('.title-heading, .project-type, .project-year')
+      // Anchor to the project title itself (the h1), not its wrapper
+      const title = visibleRects('.title-heading h1')
+      const header = title.length ? title : visibleRects('.title-heading')
       const rows = visibleRects('.project-page-title-info, .mobile-info-toggle')
       const headerBottom = header.length ? Math.max(...header.map((r) => r.bottom)) : 60
       const rowTop = rows.length ? Math.min(...rows.map((r) => r.top)) : vh - 60
