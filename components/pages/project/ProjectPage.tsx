@@ -149,6 +149,18 @@ function ProjectPageInner({
   } = data ?? {}
 
   const [isMobileDetailsOpen, setIsMobileDetailsOpen] = useState(false)
+
+  // The Information panel is mobile-only: close it if the window is resized
+  // past the mobile breakpoint, so it is not left open behind the desktop layout.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const close = () => {
+      if (mq.matches) setIsMobileDetailsOpen(false)
+    }
+    close()
+    mq.addEventListener('change', close)
+    return () => mq.removeEventListener('change', close)
+  }, [])
   const descRef = useRef<HTMLDivElement>(null)
   const descCopyRef = useRef<HTMLDivElement>(null)
   const [descOverflows, setDescOverflows] = useState(false)
