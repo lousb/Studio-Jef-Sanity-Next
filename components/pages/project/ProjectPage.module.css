@@ -208,8 +208,19 @@
   .projectPageDetailsInner > .projectPageDesc > * {
     direction: ltr;
   }
-  /* Bar: macOS-style 7px rounded thumb, hidden until the text is hovered, then the same grey as the
-     unselected View button (#999) */
+  /* Bar: macOS-style 7px rounded thumb in the unselected-View grey (#999).
+     Hidden until the text is hovered (only when it's actually longer than
+     the box), then fades in. Scrollbar pseudo-elements can't transition
+     directly, so the thumb paints with border-color inherited from the box,
+     and the box's (zero-width) border-color is what fades. */
+  .projectPageDetailsInner > .projectPageDesc {
+    border-color: transparent;
+    /* keep the opacity fade used by the View 1 / View 2 switch */
+    transition: border-color 300ms ease, opacity 500ms ease;
+  }
+  .projectPageDesc[data-scrollable='true']:hover {
+    border-color: #999;
+  }
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar {
     width: 7px;
   }
@@ -218,16 +229,18 @@
   }
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar-thumb {
     background: transparent;
+    border-left: 7px solid;
+    border-color: inherit;
     border-radius: 7px;
-  }
-  .projectPageDesc[data-scrollable='true']:hover::-webkit-scrollbar-thumb {
-    background: #999;
   }
   /* Firefox has no width control beyond "thin" */
   @supports (-moz-appearance: none) {
     .projectPageDetailsInner > .projectPageDesc {
       scrollbar-width: thin;
       scrollbar-color: transparent transparent;
+    }
+    .projectPageDetailsInner > .projectPageDesc {
+      transition: scrollbar-color 300ms ease, opacity 500ms ease;
     }
     .projectPageDesc[data-scrollable='true']:hover {
       scrollbar-color: #999 transparent;

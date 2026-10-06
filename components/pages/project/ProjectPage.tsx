@@ -432,14 +432,17 @@ function ProjectPageInner({
     )
   }, [slug])
 
-  // View 1 / View 2 toggle: shared-element morph + crossfade.
-  // - The image nearest the middle of the screen (the anchor) stays where
-  //   the eye is: the scroll is nudged so it doesn't move in the new layout,
-  //   then it glides/scales from its old size to its new one (FLIP, transform
-  //   only, so it's GPU-smooth; images keep their aspect so one scale is exact).
-  // - Every other image on screen is left behind as a still copy that fades
-  //   out in place, while the images in the new layout fade in. Nothing has
-  //   to travel across the screen, so there's no "scrolling" feel.
+  // View 1 / View 2 toggle: every image on screen morphs (FLIP).
+  // 1. Record where each on-screen image is (First).
+  // 2. Swap the view synchronously with the loop suspended.
+  // 3. Nudge the scroll (from the real scroll position) so the image nearest
+  //    mid-screen stays put; everything else lands relative to it.
+  // 4. Offset each image back to where it was with a transform and animate
+  //    it home (transform + scale only, GPU-smooth; images keep their aspect
+  //    so one uniform scale is exact).
+  // An image that would have to travel more than a screen height doesn't
+  // fly across: a still copy fades out where it was instead. Images that
+  // only come into view in the new layout fade in.
   const handleSetIsInfoActive = (next: boolean) => {
     if (next === isInfoActive || isToggling.current) return
 
@@ -470,34 +473,38 @@ function ProjectPageInner({
     }, before[0])
     const anchorFirst = first.get(anchor)!
 
-    // Still copies of the other on-screen images, to fade out in place.
-    // They live in the gallery wrapper so they layer exactly like the
-    // images (under the title / info / toggle).
     const media = document.querySelector('.project-page-media') as HTMLElement | null
-    const ghostLayer = (media?.firstElementChild as HTMLElement | null) ?? null
-    const ghosts: { el: HTMLElement; rect: DOMRect }[] = []
-    if (ghostLayer) {
-      before.forEach((el) => {
-        if (el === anchor) return
-        const g = el.cloneNode(true) as HTMLElement
-        g.removeAttribute('data-media-block')
-        g.setAttribute('aria-hidden', 'true')
-        g.querySelectorAll('img').forEach((img) => img.setAttribute('loading', 'eager'))
-        ghosts.push({ el: g, rect: first.get(el)! })
-      })
-    }
+    const layer = (media?.firstElementChild as HTMLElement | null) ?? null
+
+    // Still copies made up front, used only for images that would travel too far
+    const copies = new Map<HTMLElement, HTMLElement>()
+    before.forEach((el) => {
+      const g = el.cloneNode(true) as HTMLElement
+      g.removeAttribute('data-media-block')
+      g.setAttribute('aria-hidden', 'true')
+      g.querySelectorAll('img').forEach((img) => img.setAttribute('loading', 'eager'))
+      copies.set(el, g)
+    })
 
     // The page column's own CSS width transition would keep shifting the
     // centred images after we measure, so hold it still during the swap.
     const prevTransition = media?.style.transition ?? ''
     if (media) media.style.transition = 'none'
 
+    // Each loop copy clips to its own height; let images travel across copy
+    // edges while they move.
+    const loopCopies = layer
+      ? (Array.from(layer.querySelectorAll(':scope > div > div')) as HTMLElement[])
+      : []
+    const prevOverflow = loopCopies.map((el) => el.style.overflow)
+    loopCopies.forEach((el) => (el.style.overflow = 'visible'))
+
     infiniteLoopRef.current?.suspend()
     flushSync(() => setIsInfoActive(next))
     infiniteLoopRef.current?.resume() // re-measures the loop height synchronously
 
-    // Keep the anchor where it was on screen. Use the real scroll position,
-    // not Lenis's cached one.
+    // Keep the anchor where it was on screen (real scroll position, not
+    // Lenis's cached one)
     const delta = anchor.isConnected ? anchor.getBoundingClientRect().top - anchorFirst.top : 0
     if (Math.abs(delta) > 0.5) {
       const target = window.scrollY + delta
@@ -516,81 +523,81 @@ function ProjectPageInner({
       }
     }
 
-    // Place the still copies where the old images were (viewport coords
-    // converted into the wrapper's coords, after the scroll nudge).
-    if (ghostLayer && ghosts.length) {
-      const base = ghostLayer.getBoundingClientRect()
-      ghosts.forEach(({ el, rect }) => {
-        Object.assign(el.style, {
-          position: 'absolute',
-          left: `${rect.left - base.left}px`,
-          top: `${rect.top - base.top}px`,
-          width: `${rect.width}px`,
-          height: `${rect.height}px`,
-          margin: '0',
-          transform: 'none',
-          animation: 'none',
-          pointerEvents: 'none',
-          zIndex: '2',
-        })
-        ghostLayer.appendChild(el)
-      })
-    }
-
     const DURATION = 0.9
+    const EASE = 'power3.inOut'
+    const usedCopies: HTMLElement[] = []
     const tl = gsap.timeline({
       onComplete: () => {
-        ghosts.forEach(({ el }) => el.remove())
+        usedCopies.forEach((el) => el.remove())
+        loopCopies.forEach((el, i) => (el.style.overflow = prevOverflow[i]))
         if (media) media.style.transition = prevTransition
         isToggling.current = false
       },
     })
     tl.set({}, {}, DURATION) // fixed length, so onComplete always runs
 
-    // Anchor morph (skip if something went wrong and it'd fly a long way)
-    const last = anchor.isConnected ? anchor.getBoundingClientRect() : null
-    const canMorph =
-      last && last.width > 0 && Math.abs(anchorFirst.top - last.top) < vh * 0.5
-    if (canMorph) {
-      tl.fromTo(
-        anchor,
-        {
-          x: anchorFirst.left - last!.left,
-          y: anchorFirst.top - last!.top,
-          scale: anchorFirst.width / last!.width,
-          transformOrigin: '0 0',
-          zIndex: 3,
-          position: 'relative',
-        },
-        {
-          x: 0,
-          y: 0,
-          scale: 1,
-          duration: DURATION,
-          ease: 'power3.inOut',
-          clearProps: 'transform,transformOrigin,zIndex,position',
-        },
-        0
-      )
+    const base = layer?.getBoundingClientRect()
+    const morphing = new Set<HTMLElement>()
+
+    before.forEach((el) => {
+      const f = first.get(el)!
+      const l = el.isConnected ? el.getBoundingClientRect() : null
+      const travel = l ? Math.hypot(f.left - l.left, f.top - l.top) : Infinity
+
+      if (l && l.width > 0 && travel < vh) {
+        morphing.add(el)
+        tl.fromTo(
+          el,
+          {
+            x: f.left - l.left,
+            y: f.top - l.top,
+            scale: f.width / l.width,
+            transformOrigin: '0 0',
+          },
+          {
+            x: 0,
+            y: 0,
+            scale: 1,
+            duration: DURATION,
+            ease: EASE,
+            clearProps: 'transform,transformOrigin',
+          },
+          0
+        )
+        return
+      }
+
+      // Too far to travel: fade a still copy out where it was
+      const g = copies.get(el)
+      if (!g || !layer || !base) return
+      Object.assign(g.style, {
+        position: 'absolute',
+        left: `${f.left - base.left}px`,
+        top: `${f.top - base.top}px`,
+        width: `${f.width}px`,
+        height: `${f.height}px`,
+        margin: '0',
+        transform: 'none',
+        animation: 'none',
+        pointerEvents: 'none',
+        zIndex: '2',
+      })
+      layer.appendChild(g)
+      usedCopies.push(g)
+    })
+
+    if (usedCopies.length) {
+      tl.to(usedCopies, { opacity: 0, duration: 0.45, ease: 'power1.out' }, 0)
     }
 
-    // Old copies fade out in place...
-    if (ghosts.length) {
-      tl.to(
-        ghosts.map((g) => g.el),
-        { opacity: 0, duration: 0.45, ease: 'power1.out' },
-        0
-      )
-    }
-
-    // ...while the new layout's images fade in
-    const incoming = getVisibleBlocks(allBlocks()).filter((el) => !(canMorph && el === anchor))
+    // Images that weren't on screen before fade in at their new spot
+    const incoming = getVisibleBlocks(allBlocks()).filter((el) => !morphing.has(el))
     if (incoming.length) {
       tl.fromTo(
         incoming,
         { opacity: 0 },
         { opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.05, clearProps: 'opacity' },
-        0.2
+        0.25
       )
     }
   }
