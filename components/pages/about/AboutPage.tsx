@@ -2,10 +2,11 @@
 
 import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
 import { Link } from 'next-view-transitions'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { InfiniteLoop } from '@/components/global/InfiniteLoop'
 import Reveal from '@/components/global/Reveal'
+import { useScrollableText } from '@/components/global/useScrollableText'
 import styles from '@/components/pages/project/ProjectPage.module.css'
 import AboutImageBox from '@/components/shared/AboutImageBox'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
@@ -141,6 +142,11 @@ function MobileAbout({ overview, aboutLinks, media, services, press, location }:
 }
 
 function DesktopAbout({ overview, aboutLinks, media, services, press, location }: SectionProps) {
+  // Long overview scrolls in its own box, same as the project page text
+  const descRef = useRef<HTMLDivElement>(null)
+  const descCopyRef = useRef<HTMLDivElement>(null)
+  useScrollableText(descRef, descCopyRef, [overview])
+
   return (
     <div className={`${styles.infoActive} info-active about-page`}>
       <div className="space-y-6 project-page-media">
@@ -171,8 +177,11 @@ function DesktopAbout({ overview, aboutLinks, media, services, press, location }
         <div className={`project-page-details ${styles.projectPageDetails}`}>
           <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
             {overview && (
-              <div className="flex flex-wrap justify-between flex-col md:flex-row project-page-details">
-                <div className="w-full">
+              <div
+                ref={descRef}
+                className={`flex flex-wrap justify-between flex-col md:flex-row project-page-details ${styles.projectPageDesc}`}
+              >
+                <div ref={descCopyRef} className="w-full">
                   <CustomPortableText value={overview} />
                 </div>
               </div>
@@ -190,7 +199,7 @@ function DesktopAbout({ overview, aboutLinks, media, services, press, location }
 
             <div
               className="project-page-meta"
-              style={{ marginTop: '1rem', marginBottom: '1rem'}}
+              style={{ marginTop: '20px', marginBottom: '1rem'}}
             >
               <AboutMeta services={services} press={press} location={location} />
             </div>

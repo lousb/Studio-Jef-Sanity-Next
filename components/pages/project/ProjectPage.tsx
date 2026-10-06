@@ -9,6 +9,7 @@ import { flushSync } from 'react-dom'
 import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
 import { useLenis } from '@/components/global/LenisProvider'
 import RevealDiv from '@/components/global/revealDiv'
+import { useScrollableText } from '@/components/global/useScrollableText'
 import { Module } from '@/components/modules'
 import { CustomPortableText } from '@/components/shared/CustomPortableText'
 import type { ProjectPayload } from '@/types'
@@ -217,44 +218,9 @@ function ProjectPageInner({
     }
   }, [isMobileDetailsOpen])
 
-  // Desktop: when the description is taller than the space left above the
-  // title + meta, it scrolls inside its own box (Lenis leaves wheel events
-  // inside it alone via data-lenis-prevent) with a soft fade at whichever edge has more text.
-  useEffect(() => {
-    const el = descRef.current
-    if (!el) return
-    const mq = window.matchMedia('(min-width: 768px)')
-
-    const update = () => {
-      if (!mq.matches) {
-        // Mobile keeps its own page-linked behaviour, so Lenis stays in charge
-        el.removeAttribute('data-lenis-prevent')
-        delete el.dataset.scrollable
-        delete el.dataset.atStart
-        delete el.dataset.atEnd
-        return
-      }
-      const scrollable = el.scrollHeight > el.clientHeight + 1
-      // Only take the wheel away from Lenis when there's something to scroll
-      if (scrollable) el.setAttribute('data-lenis-prevent', '')
-      else el.removeAttribute('data-lenis-prevent')
-      el.dataset.scrollable = scrollable ? 'true' : 'false'
-      el.dataset.atStart = el.scrollTop <= 1 ? 'true' : 'false'
-      el.dataset.atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 ? 'true' : 'false'
-    }
-
-    const ro = new ResizeObserver(update)
-    ro.observe(el)
-    if (descCopyRef.current) ro.observe(descCopyRef.current)
-    el.addEventListener('scroll', update, { passive: true })
-    mq.addEventListener('change', update)
-    update()
-    return () => {
-      ro.disconnect()
-      el.removeEventListener('scroll', update)
-      mq.removeEventListener('change', update)
-    }
-  }, [slug])
+  // Desktop: long descriptions scroll in their own box (hover scrollbar,
+  // edge fades); see useScrollableText
+  useScrollableText(descRef, descCopyRef, [slug])
 
   const figures = getFigures(content)
 
