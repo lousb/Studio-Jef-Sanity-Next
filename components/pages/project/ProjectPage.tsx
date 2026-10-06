@@ -432,26 +432,21 @@ function ProjectPageInner({
     )
   }, [slug])
 
-  // View 1 / View 2 toggle as a FLIP morph: every image on screen glides
-  // and scales from where it is now to where it sits in the other view,
-  // instead of fading out and popping back in.
-  // 1. Record the on-screen blocks' positions/sizes (First).
-  // 2. Swap the view synchronously (flushSync) with the loop suspended so
-  //    nothing re-measures or wraps mid-swap.
-  // 3. Keep the image nearest the middle of the screen where it was by
-  //    nudging the scroll by however far it moved in the new layout.
-  // 4. Read the new positions (Last), offset each block back to its old
-  //    spot with a transform (Invert), then animate the transform to zero
-  //    (Play). Transform + scale only, so it stays on the GPU and smooth.
-  //    Images keep their aspect ratio, so one uniform scale is exact.
-  // Blocks that only come into view in the new layout fade in.
+  // View 1 / View 2 toggle: shared-element morph + crossfade.
+  // - The image nearest the middle of the screen (the anchor) stays where
+  //   the eye is: the scroll is nudged so it doesn't move in the new layout,
+  //   then it glides/scales from its old size to its new one (FLIP, transform
+  //   only, so it's GPU-smooth; images keep their aspect so one scale is exact).
+  // - Every other image on screen is left behind as a still copy that fades
+  //   out in place, while the images in the new layout fade in. Nothing has
+  //   to travel across the screen, so there's no "scrolling" feel.
   const handleSetIsInfoActive = (next: boolean) => {
     if (next === isInfoActive || isToggling.current) return
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const before = getVisibleBlocks(
+    const allBlocks = () =>
       Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
-    )
+    const before = getVisibleBlocks(allBlocks())
 
     if (reduceMotion || !before.length) {
       setIsInfoActive(next)
@@ -466,7 +461,6 @@ function ProjectPageInner({
     const first = new Map<HTMLElement, DOMRect>()
     before.forEach((el) => first.set(el, el.getBoundingClientRect()))
 
-    // Anchor: the block whose centre is closest to the middle of the screen
     const anchor = before.reduce((best, el) => {
       const r = first.get(el)!
       const b = first.get(best)!
@@ -474,92 +468,129 @@ function ProjectPageInner({
       const db = Math.abs(b.top + b.height / 2 - vh / 2)
       return d < db ? el : best
     }, before[0])
-    const anchorTop = first.get(anchor)!.top
+    const anchorFirst = first.get(anchor)!
+
+    // Still copies of the other on-screen images, to fade out in place.
+    // They live in the gallery wrapper so they layer exactly like the
+    // images (under the title / info / toggle).
+    const media = document.querySelector('.project-page-media') as HTMLElement | null
+    const ghostLayer = (media?.firstElementChild as HTMLElement | null) ?? null
+    const ghosts: { el: HTMLElement; rect: DOMRect }[] = []
+    if (ghostLayer) {
+      before.forEach((el) => {
+        if (el === anchor) return
+        const g = el.cloneNode(true) as HTMLElement
+        g.removeAttribute('data-media-block')
+        g.setAttribute('aria-hidden', 'true')
+        g.querySelectorAll('img').forEach((img) => img.setAttribute('loading', 'eager'))
+        ghosts.push({ el: g, rect: first.get(el)! })
+      })
+    }
 
     // The page column's own CSS width transition would keep shifting the
     // centred images after we measure, so hold it still during the swap.
-    const media = document.querySelector('.project-page-media') as HTMLElement | null
     const prevTransition = media?.style.transition ?? ''
     if (media) media.style.transition = 'none'
-
-    // Each loop copy clips to its own height; let images travel across copy
-    // edges while they move, then restore.
-    const loopCopies = media
-      ? (Array.from(media.querySelectorAll(':scope > div > div > div')) as HTMLElement[])
-      : []
-    const prevOverflow = loopCopies.map((el) => el.style.overflow)
-    loopCopies.forEach((el) => (el.style.overflow = 'visible'))
 
     infiniteLoopRef.current?.suspend()
     flushSync(() => setIsInfoActive(next))
     infiniteLoopRef.current?.resume() // re-measures the loop height synchronously
 
-    // Keep the anchor image where the eye is
-    if (anchor.isConnected) {
-      const delta = anchor.getBoundingClientRect().top - anchorTop
-      if (Math.abs(delta) > 0.5) {
-        if (lenis) {
-          const l = lenis as typeof lenis & { __isProgrammaticJump?: boolean }
-          l.__isProgrammaticJump = true
-          lenis.resize()
-          lenis.scrollTo(lenis.scroll + delta, { immediate: true, force: true })
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => {
-              l.__isProgrammaticJump = false
-            })
-          )
-        } else {
-          window.scrollBy(0, delta)
-        }
+    // Keep the anchor where it was on screen. Use the real scroll position,
+    // not Lenis's cached one.
+    const delta = anchor.isConnected ? anchor.getBoundingClientRect().top - anchorFirst.top : 0
+    if (Math.abs(delta) > 0.5) {
+      const target = window.scrollY + delta
+      if (lenis) {
+        const l = lenis as typeof lenis & { __isProgrammaticJump?: boolean }
+        l.__isProgrammaticJump = true
+        lenis.resize()
+        lenis.scrollTo(target, { immediate: true, force: true })
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            l.__isProgrammaticJump = false
+          })
+        )
+      } else {
+        window.scrollTo(0, target)
       }
     }
 
+    // Place the still copies where the old images were (viewport coords
+    // converted into the wrapper's coords, after the scroll nudge).
+    if (ghostLayer && ghosts.length) {
+      const base = ghostLayer.getBoundingClientRect()
+      ghosts.forEach(({ el, rect }) => {
+        Object.assign(el.style, {
+          position: 'absolute',
+          left: `${rect.left - base.left}px`,
+          top: `${rect.top - base.top}px`,
+          width: `${rect.width}px`,
+          height: `${rect.height}px`,
+          margin: '0',
+          transform: 'none',
+          animation: 'none',
+          pointerEvents: 'none',
+          zIndex: '2',
+        })
+        ghostLayer.appendChild(el)
+      })
+    }
+
     const DURATION = 0.9
-    const EASE = 'power3.inOut'
     const tl = gsap.timeline({
       onComplete: () => {
+        ghosts.forEach(({ el }) => el.remove())
         if (media) media.style.transition = prevTransition
-        loopCopies.forEach((el, i) => (el.style.overflow = prevOverflow[i]))
         isToggling.current = false
       },
     })
+    tl.set({}, {}, DURATION) // fixed length, so onComplete always runs
 
-    before.forEach((el) => {
-      if (!el.isConnected) return
-      const f = first.get(el)!
-      const l = el.getBoundingClientRect()
-      if (!l.width) return
+    // Anchor morph (skip if something went wrong and it'd fly a long way)
+    const last = anchor.isConnected ? anchor.getBoundingClientRect() : null
+    const canMorph =
+      last && last.width > 0 && Math.abs(anchorFirst.top - last.top) < vh * 0.5
+    if (canMorph) {
       tl.fromTo(
-        el,
+        anchor,
         {
-          x: f.left - l.left,
-          y: f.top - l.top,
-          scale: f.width / l.width,
+          x: anchorFirst.left - last!.left,
+          y: anchorFirst.top - last!.top,
+          scale: anchorFirst.width / last!.width,
           transformOrigin: '0 0',
+          zIndex: 3,
+          position: 'relative',
         },
         {
           x: 0,
           y: 0,
           scale: 1,
           duration: DURATION,
-          ease: EASE,
-          clearProps: 'transform,transformOrigin',
+          ease: 'power3.inOut',
+          clearProps: 'transform,transformOrigin,zIndex,position',
         },
         0
       )
-    })
+    }
 
-    tl.set({}, {}, DURATION) // fixed length, so onComplete always runs
+    // Old copies fade out in place...
+    if (ghosts.length) {
+      tl.to(
+        ghosts.map((g) => g.el),
+        { opacity: 0, duration: 0.45, ease: 'power1.out' },
+        0
+      )
+    }
 
-    const entering = getVisibleBlocks(
-      Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
-    ).filter((el) => !first.has(el))
-    if (entering.length) {
+    // ...while the new layout's images fade in
+    const incoming = getVisibleBlocks(allBlocks()).filter((el) => !(canMorph && el === anchor))
+    if (incoming.length) {
       tl.fromTo(
-        entering,
+        incoming,
         { opacity: 0 },
-        { opacity: 1, duration: DURATION * 0.6, ease: 'power2.out', clearProps: 'opacity' },
-        DURATION * 0.4
+        { opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.05, clearProps: 'opacity' },
+        0.2
       )
     }
   }
@@ -666,7 +697,7 @@ function ProjectPageInner({
             </div>
 
             {/* Project meta: title, status, size, type, year, location, architect */}
-            <div className={`project-page-meta ${styles.projectPageMeta}`} style={{ marginTop: '1rem', marginBottom: '1rem' }}>
+            <div className={`project-page-meta ${styles.projectPageMeta}`} style={{ marginTop: '20px', marginBottom: '1rem' }}>
               {client?.map((client, i) => (
                 <span key={i}>
                   {client.title}

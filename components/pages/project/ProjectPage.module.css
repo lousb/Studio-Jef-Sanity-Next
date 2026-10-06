@@ -192,10 +192,40 @@
     flex-wrap: nowrap;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-width: none;
+    /* 20px clear of the title below */
+    margin-bottom: 20px;
+    /* Scrollbar on the LEFT: rtl puts it there, the text itself stays ltr.
+       2px bar + 10px gap sit out in the gutter, so the text keeps its grid line. */
+    direction: rtl;
+    margin-left: -12px;
+    padding-left: 10px;
   }
+  .projectPageDetailsInner > .projectPageDesc > * {
+    direction: ltr;
+  }
+  /* Bar: 2px, hidden until the text is hovered, then the same grey as the
+     unselected View button (#999) */
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar {
-    display: none;
+    width: 2px;
+  }
+  .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  .projectPageDesc[data-scrollable='true']:hover::-webkit-scrollbar-thumb {
+    background: #999;
+  }
+  /* Firefox has no width control beyond "thin" */
+  @supports (-moz-appearance: none) {
+    .projectPageDetailsInner > .projectPageDesc {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
+    .projectPageDesc[data-scrollable='true']:hover {
+      scrollbar-color: #999 transparent;
+    }
   }
   /* Soft fade on whichever edge has more text */
   .projectPageDesc[data-scrollable='true'] {
