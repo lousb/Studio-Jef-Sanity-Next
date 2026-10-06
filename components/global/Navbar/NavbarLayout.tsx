@@ -203,7 +203,7 @@ export default function Navbar(props: NavbarProps) {
           ${isVisible ? 'scroll-hidden' : 'scroll-visible'}`}
       >
 
-        <div className="flex absolute top-[10px] left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
+        <div className="flex absolute top-[10px] left-0 md:left-[10px] flex-col text-white items-center text-center w-full pointer-events-auto md:[grid-column:auto] md:flex-wrap md:items-start md:text-left md:mt-0 md:text-1xl">
           <button
             type="button"
             onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -249,7 +249,8 @@ export default function Navbar(props: NavbarProps) {
           </div>
         )}
 
-        {customLogo ? (
+        {/* No logo on the projects index */}
+        {customLogo && !isProjectsPage ? (
           <Image
             src={logoImageUrl}
             alt={title || 'Studio Jef'}

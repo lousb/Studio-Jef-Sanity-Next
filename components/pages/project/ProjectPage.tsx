@@ -166,9 +166,8 @@ function ProjectPageInner({
         Array.from(document.querySelectorAll(selector))
           .map((n) => n.getBoundingClientRect())
           .filter((r) => r.height > 0 && r.width > 0)
-      // Anchor to the project title itself (the h1), not its wrapper
-      const title = visibleRects('.title-heading h1')
-      const header = title.length ? title : visibleRects('.title-heading')
+      // Anchor to the bottom of the stacked title block (index, title, type, year)
+      const header = visibleRects('.title-heading')
       const rows = visibleRects('.project-page-title-info, .mobile-info-toggle')
       const headerBottom = header.length ? Math.max(...header.map((r) => r.bottom)) : 60
       const rowTop = rows.length ? Math.min(...rows.map((r) => r.top)) : vh - 60
@@ -204,6 +203,45 @@ function ProjectPageInner({
       window.visualViewport?.removeEventListener('resize', update)
     }
   }, [isMobileDetailsOpen])
+
+  // Desktop: when the description is taller than the space left above the
+  // title + meta, it scrolls inside its own box (Lenis leaves wheel events
+  // inside it alone via data-lenis-prevent) with a soft fade at whichever edge has more text.
+  useEffect(() => {
+    const el = descRef.current
+    if (!el) return
+    const mq = window.matchMedia('(min-width: 768px)')
+
+    const update = () => {
+      if (!mq.matches) {
+        // Mobile keeps its own page-linked behaviour, so Lenis stays in charge
+        el.removeAttribute('data-lenis-prevent')
+        delete el.dataset.scrollable
+        delete el.dataset.atStart
+        delete el.dataset.atEnd
+        return
+      }
+      const scrollable = el.scrollHeight > el.clientHeight + 1
+      // Only take the wheel away from Lenis when there's something to scroll
+      if (scrollable) el.setAttribute('data-lenis-prevent', '')
+      else el.removeAttribute('data-lenis-prevent')
+      el.dataset.scrollable = scrollable ? 'true' : 'false'
+      el.dataset.atStart = el.scrollTop <= 1 ? 'true' : 'false'
+      el.dataset.atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 ? 'true' : 'false'
+    }
+
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    if (descCopyRef.current) ro.observe(descCopyRef.current)
+    el.addEventListener('scroll', update, { passive: true })
+    mq.addEventListener('change', update)
+    update()
+    return () => {
+      ro.disconnect()
+      el.removeEventListener('scroll', update)
+      mq.removeEventListener('change', update)
+    }
+  }, [slug])
 
   const figures = getFigures(content)
 
@@ -422,14 +460,20 @@ function ProjectPageInner({
     isToggling.current = true
     gsap.killTweensOf(blocks)
 
-    gsap.to(blocks, {
+    // Top-to-bottom order so the swap reads as one soft wave rather than
+    // random pops.
+    const byPosition = (els: HTMLElement[]) =>
+      [...els].sort((a, b) => {
+        const ra = a.getBoundingClientRect()
+        const rb = b.getBoundingClientRect()
+        return ra.top - rb.top || ra.left - rb.left
+      })
+
+    gsap.to(byPosition(blocks), {
       opacity: 0,
-      duration: 0.6,
-      ease: 'power1.in',
-      stagger: {
-        each: 0.1,
-        from: 'random',
-      },
+      duration: 0.35,
+      ease: 'power1.inOut',
+      stagger: 0.04,
       onComplete: () => {
         infiniteLoopRef.current?.suspend()
         setIsInfoActive(next)
@@ -442,17 +486,18 @@ function ProjectPageInner({
             // InfiniteLoop can clone/regenerate the block nodes, so the
             // references captured before the toggle may now be detached
             // from the document — animating them would be a silent no-op.
-            const freshBlocks = getVisibleBlocks(
-              Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
-            )
+            const freshAll = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
+            const freshBlocks = byPosition(getVisibleBlocks(freshAll))
             gsap.killTweensOf(freshBlocks)
-            gsap.set(freshBlocks, { opacity: 0 })
+            gsap.set(freshBlocks, { opacity: 0, y: 12 })
 
             gsap.to(freshBlocks, {
               opacity: 1,
-              duration: 0.8,
+              y: 0,
+              duration: 0.6,
               ease: 'power2.out',
-              stagger: { each: 0.2, from: 'random' },
+              stagger: 0.06,
+              clearProps: 'transform',
               onComplete: () => {
                 isToggling.current = false
               },
@@ -538,7 +583,11 @@ function ProjectPageInner({
               </div>
             )}
 
-            <div ref={titleHeadingRef} className={`${styles.titleHeading} text-list title-heading`}>
+            <div
+              ref={titleHeadingRef}
+              className={`${styles.titleHeading} text-list title-heading`}
+              data-open={isMobileDetailsOpen ? 'true' : 'false'}
+            >
               {customIndex !== undefined && customIndex !== null && (
                 <Reveal element="div" elementClass="opacity-60">
                   {String(customIndex).padStart(3, '0')}
@@ -549,6 +598,15 @@ function ProjectPageInner({
                   {title}
                 </Reveal>
               )}
+
+              {/* Mobile only: type + year join the centred stack when the
+                  information panel is open (desktop shows them in the meta list) */}
+              {projectType?.length ? (
+                <div className="title-stack-meta">
+                  {projectType.map((t) => t.title).join(', ')}
+                </div>
+              ) : null}
+              {year && <div className="title-stack-meta">{year}</div>}
             </div>
 
             {/* Project meta: title, status, size, type, year, location, architect */}
@@ -652,26 +710,24 @@ function ProjectPageInner({
 
       <div className={`mt-2 md:mt-4 flex gap-4 project-page-title-info ${styles.projectPageTitleInfo}`}>
         <button
+          type="button"
           onClick={() => handleSetIsInfoActive(true)}
-          disabled={isInfoActive}
-          style={{
-            opacity: isInfoActive ? 0.5 : 1,
-            cursor: isInfoActive ? 'default' : 'pointer',
-            pointerEvents: isInfoActive ? 'none' : 'auto',
-          }}
+          aria-pressed={isInfoActive}
+          className="view-toggle"
         >
-          <Reveal>View 1</Reveal>
+          <Reveal>
+            <span className="view-toggle-label">View 1</span>
+          </Reveal>
         </button>
         <button
+          type="button"
           onClick={() => handleSetIsInfoActive(false)}
-          disabled={!isInfoActive}
-          style={{
-            opacity: !isInfoActive ? 0.5 : 1,
-            cursor: !isInfoActive ? 'default' : 'pointer',
-            pointerEvents: !isInfoActive ? 'none' : 'auto',
-          }}
+          aria-pressed={!isInfoActive}
+          className="view-toggle"
         >
-          <Reveal>View 2</Reveal>
+          <Reveal>
+            <span className="view-toggle-label">View 2</span>
+          </Reveal>
         </button>
       </div>
 

@@ -668,10 +668,6 @@ body:has(.all-projects-page) .fixed-logo{
   .project-page-details{
     margin-bottom: 20px;
   }
-  body:has(.project-page-overlay) .title-heading{
-    left: 20px;
-    transform: translateX(0);
-  }
   .project-page-meta *{
     opacity: 0;
     pointer-events: none;
@@ -679,11 +675,6 @@ body:has(.all-projects-page) .fixed-logo{
   }
   .project-type-title, .project-year-title{
     display: none !important;
-  }
-  .project-type, .project-year, .project-type *, .project-year *{
-    opacity: 1;
-    pointer-events: all;
-    display: block;
   }
   .project-page-details{
     mix-blend-mode: difference;
@@ -694,25 +685,24 @@ body:has(.all-projects-page) .fixed-logo{
   .hybrid-media{
     margin-bottom: 20px !important;
   }
-  .project-type{
-    position: fixed;
-    top:40px;
-    left: calc(50% + 5px);
-    transition: 500ms opacity ease-in 500ms !important;
-    opacity: 0 !important;
+  /* Project title block: one centred stack, like the menu. Index and title
+     always; type and year join it while the information panel is open. */
+  .title-heading{
+    flex-direction: column;
+    align-items: center;
+    row-gap: 0.5rem;
+    width: max-content;
+    max-width: calc(100vw - 40px);
+    text-align: center;
   }
-  body:has(.project-page-overlay.is-visible)  .project-type{
-    opacity: 1 !important;
+  .title-heading h1{
+    max-width: 100%;
+    hyphens: manual;
+    text-wrap: balance;
   }
-  .project-year{
-    position: fixed;
-    top:40px;
-    right: 20px;
-
-  }
-  body:has(.project-page-overlay) .title-heading > div{
-    min-width: calc(10vw + 10px);
-    max-width: calc(30vw + 20px);
+  .title-heading[data-open='true'] .title-stack-meta{
+    display: block;
+    animation: title-stack-in 400ms ease-out both;
   }
   body:has(.mobile-menu-overlay) .project-page-title-info, body:has(.mobile-menu-overlay) .mobile-info-toggle{
     display:none;
@@ -722,7 +712,51 @@ body:has(.all-projects-page) .fixed-logo{
   }
   .title-heading > div{
     width: max-content;
+    max-width: 100%;
   }
+}
+
+/* Type / year inside the mobile title stack (shown via the rule above) */
+.title-stack-meta{
+  display: none;
+}
+@keyframes title-stack-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* View 1 / View 2: the selected view is solid and underlined, the other grey.
+   (The row is mix-blend-mode: difference, so white here reads as black.) */
+.view-toggle{
+  opacity: 0.4;
+  cursor: pointer;
+  transition: opacity 300ms ease;
+}
+.view-toggle:hover{
+  opacity: 0.7;
+}
+.view-toggle[aria-pressed='true']{
+  opacity: 1;
+  cursor: default;
+}
+.view-toggle-label{
+  position: relative;
+  display: inline-block;
+}
+.view-toggle-label::after{
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 350ms ease;
+}
+.view-toggle[aria-pressed='true'] .view-toggle-label::after{
+  transform: scaleX(1);
 }
 
 
