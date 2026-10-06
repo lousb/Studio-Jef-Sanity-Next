@@ -259,6 +259,37 @@
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40px);
     mask-image: linear-gradient(to bottom, transparent 0, #000 40px);
   }
+  /* Project page (IPP): three rows over the full screen height, so the
+     index + title row is always at the vertical centre of the screen no
+     matter how long the description is. The description gets the space
+     between the navbar intro (--ipp-top, set in ProjectPage.tsx) and 20px
+     above the title, and scrolls in there if it's longer; the info list
+     sits at the bottom. Mobile (<768px) is untouched. */
+  .projectPageDetails > .ippInner {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+    position: relative;
+    top: calc(-1 * var(--ipp-top, 0px));
+    height: calc(100% + var(--ipp-top, 0px));
+    pointer-events: none;
+  }
+  .projectPageDetails > .ippInner > * {
+    pointer-events: auto;
+  }
+  .projectPageDetails > .ippInner > .projectPageDesc {
+    grid-row: 1;
+    align-self: start;
+    margin-top: var(--ipp-top, 0px);
+    max-height: calc(100% - var(--ipp-top, 0px) - 20px);
+  }
+  .projectPageDetails > .ippInner > .titleHeading {
+    grid-row: 2;
+  }
+  .projectPageDetails > .ippInner > .projectPageMeta {
+    grid-row: 3;
+    align-self: end;
+  }
+
   /* View 2 hides the text; don't let the invisible box catch the wheel */
   .infoInActive .projectPageDesc {
     pointer-events: none;

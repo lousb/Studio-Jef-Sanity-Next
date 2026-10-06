@@ -11,8 +11,13 @@ import { type RefObject, useEffect } from 'react'
  *   data-at-start / data-at-end – drives the top / bottom edge fades
  * and hands wheel events inside it to the browser instead of Lenis
  * (data-lenis-prevent), only while there's something to scroll.
+ * It also keeps the text on its grid line: the box is pulled 17px left to
+ * make room for the left-hand scrollbar, so the left padding is set to
+ * 17px minus whatever the scrollbar actually takes (7px when it's showing,
+ * 0 when the text fits or the browser uses overlay scrollbars).
  * Below 768px it clears all of that and leaves mobile behaviour alone.
  */
+const SCROLLBAR_ALLOWANCE = 17
 export function useScrollableText(
   boxRef: RefObject<HTMLElement>,
   contentRef?: RefObject<HTMLElement>,
@@ -29,8 +34,11 @@ export function useScrollableText(
         delete el.dataset.scrollable
         delete el.dataset.atStart
         delete el.dataset.atEnd
+        el.style.paddingLeft = ''
         return
       }
+      const scrollbar = Math.max(0, el.offsetWidth - el.clientWidth)
+      el.style.paddingLeft = `${Math.max(0, SCROLLBAR_ALLOWANCE - scrollbar)}px`
       const scrollable = el.scrollHeight > el.clientHeight + 1
       if (scrollable) el.setAttribute('data-lenis-prevent', '')
       else el.removeAttribute('data-lenis-prevent')
@@ -49,6 +57,7 @@ export function useScrollableText(
       ro.disconnect()
       el.removeEventListener('scroll', update)
       mq.removeEventListener('change', update)
+      el.style.paddingLeft = ''
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)

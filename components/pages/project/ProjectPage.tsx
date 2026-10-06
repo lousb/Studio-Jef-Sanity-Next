@@ -226,6 +226,28 @@ function ProjectPageInner({
 
   const titleRef = useRef<HTMLDivElement>(null)
   const titleHeadingRef = useRef<HTMLDivElement>(null)
+  const detailsInnerRef = useRef<HTMLDivElement>(null)
+
+  // Desktop: the right-hand column (description / title / info) is laid out
+  // over the full screen height so the title row sits at the exact vertical
+  // centre. The panel itself starts below the navbar intro, so pass that
+  // offset to the CSS (--ipp-top) — see .ippInner in ProjectPage.module.css.
+  useEffect(() => {
+    const panel = detailsInnerRef.current?.parentElement
+    if (!panel) return
+    const update = () => {
+      const top = Math.max(0, Math.round(panel.getBoundingClientRect().top))
+      panel.style.setProperty('--ipp-top', `${top}px`)
+    }
+    const ro = new ResizeObserver(update)
+    ro.observe(panel)
+    window.addEventListener('resize', update)
+    update()
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', update)
+    }
+  }, [])
   const figuresRef = useRef<HTMLDivElement>(null)
   const infiniteLoopRef = useRef<InfiniteLoopHandle>(null)
   const isToggling = useRef(false)
@@ -625,7 +647,7 @@ function ProjectPageInner({
           className={`project-page-details ${styles.projectPageDetails} ${styles.detailsPanel}`}
           data-mobile-open={isMobileDetailsOpen ? 'true' : 'false'}
         >
-          <div className={`flex flex-col ${styles.projectPageDetailsInner}`}>
+          <div ref={detailsInnerRef} className={`flex flex-col ${styles.projectPageDetailsInner} ${styles.ippInner}`}>
             {overview && (
               <div
                 ref={descRef}
