@@ -4,6 +4,7 @@ import type { EncodeDataAttributeCallback } from '@sanity/react-loader'
 import { gsap } from 'gsap'
 import { Link } from 'next-view-transitions'
 import { useEffect, useRef,useState } from 'react'
+import { flushSync } from 'react-dom'
 
 import { InfiniteLoop, type InfiniteLoopHandle } from '@/components/global/InfiniteLoop'
 import { useLenis } from '@/components/global/LenisProvider'
@@ -431,81 +432,136 @@ function ProjectPageInner({
     )
   }, [slug])
 
-  // View 1 / View 2 toggle, fully sequenced and scoped to what's on
-  // screen, with the width/margin change happening instantly (no CSS
-  // transition on HybridMedia) so hidden time is kept to a minimum:
-  // 1. Stagger-fade only the on-screen (or near-screen) gallery blocks
-  //    to opacity 0.
-  // 2. Once that fade finishes, flip isInfoActive — width/margin apply
-  //    instantly on HybridMedia while the blocks are invisible.
-  // 3. Wait one frame for that layout change to actually paint.
-  // 4. Stagger-fade the blocks back to opacity 1 in their new position.
+  // View 1 / View 2 toggle as a FLIP morph: every image on screen glides
+  // and scales from where it is now to where it sits in the other view,
+  // instead of fading out and popping back in.
+  // 1. Record the on-screen blocks' positions/sizes (First).
+  // 2. Swap the view synchronously (flushSync) with the loop suspended so
+  //    nothing re-measures or wraps mid-swap.
+  // 3. Keep the image nearest the middle of the screen where it was by
+  //    nudging the scroll by however far it moved in the new layout.
+  // 4. Read the new positions (Last), offset each block back to its old
+  //    spot with a transform (Invert), then animate the transform to zero
+  //    (Play). Transform + scale only, so it stays on the GPU and smooth.
+  //    Images keep their aspect ratio, so one uniform scale is exact.
+  // Blocks that only come into view in the new layout fade in.
   const handleSetIsInfoActive = (next: boolean) => {
     if (next === isInfoActive || isToggling.current) return
 
-    const allBlocks = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const before = getVisibleBlocks(
+      Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
+    )
 
-    if (!allBlocks.length) {
-      setIsInfoActive(next)
-      return
-    }
-
-    const blocks = getVisibleBlocks(allBlocks)
-
-    if (!blocks.length) {
+    if (reduceMotion || !before.length) {
       setIsInfoActive(next)
       return
     }
 
     isToggling.current = true
-    gsap.killTweensOf(blocks)
+    gsap.killTweensOf(before)
+    gsap.set(before, { clearProps: 'transform,opacity' })
 
-    // Top-to-bottom order so the swap reads as one soft wave rather than
-    // random pops.
-    const byPosition = (els: HTMLElement[]) =>
-      [...els].sort((a, b) => {
-        const ra = a.getBoundingClientRect()
-        const rb = b.getBoundingClientRect()
-        return ra.top - rb.top || ra.left - rb.left
-      })
+    const vh = window.innerHeight
+    const first = new Map<HTMLElement, DOMRect>()
+    before.forEach((el) => first.set(el, el.getBoundingClientRect()))
 
-    gsap.to(byPosition(blocks), {
-      opacity: 0,
-      duration: 0.35,
-      ease: 'power1.inOut',
-      stagger: 0.04,
-      onComplete: () => {
-        infiniteLoopRef.current?.suspend()
-        setIsInfoActive(next)
+    // Anchor: the block whose centre is closest to the middle of the screen
+    const anchor = before.reduce((best, el) => {
+      const r = first.get(el)!
+      const b = first.get(best)!
+      const d = Math.abs(r.top + r.height / 2 - vh / 2)
+      const db = Math.abs(b.top + b.height / 2 - vh / 2)
+      return d < db ? el : best
+    }, before[0])
+    const anchorTop = first.get(anchor)!.top
 
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            infiniteLoopRef.current?.resume()
+    // The page column's own CSS width transition would keep shifting the
+    // centred images after we measure, so hold it still during the swap.
+    const media = document.querySelector('.project-page-media') as HTMLElement | null
+    const prevTransition = media?.style.transition ?? ''
+    if (media) media.style.transition = 'none'
 
-            // Re-query instead of reusing `blocks`: suspend()/resume() on
-            // InfiniteLoop can clone/regenerate the block nodes, so the
-            // references captured before the toggle may now be detached
-            // from the document — animating them would be a silent no-op.
-            const freshAll = Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
-            const freshBlocks = byPosition(getVisibleBlocks(freshAll))
-            gsap.killTweensOf(freshBlocks)
-            gsap.set(freshBlocks, { opacity: 0, y: 12 })
+    // Each loop copy clips to its own height; let images travel across copy
+    // edges while they move, then restore.
+    const loopCopies = media
+      ? (Array.from(media.querySelectorAll(':scope > div > div > div')) as HTMLElement[])
+      : []
+    const prevOverflow = loopCopies.map((el) => el.style.overflow)
+    loopCopies.forEach((el) => (el.style.overflow = 'visible'))
 
-            gsap.to(freshBlocks, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: 'power2.out',
-              stagger: 0.06,
-              clearProps: 'transform',
-              onComplete: () => {
-                isToggling.current = false
-              },
+    infiniteLoopRef.current?.suspend()
+    flushSync(() => setIsInfoActive(next))
+    infiniteLoopRef.current?.resume() // re-measures the loop height synchronously
+
+    // Keep the anchor image where the eye is
+    if (anchor.isConnected) {
+      const delta = anchor.getBoundingClientRect().top - anchorTop
+      if (Math.abs(delta) > 0.5) {
+        if (lenis) {
+          const l = lenis as typeof lenis & { __isProgrammaticJump?: boolean }
+          l.__isProgrammaticJump = true
+          lenis.resize()
+          lenis.scrollTo(lenis.scroll + delta, { immediate: true, force: true })
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => {
+              l.__isProgrammaticJump = false
             })
-          })
-        })
+          )
+        } else {
+          window.scrollBy(0, delta)
+        }
+      }
+    }
+
+    const DURATION = 0.9
+    const EASE = 'power3.inOut'
+    const tl = gsap.timeline({
+      onComplete: () => {
+        if (media) media.style.transition = prevTransition
+        loopCopies.forEach((el, i) => (el.style.overflow = prevOverflow[i]))
+        isToggling.current = false
       },
     })
+
+    before.forEach((el) => {
+      if (!el.isConnected) return
+      const f = first.get(el)!
+      const l = el.getBoundingClientRect()
+      if (!l.width) return
+      tl.fromTo(
+        el,
+        {
+          x: f.left - l.left,
+          y: f.top - l.top,
+          scale: f.width / l.width,
+          transformOrigin: '0 0',
+        },
+        {
+          x: 0,
+          y: 0,
+          scale: 1,
+          duration: DURATION,
+          ease: EASE,
+          clearProps: 'transform,transformOrigin',
+        },
+        0
+      )
+    })
+
+    tl.set({}, {}, DURATION) // fixed length, so onComplete always runs
+
+    const entering = getVisibleBlocks(
+      Array.from(document.querySelectorAll('[data-media-block]')) as HTMLElement[]
+    ).filter((el) => !first.has(el))
+    if (entering.length) {
+      tl.fromTo(
+        entering,
+        { opacity: 0 },
+        { opacity: 1, duration: DURATION * 0.6, ease: 'power2.out', clearProps: 'opacity' },
+        DURATION * 0.4
+      )
+    }
   }
 
   // On page navigation: reset scroll once the new content's real height

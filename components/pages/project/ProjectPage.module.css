@@ -141,6 +141,9 @@
   mix-blend-mode: difference;
 }
 
+.projectPageDetails > div > div{
+  transition: opacity 500ms ease;
+}
 .infoInActive .projectPageDetails > div > div{
   opacity: 0;
   

@@ -60,7 +60,9 @@ const HybridMedia = ({ data, isInfoActive }) => {
     ...baseWrapperStyle,
     '--hm-mobile-cols': mobileCols,
     ...(shouldAnimateIn && {
-      animation: `hybrid-media-fade-in 0.4s ease-out ${entranceDelay}s both`,
+      // `backwards`, not `both`: a finished animation that keeps filling would
+      // override inline opacity forever (blocking the view-toggle fades)
+      animation: `hybrid-media-fade-in 0.4s ease-out ${entranceDelay}s backwards`,
     }),
   };
 
