@@ -199,6 +199,11 @@
     direction: rtl;
     margin-left: -12px;
     padding-left: 10px;
+    /* styles/index.css hides every scrollbar with scrollbar-width: none, and
+       Chrome ignores the ::-webkit-scrollbar styling below while that's set.
+       Back to auto here so the custom bar shows. */
+    scrollbar-width: auto;
+    scrollbar-color: auto;
   }
   .projectPageDetailsInner > .projectPageDesc > * {
     direction: ltr;
