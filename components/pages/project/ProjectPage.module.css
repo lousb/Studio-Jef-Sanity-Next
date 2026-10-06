@@ -195,9 +195,9 @@
     /* 20px clear of the title below */
     margin-bottom: 20px;
     /* Scrollbar on the LEFT: rtl puts it there, the text itself stays ltr.
-       2px bar + 10px gap sit out in the gutter, so the text keeps its grid line. */
+       7px bar + 10px gap sit out to the left, so the text keeps its grid line. */
     direction: rtl;
-    margin-left: -12px;
+    margin-left: -17px;
     padding-left: 10px;
     /* styles/index.css hides every scrollbar with scrollbar-width: none, and
        Chrome ignores the ::-webkit-scrollbar styling below while that's set.
@@ -208,16 +208,17 @@
   .projectPageDetailsInner > .projectPageDesc > * {
     direction: ltr;
   }
-  /* Bar: 2px, hidden until the text is hovered, then the same grey as the
+  /* Bar: macOS-style 7px rounded thumb, hidden until the text is hovered, then the same grey as the
      unselected View button (#999) */
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar {
-    width: 2px;
+    width: 7px;
   }
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar-track {
     background: transparent;
   }
   .projectPageDetailsInner > .projectPageDesc::-webkit-scrollbar-thumb {
     background: transparent;
+    border-radius: 7px;
   }
   .projectPageDesc[data-scrollable='true']:hover::-webkit-scrollbar-thumb {
     background: #999;
