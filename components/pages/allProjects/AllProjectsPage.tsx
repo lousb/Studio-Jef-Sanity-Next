@@ -312,10 +312,14 @@ export function AllProjectsPage({
               </div>
 
           ) : (
-            // Desktop: unchanged vertical grid with hover-driven preview
+            // Desktop: vertical grid with hover-driven preview.
+            // Hover only clears when the mouse leaves the whole list; moving
+            // through the gaps between rows/columns keeps the last project,
+            // so the preview never flashes off and on at a row edge.
             <div
               ref={gridRef}
               className="grid"
+              onMouseLeave={() => setHoveredKey(null)}
             >
               {filteredProjects.map((project, key) => {
                 const href = resolveHref(project._type, project.slug);
@@ -330,9 +334,7 @@ export function AllProjectsPage({
                     isMobile={isMobile}
                     opacity={hoveredKey === null ? 1 : hoveredKey === key ? 1 : 0.3}
                     onMouseEnter={() => setHoveredKey(key)}
-                    onMouseLeave={() =>
-                      setHoveredKey((current) => (current === key ? null : current))
-                    }
+                    onMouseLeave={() => {}}
                   />
                 );
               })}
