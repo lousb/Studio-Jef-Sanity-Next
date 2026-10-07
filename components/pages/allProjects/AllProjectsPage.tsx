@@ -344,7 +344,7 @@ export function AllProjectsPage({
             <ProjectHoverPreview
               images={
                 hoveredKey !== null
-                  ? getPreviewImages(filteredProjects[hoveredKey]?.previewMedia) // unchanged, still capped at 3
+                  ? getPreviewImages(filteredProjects[hoveredKey]?.previewMedia, Infinity) // the preview trims to what fills the screen
                   : []
               }
               active={hoveredKey !== null}
