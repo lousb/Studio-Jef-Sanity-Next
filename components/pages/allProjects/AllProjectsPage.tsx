@@ -332,7 +332,13 @@ export function AllProjectsPage({
                     href={href}
                     encodedSlug={encodeDataAttribute?.(['projects', key, 'slug'])}
                     isMobile={isMobile}
-                    opacity={hoveredKey === null ? 1 : hoveredKey === key ? 1 : 0.3}
+                    // Hovered row is 0.999, not 1: anything below opacity 1 gets its
+                    // own paint layer, and the browser hit-tests those on top. With
+                    // 1 vs 0.3, a cursor parked on the boundary between two rows
+                    // hits whichever is dimmed, which then becomes the hovered one,
+                    // flipping every frame. Keeping every row below 1 while hovering
+                    // means plain DOM order decides, so the hover stays put.
+                    opacity={hoveredKey === null ? 1 : hoveredKey === key ? 0.999 : 0.3}
                     onMouseEnter={() => setHoveredKey(key)}
                     onMouseLeave={() => {}}
                   />
