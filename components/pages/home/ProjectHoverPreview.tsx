@@ -124,8 +124,12 @@ export function ProjectHoverPreview({ images, active }: ProjectHoverPreviewProps
         left: '50%',
         transform: 'translateX(-50%)', // matches View 1's centered margin-auto behavior
         width: colsToWidth(6),
-        // No height / overflow: the stack runs past the bottom of the screen
-        // instead of being cropped by its own scroll box.
+        // Exactly covers the screen (top is -15px, so +15px) and clips there:
+        // the stack meets the bottom edge instead of stopping short, and it
+        // can never make the page taller. A taller page adds a scrollbar,
+        // which shifts the rows under the mouse and makes the hover flicker.
+        height: `calc(100vh - ${STACK_TOP}px)`,
+        overflow: 'hidden',
         pointerEvents: 'none', // never intercepts hover/click on the row underneath
         zIndex: 50,
         padding: '2rem 0',
