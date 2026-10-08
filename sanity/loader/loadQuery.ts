@@ -49,11 +49,16 @@ export const loadQuery = ((query, params = {}, options = {}) => {
   } else if (usingCdn) {
     revalidate = 60
   }
+  // Locally the revalidate webhook never reaches localhost, so skip the cache
+  // in dev or Studio changes (like reordering projects) never show up
+  const isDev = process.env.NODE_ENV === 'development'
+  if (isDev) revalidate = 0
   return queryStore.loadQuery(query, params, {
     ...options,
     next: {
       revalidate,
       ...(options.next || {}),
+      ...(isDev ? { revalidate: 0 } : {}),
     },
     perspective,
     // Enable stega if in Draft Mode, to enable overlays when outside Sanity Studio

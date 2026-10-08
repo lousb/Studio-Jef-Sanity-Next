@@ -63,7 +63,7 @@ export const homePageQuery = groq`
 
 // sanity/lib/queries.ts
 export const projectsPageQuery = groq`
-*[_type == "project" && defined(slug) && defined(title)]{
+*[_type == "project" && defined(slug) && defined(title)] | order(orderRank asc, _createdAt desc) {
   _type,
   customIndex,
   title,

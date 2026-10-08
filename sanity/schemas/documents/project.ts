@@ -1,4 +1,5 @@
 import { ImageIcon, PlayIcon, StarIcon, TextIcon } from '@sanity/icons'
+import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
 // Counts the visible characters in a portable-text field (what ends up in <meta description>)
@@ -14,7 +15,10 @@ export default defineType({
   icon: StarIcon,
   // Uncomment below to have edits publish automatically as you type
   // liveEdit: true,
+  orderings: [orderRankOrdering],
   fields: [
+    // Hidden field set by dragging projects in the Studio's Projects list
+    orderRankField({ type: 'project' }),
     defineField({
       name: 'customIndex',
       description: 'A custom numerical index.',

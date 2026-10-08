@@ -1,7 +1,8 @@
 import type { StructureResolver } from 'sanity/structure'
 import { HomeIcon, BookIcon, StarIcon, CogIcon } from '@sanity/icons'
+import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 
-export const structure: StructureResolver = (S) =>
+export const structure: StructureResolver = (S, context) =>
   S.list()
     .title('Content')
     .items([
@@ -15,10 +16,14 @@ export const structure: StructureResolver = (S) =>
         .icon(BookIcon)
         .child(S.document().schemaType('about').documentId('about')),
 
-      S.listItem()
-        .title('Projects')
-        .icon(StarIcon)
-        .child(S.documentTypeList('project').title('Projects')),
+      // Drag-and-drop ordering; the order is saved to each project's `orderRank`
+      orderableDocumentListDeskItem({
+        type: 'project',
+        title: 'Projects',
+        icon: StarIcon,
+        S,
+        context,
+      }),
 
       S.listItem()
         .title('Site Settings')
