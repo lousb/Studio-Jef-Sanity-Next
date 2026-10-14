@@ -11,13 +11,13 @@ import { type RefObject, useEffect } from 'react'
  *   data-at-start / data-at-end – drives the top / bottom edge fades
  * and hands wheel events inside it to the browser instead of Lenis
  * (data-lenis-prevent), only while there's something to scroll.
- * It also keeps the text on its grid line: the box is pulled 17px left to
- * make room for the left-hand scrollbar, so the left padding is set to
- * 17px minus whatever the scrollbar actually takes (7px when it's showing,
- * 0 when the text fits or the browser uses overlay scrollbars).
- * Below 768px it clears all of that and leaves mobile behaviour alone.
+ *
+ * The scrollbar gutter is permanently reserved in CSS (scrollbar-gutter:
+ * stable), so the text width never changes when the bar appears/disappears.
+ * This hook only toggles attributes, never layout, so it can't feed back
+ * into itself (that loop is what caused the flicker around 958–985px).
+ * Below 768px it clears everything and leaves mobile behaviour alone.
  */
-const SCROLLBAR_ALLOWANCE = 17
 export function useScrollableText(
   boxRef: RefObject<HTMLElement>,
   contentRef?: RefObject<HTMLElement>,
@@ -27,37 +27,52 @@ export function useScrollableText(
     const el = boxRef.current
     if (!el) return
     const mq = window.matchMedia('(min-width: 768px)')
+    let raf = 0
+
+    const setAttr = (key: string, value: string) => {
+      if (el.dataset[key] !== value) el.dataset[key] = value
+    }
 
     const update = () => {
+      raf = 0
       if (!mq.matches) {
         el.removeAttribute('data-lenis-prevent')
         delete el.dataset.scrollable
         delete el.dataset.atStart
         delete el.dataset.atEnd
-        el.style.paddingLeft = ''
         return
       }
-      const scrollbar = Math.max(0, el.offsetWidth - el.clientWidth)
-      el.style.paddingLeft = `${Math.max(0, SCROLLBAR_ALLOWANCE - scrollbar)}px`
       const scrollable = el.scrollHeight > el.clientHeight + 1
-      if (scrollable) el.setAttribute('data-lenis-prevent', '')
-      else el.removeAttribute('data-lenis-prevent')
-      el.dataset.scrollable = scrollable ? 'true' : 'false'
-      el.dataset.atStart = el.scrollTop <= 1 ? 'true' : 'false'
-      el.dataset.atEnd = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 ? 'true' : 'false'
+      if (scrollable) {
+        if (!el.hasAttribute('data-lenis-prevent')) el.setAttribute('data-lenis-prevent', '')
+      } else {
+        el.removeAttribute('data-lenis-prevent')
+      }
+      setAttr('scrollable', scrollable ? 'true' : 'false')
+      setAttr('atStart', el.scrollTop <= 1 ? 'true' : 'false')
+      setAttr(
+        'atEnd',
+        el.scrollTop + el.clientHeight >= el.scrollHeight - 1 ? 'true' : 'false'
+      )
     }
 
-    const ro = new ResizeObserver(update)
+    // batch to one update per frame (resize + scroll can fire many times)
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update)
+    }
+
+    const ro = new ResizeObserver(schedule)
     ro.observe(el)
     if (contentRef?.current) ro.observe(contentRef.current)
-    el.addEventListener('scroll', update, { passive: true })
-    mq.addEventListener('change', update)
+    el.addEventListener('scroll', schedule, { passive: true })
+    mq.addEventListener('change', schedule)
     update()
+
     return () => {
+      if (raf) cancelAnimationFrame(raf)
       ro.disconnect()
-      el.removeEventListener('scroll', update)
-      mq.removeEventListener('change', update)
-      el.style.paddingLeft = ''
+      el.removeEventListener('scroll', schedule)
+      mq.removeEventListener('change', schedule)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)

@@ -76,14 +76,43 @@ const LenisProvider = ({ children }: PropsWithChildren) => {
     lenisRef.current = lenis;
     setLenisInstance(lenis);
 
+    // TEMP (screen recording): add ?autoscroll to the URL for a constant,
+    // linear scroll. ?autoscroll=180 sets the speed in px/sec (default 120).
+    // Waits 5s, eases up to speed over 2s, then linear forever, never pauses.
+    // Delete this block to remove.
+    const autoParam = new URLSearchParams(window.location.search).get("autoscroll");
+    const autoSpeed = autoParam === null ? 0 : Number(autoParam) || 120;
+    const autoStartAt = performance.now() + 5000;
+    const AUTO_EASE_MS = 2000;
+    let lastTime = 0;
+    // Float position we own, so sub-pixel steps accumulate evenly instead of
+    // being re-read from the (rounded) real scroll each frame.
+    let autoPos: number | null = null;
+
+    let rafId = 0;
     const raf = (time: number) => {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      if (autoSpeed && time > autoStartAt) {
+        const dt = lastTime ? Math.min(time - lastTime, 34) / 1000 : 0;
+        // Re-sync if something else moved the page (the infinite loop's
+        // seamless wrap jump), then carry on from there at the same speed.
+        if (autoPos === null || Math.abs(lenis.scroll - autoPos) > 4) {
+          autoPos = lenis.scroll;
+        }
+        // velocity ramps 0 -> full on a sine curve (no kick at either end)
+        const ramp = Math.min((time - autoStartAt) / AUTO_EASE_MS, 1);
+        const easedSpeed = autoSpeed * (0.5 - 0.5 * Math.cos(Math.PI * ramp));
+        autoPos += easedSpeed * dt;
+        lenis.scrollTo(autoPos, { immediate: true, force: true });
+      }
+      lastTime = time;
+      rafId = requestAnimationFrame(raf);
     };
 
-    requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(rafId);
       lenis.destroy();
       lenisRef.current = null;
       setLenisInstance(null);

@@ -133,6 +133,8 @@ export default function LoadingOverlay({ imageUrl }: LoadingOverlayProps) {
         opacity:1,
         duration: 1.2,
         ease: 'power2.in',
+        // hand opacity back to the stylesheet so .scroll-visible .fixed-logo can hide it
+        clearProps: 'opacity',
       })
 
       gsap.to(containerRef.current, {

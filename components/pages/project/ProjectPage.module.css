@@ -195,10 +195,14 @@
     /* 20px clear of the title below */
     margin-bottom: 20px;
     /* Scrollbar on the LEFT: rtl puts it there, the text itself stays ltr.
-       7px bar + 10px gap sit out to the left, so the text keeps its grid line. */
+       7px bar + 10px gap sit out to the left, so the text keeps its grid line.
+       The gutter is ALWAYS reserved (scrollbar-gutter: stable) so the text
+       width never changes when the bar appears, which stops the
+       overflow/no-overflow flicker loop at in-between widths. */
     direction: rtl;
     margin-left: -17px;
     padding-left: 10px;
+    scrollbar-gutter: stable;
     /* styles/index.css hides every scrollbar with scrollbar-width: none, and
        Chrome ignores the ::-webkit-scrollbar styling below while that's set.
        Back to auto here so the custom bar shows. */
